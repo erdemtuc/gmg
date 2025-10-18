@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand colors */
+  --color-brand-white: #ffffff;
+
+  --color-brand-gray-25: #f9fafb;
+  --color-brand-gray-50: #f3f4f6;
+  --color-brand-gray-100: #e5e7eb;
+  --color-brand-gray-200: #d1d5db;
+  --color-brand-gray-300: #9ca3af;
+  --color-brand-gray-400: #6b7280;
+  --color-brand-gray-500: #4b5563;
+  --color-brand-gray-600: #374151;
+
+  --color-brand-primary-25: #eff6ff;
+  --color-brand-primary-50: #dbeafe;
+  --color-brand-primary-100: #bfdbfe;
+  --color-brand-primary-200: #93c5fd;
+  --color-brand-primary-300: #60a5fa;
+  --color-brand-primary-400: #3b82f6;
+  --color-brand-primary-500: #004eeb;
+  --color-brand-primary-600: #12347a;
+
+  --color-brand-error-25: #fef2f2;
+  --color-brand-error-50: #fee2e2;
+  --color-brand-error-100: #fecaca;
+  --color-brand-error-200: #fca5a5;
+  --color-brand-error-300: #f87171;
+  --color-brand-error-400: #ef4444;
+  --color-brand-error-500: #dc2626;
+  --color-brand-error-600: #b91c1c;
+
+  --color-brand-warning-25: #fffbeb;
+  --color-brand-warning-50: #fef3c7;
+  --color-brand-warning-100: #fde68a;
+  --color-brand-warning-200: #fcd34d;
+  --color-brand-warning-300: #fbbf24;
+  --color-brand-warning-400: #f59e0b;
+  --color-brand-warning-500: #d97706;
+  --color-brand-warning-600: #b45309;
+
+  --color-brand-success-25: #ecfdf5;
+  --color-brand-success-50: #d1fae5;
+  --color-brand-success-100: #a7f3d0;
+  --color-brand-success-200: #6ee7b7;
+  --color-brand-success-300: #34d399;
+  --color-brand-success-400: #10b981;
+  --color-brand-success-500: #059669;
+  --color-brand-success-600: #047857;
+
+  --color-brand-blue-25: #eff6ff;
+  --color-brand-blue-50: #dbeafe;
+  --color-brand-blue-100: #bfdbfe;
+  --color-brand-blue-200: #93c5fd;
+  --color-brand-blue-300: #60a5fa;
+  --color-brand-blue-400: #3b82f6;
+  --color-brand-blue-500: #2563eb;
+  --color-brand-blue-600: #1d4ed8;
+
+  --color-brand-purple-25: #f5f3ff;
+  --color-brand-purple-50: #ede9fe;
+  --color-brand-purple-100: #ddd6fe;
+  --color-brand-purple-200: #c4b5fd;
+  --color-brand-purple-300: #a78bfa;
+  --color-brand-purple-400: #8b5cf6;
+  --color-brand-purple-500: #7c3aed;
+  --color-brand-purple-600: #6d28d9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer components {
+  .arc-spinner {
+    @apply animate-spin motion-reduce:animate-none;
+    /* ensure rotation around the icon center */
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  .app-shell {
+    --left-menu-w: 15rem;
+  } /* expanded */
+  .app-shell:has(nav[data-collapsed="true"]) {
+    --left-menu-w: 6.5rem;
+  } /* collapsed */
+
+  /* expand on hover, collapse on leave (pointer devices) */
+  @media (hover: hover) and (pointer: fine) {
+    .app-shell:has(nav[data-collapsed="true"]:hover) {
+      --left-menu-w: 15rem;
+    }
+  }
+
+  /* labels only visible while hovered in collapsed state */
+  .app-shell nav[data-collapsed="true"] .left-menu__label {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .app-shell nav[data-collapsed="true"]:hover .left-menu__label {
+      display: inline;
+    }
+  }
+
+  /* hide scrollbar when collapsed; restore on hover */
+  .app-shell nav[data-collapsed="true"] .left-menu__scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .app-shell nav[data-collapsed="true"] .left-menu__scroll::-webkit-scrollbar {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .app-shell nav[data-collapsed="true"]:hover .left-menu__scroll {
+      scrollbar-width: thin;
+    }
+    .app-shell
+      nav[data-collapsed="true"]:hover
+      .left-menu__scroll::-webkit-scrollbar {
+      display: block;
+      width: 8px;
+    }
+  }
+
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+  .scroll-thin::-webkit-scrollbar {
+    width: 8px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 9999px;
+  }
+
+  /* Gray scrollbar for white backgrounds */
+  .scrollbar-on-white {
+    /* Firefox */
+    scrollbar-color: var(--color-brand-gray-200) var(--color-brand-white);
+  }
+  .scrollbar-on-white::-webkit-scrollbar-thumb {
+    background: var(--color-brand-gray-200);
+  }
+  .scrollbar-on-white::-webkit-scrollbar-track {
+    background: var(--color-brand-white);
+  }
+
+  /* Input component styles */
+  .input-wrapper {
+    @apply border-brand-gray-300 focus-within:border-brand-primary-500 relative h-10 w-full rounded-md border-1;
+  }
+
+  .input-label {
+    @apply absolute -top-2 left-3 bg-white px-2 text-xs text-[#61646C];
+  }
+
+  .input-field {
+    @apply text-brand-gray-600 w-full px-3 py-2 text-sm font-medium focus:outline-none;
+  }
+}
