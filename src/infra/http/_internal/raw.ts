@@ -121,6 +121,7 @@ export async function apiServerRaw<T = unknown>(
     return payload as unknown as T;
   } catch (err: unknown) {
     // If in DEV mode and this is a network error for the menu endpoint, return mock data
+    const isDevMode = process.env.NODE_ENV === "development";
     if (isDevMode && path.includes("resource_type=menu") && 
         (err instanceof Error && err.message.includes("fetch"))) {
       const mockMenuData: any = [

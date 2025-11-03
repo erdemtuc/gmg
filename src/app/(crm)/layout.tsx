@@ -5,15 +5,16 @@ import Reports from "./_components/reports";
 import TopBar from "./_components/top-bar";
 import { Suspense } from "react";
 
+// This layout is used specifically for the CRM section with a fixed sidebar configuration
+// To customize the sidebar, create a separate layout or use context/state
+
 export default function AppShell({ 
-  children, 
-  showDefaultSidebar = true,
-  customSidebar 
-}: { 
+  children
+}: {
   children: React.ReactNode;
-  showDefaultSidebar?: boolean;
-  customSidebar?: React.ReactNode;
 }) {
+  const showDefaultSidebar = true;
+  const customSidebar = undefined;
   return (
     <div className={`app-shell bg-brand-gray-50 grid h-screen min-h-0 grid-cols-[var(--left-menu-w)_1fr${showDefaultSidebar ? '_25rem' : ''}] grid-rows-[auto_1fr] overflow-hidden transition-[grid-template-columns] duration-300 ease-in-out`}>
       {/* Left Menu (spans both rows) */}
