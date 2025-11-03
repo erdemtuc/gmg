@@ -106,13 +106,14 @@ export const CalendarView: React.FC = () => {
   };
 
   return (
-    <div className="w-[1152px] h-[824px] relative bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 overflow-hidden">
-      {/* Vertical separator */}
-      <div className="w-[817px] h-0 left-[874px] top-0 absolute origin-top-left rotate-90 outline outline-1 outline-offset-[-0.50px] outline-neutral-200"></div>
+    <div className="w-full h-full min-w-[1024px] min-h-[700px] max-w-[1400px] max-h-[900px] relative bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 overflow-hidden flex">
+      {/* Main Content Area - Calendar */}
+      <div className="flex-1 flex flex-col">
+        {/* Vertical separator - now using flex positioning */}
+        <div className="h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-200"></div>
 
-      {/* Header Controls */}
-      <div className="w-[875px] left-0 top-[16px] absolute inline-flex flex-col justify-start items-start gap-4">
-        <div className="self-stretch px-4 flex flex-col justify-start items-start gap-3">
+        {/* Header Controls */}
+        <div className="p-6 flex flex-col justify-start items-start gap-4 flex-shrink-0">
           <div className="self-stretch inline-flex justify-between items-center">
             <div className="flex justify-start items-center gap-2">
               <button className="w-12 px-2 py-1 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-neutral-200 flex justify-start items-center gap-2 hover:bg-gray-50">
@@ -240,87 +241,140 @@ export const CalendarView: React.FC = () => {
         </div>
 
         {/* Calendar Grid */}
-        <div className="self-stretch inline-flex justify-start items-center">
-          {/* Days of the week */}
-          {weekDays.map((day, index) => (
-            <div key={day} className="w-32 inline-flex flex-col justify-start items-start">
-              <div className="self-stretch h-7 bg-neutral-50 border-r border-t border-neutral-200 inline-flex justify-between items-center">
-                <div className="text-center justify-center text-zinc-700 text-xs font-medium leading-4">{day}</div>
+        <div className="flex-1 flex flex-col overflow-auto">
+          <div className="self-stretch inline-flex justify-start items-center flex-shrink-0">
+            {/* Days of the week */}
+            {weekDays.map((day, index) => (
+              <div key={day} className="w-32 inline-flex flex-col justify-start items-start">
+                <div className="self-stretch h-7 bg-neutral-50 border-r border-t border-neutral-200 inline-flex justify-between items-center">
+                  <div className="text-center justify-center text-zinc-700 text-xs font-medium leading-4">{day}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Calendar days */}
-        <div className="self-stretch inline-flex justify-start items-center">
-          {weekDays.map((day, weekIndex) => (
-            <div key={day} className="w-32 inline-flex flex-col justify-start items-start">
-              {Array.from({ length: 5 }, (_, rowIndex) => {
-                const dayNumber = days[weekIndex + rowIndex * 7];
-                const dayEvents = dayNumber ? getEventsForDay(dayNumber) : [];
-                const isCurrentMonth = dayNumber !== null;
-                const isToday = dayNumber === 12; // Highlight day 12 as today
+          {/* Calendar days */}
+          <div className="flex-1 self-stretch inline-flex justify-start items-center">
+            {weekDays.map((day, weekIndex) => (
+              <div key={day} className="w-32 inline-flex flex-col justify-start items-start">
+                {Array.from({ length: 5 }, (_, rowIndex) => {
+                  const dayNumber = days[weekIndex + rowIndex * 7];
+                  const dayEvents = dayNumber ? getEventsForDay(dayNumber) : [];
+                  const isCurrentMonth = dayNumber !== null;
+                  const isToday = dayNumber === 12; // Highlight day 12 as today
 
-                return (
-                  <div
-                    key={rowIndex}
-                    className={`self-stretch h-32 relative border-r border-t border-neutral-200 ${
-                      isToday ? 'bg-slate-50' : 'bg-white'
-                    } ${!isCurrentMonth ? 'bg-gray-50' : ''}`}
-                  >
-                    {dayNumber && (
-                      <>
-                        <div className={`left-[8px] top-[8px] absolute justify-center text-zinc-700 text-xs font-medium leading-4 ${
-                          isToday ? 'text-blue-700' : ''
-                        } ${!isCurrentMonth ? 'text-zinc-500' : ''}`}>
-                          {dayNumber}
-                        </div>
+                  return (
+                    <div
+                      key={rowIndex}
+                      className={`self-stretch h-32 relative border-r border-t border-neutral-200 ${
+                        isToday ? 'bg-slate-50' : 'bg-white'
+                      } ${!isCurrentMonth ? 'bg-gray-50' : ''}`}
+                    >
+                      {dayNumber && (
+                        <>
+                          <div className={`left-[8px] top-[8px] absolute justify-center text-zinc-700 text-xs font-medium leading-4 ${
+                            isToday ? 'text-blue-700' : ''
+                          } ${!isCurrentMonth ? 'text-zinc-500' : ''}`}>
+                            {dayNumber}
+                          </div>
 
-                        {isToday && (
-                          <div className="w-5 h-5 left-[4px] top-[6px] absolute bg-blue-50 rounded-[3px]" />
-                        )}
-
-                        {/* Events */}
-                        <div className="w-32 left-[2px] top-[30px] absolute inline-flex flex-col justify-start items-start gap-0.5">
-                          {dayEvents.slice(0, 3).map((event) => (
-                            <div key={event.id} className={`self-stretch h-6 ${getEventColor(event.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
-                              <div className={`w-1 self-stretch ${getEventBarColor(event.type)} shadow-[inset_0px_-2px_2px_0px_rgba(0,0,0,0.15)] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.15)]`} />
-                              <div className={`flex-1 self-stretch px-1 py-2 rounded-tr rounded-br border-r border-t border-b ${event.type === 'red' ? 'border-red-100' : event.type === 'blue' ? 'border-blue-100' : event.type === 'green' ? 'border-emerald-100' : 'border-orange-100'} inline-flex flex-col justify-between items-start`}>
-                                <div className="w-28 justify-start text-zinc-700 text-xs font-normal leading-4 line-clamp-1">{event.title}</div>
-                              </div>
-                            </div>
-                          ))}
-
-                          {dayEvents.length > 3 && (
-                            <div className="left-[6px] top-[112px] absolute justify-center text-blue-700 text-xs font-medium leading-4">
-                              +{dayEvents.length - 3} more
-                            </div>
+                          {isToday && (
+                            <div className="w-5 h-5 left-[4px] top-[6px] absolute bg-blue-50 rounded-[3px]" />
                           )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+
+                          {/* Events */}
+                          <div className="w-32 left-[2px] top-[30px] absolute inline-flex flex-col justify-start items-start gap-0.5">
+                            {dayEvents.slice(0, 3).map((event) => (
+                              <div key={event.id} className={`self-stretch h-6 ${getEventColor(event.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
+                                <div className={`w-1 self-stretch ${getEventBarColor(event.type)} shadow-[inset_0px_-2px_2px_0px_rgba(0,0,0,0.15)] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.15)]`} />
+                                <div className={`flex-1 self-stretch px-2 py-1 rounded-tr rounded-br border-r border-t border-b ${event.type === 'red' ? 'border-red-100' : event.type === 'blue' ? 'border-blue-100' : event.type === 'green' ? 'border-emerald-100' : 'border-orange-100'} inline-flex flex-col justify-between items-start`}>
+                                  <div className="w-[calc(100%-8px)] justify-start text-zinc-700 text-xs font-normal leading-4 line-clamp-1">{event.title}</div>
+                                </div>
+                              </div>
+                            ))}
+
+                            {dayEvents.length > 3 && (
+                              <div className="left-[6px] top-[112px] absolute justify-center text-blue-700 text-xs font-medium leading-4">
+                                +{dayEvents.length - 3} more
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Sidebar - User Selection */}
-      <div className="w-72 left-[875px] top-[16px] absolute inline-flex flex-col justify-start items-center gap-4">
-        <div className="w-64 flex flex-col justify-start items-start gap-4">
-          <div className="self-stretch inline-flex justify-between items-center">
-            <div className="flex-1 flex justify-start items-center gap-1.5">
-              <button
-                onClick={() => setSelectedUsers(selectedUsers.length === users.length ? [] : users.map(u => u.id))}
-                className="w-4 h-4 relative bg-white rounded shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-blue-700 overflow-hidden"
-              >
-                <div className="w-3 h-3 left-[2px] top-[2px] absolute bg-blue-700 rounded-sm" />
-              </button>
-              <div className="justify-start text-black text-sm font-medium leading-6">All Users</div>
+      {/* Sidebar - User Selection and Tasks */}
+      <div className="w-72 flex flex-col border-l border-neutral-200">
+        {/* User Selection */}
+        <div className="flex-1 flex flex-col justify-start items-start gap-4 p-4">
+          <div className="w-full flex flex-col justify-start items-start gap-4">
+            <div className="self-stretch inline-flex justify-between items-center">
+              <div className="flex-1 flex justify-start items-center gap-1.5">
+                <button
+                  onClick={() => setSelectedUsers(selectedUsers.length === users.length ? [] : users.map(u => u.id))}
+                  className="w-4 h-4 relative bg-white rounded shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] outline outline-1 outline-offset-[-1px] outline-blue-700 overflow-hidden"
+                >
+                  <div className="w-3 h-3 left-[2px] top-[2px] absolute bg-blue-700 rounded-sm" />
+                </button>
+                <div className="justify-start text-black text-sm font-medium leading-6">All Users</div>
+              </div>
+              <div className="flex justify-start items-center gap-4">
+                <button className="p-1 hover:bg-gray-100 rounded">
+                  <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+                <button className="p-1 hover:bg-gray-100 rounded">
+                  <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div className="flex justify-start items-center gap-4">
+
+            <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-200"></div>
+
+            <div className="flex flex-col justify-start items-start gap-3">
+              {users.map((user) => (
+                <div key={user.id} className="self-stretch inline-flex justify-start items-center gap-2">
+                  <button
+                    onClick={() => toggleUser(user.id)}
+                    className={`w-5 h-5 relative rounded outline outline-1 outline-offset-[-1px] overflow-hidden ${
+                      selectedUsers.includes(user.id)
+                        ? 'bg-blue-700 outline-blue-700'
+                        : 'bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-zinc-400'
+                    }`}
+                  >
+                    {selectedUsers.includes(user.id) && (
+                      <svg className="w-4 h-4 left-[2px] top-[2px] absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" className="text-white" />
+                      </svg>
+                    )}
+                  </button>
+                  <div className="justify-start text-zinc-700 text-xs font-medium leading-4 whitespace-nowrap overflow-hidden text-ellipsis" style={{maxWidth: '140px'}}>{user.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Separator line */}
+        <div className="h-[5px] bg-neutral-50 flex-shrink-0" />
+
+        {/* Tasks without due dates */}
+        <div className="w-full flex flex-col justify-start items-start gap-4 p-4">
+          <div className="self-stretch inline-flex justify-between items-center">
+            <div className="flex-1 flex justify-start items-center gap-2">
+              <div className="justify-start text-black text-base font-medium leading-6">Tasks with no due</div>
+            </div>
+            <div className="w-12 flex justify-between items-center">
               <button className="p-1 hover:bg-gray-100 rounded">
                 <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -336,66 +390,18 @@ export const CalendarView: React.FC = () => {
 
           <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-200"></div>
 
-          <div className="flex flex-col justify-start items-start gap-3">
-            {users.map((user) => (
-              <div key={user.id} className="self-stretch inline-flex justify-start items-center gap-2">
-                <button
-                  onClick={() => toggleUser(user.id)}
-                  className={`w-5 h-5 relative rounded outline outline-1 outline-offset-[-1px] overflow-hidden ${
-                    selectedUsers.includes(user.id)
-                      ? 'bg-blue-700 outline-blue-700'
-                      : 'bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] border border-zinc-400'
-                  }`}
-                >
-                  {selectedUsers.includes(user.id) && (
-                    <svg className="w-4 h-4 left-[2px] top-[2px] absolute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" className="text-white" />
-                    </svg>
-                  )}
-                </button>
-                <div className="justify-start text-zinc-700 text-xs font-medium leading-4">{user.name}</div>
+          <div className="flex flex-col justify-start items-start gap-2">
+            {tasksWithoutDue.map((task) => (
+              <div key={task.id} className={`w-full h-6 ${getEventColor(task.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
+                <div className={`w-1 self-stretch ${getEventBarColor(task.type)} shadow-[inset_0px_-2px_2px_0px_rgba(0,0,0,0.15)] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.15)]`} />
+                <div className={`flex-1 self-stretch px-2 py-1 rounded-tr rounded-br border-r border-t border-b ${task.type === 'red' ? 'border-red-100' : 'border-orange-100'} inline-flex flex-col justify-between items-start`}>
+                  <div className="w-[calc(100%-8px)] justify-start text-zinc-700 text-xs font-normal leading-4 line-clamp-1">{task.title}</div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Tasks without due dates */}
-      <div className="w-64 left-[888.50px] top-[566px] absolute inline-flex flex-col justify-start items-start gap-4">
-        <div className="self-stretch inline-flex justify-between items-center">
-          <div className="flex-1 flex justify-start items-center gap-2">
-            <div className="justify-start text-black text-base font-medium font-['Geist'] leading-6">Tasks with no due</div>
-          </div>
-          <div className="w-12 flex justify-between items-center">
-            <button className="p-1 hover:bg-gray-100 rounded">
-              <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-            <button className="p-1 hover:bg-gray-100 rounded">
-              <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-neutral-200"></div>
-
-        <div className="flex flex-col justify-start items-start gap-2">
-          {tasksWithoutDue.map((task) => (
-            <div key={task.id} className={`w-64 h-6 ${getEventColor(task.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
-              <div className={`w-1 self-stretch ${getEventBarColor(task.type)} shadow-[inset_0px_-2px_2px_0px_rgba(0,0,0,0.15)] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.15)]`} />
-              <div className={`flex-1 self-stretch px-1 py-2 rounded-tr rounded-br border-r border-t border-b ${task.type === 'red' ? 'border-red-100' : 'border-orange-100'} inline-flex flex-col justify-between items-start`}>
-                <div className="w-60 justify-start text-zinc-700 text-xs font-normal font-['Geist'] leading-4 line-clamp-1">{task.title}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Separator line */}
-      <div className="w-72 h-[5px] left-[875px] top-[544px] absolute bg-neutral-50" />
     </div>
   );
 };
