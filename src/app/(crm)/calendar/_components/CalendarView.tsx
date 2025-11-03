@@ -117,7 +117,7 @@ export const CalendarView: React.FC = () => {
             <div className="flex justify-start items-center gap-2">
               <button className="w-12 px-2 py-1 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-neutral-200 flex justify-start items-center gap-2 hover:bg-gray-50">
                 <div className="flex-1 h-6 flex justify-center items-center gap-2">
-                  <div className="flex-1 self-stretch text-center justify-center text-zinc-700 text-xs font-medium font-['Geist'] leading-4">Today</div>
+                  <div className="flex-1 self-stretch text-center justify-center text-zinc-700 text-xs font-medium leading-4">Today</div>
                 </div>
               </button>
 
@@ -134,7 +134,7 @@ export const CalendarView: React.FC = () => {
                 </svg>
               </button>
 
-              <div className="justify-start text-zinc-700 text-sm font-medium font-['Geist'] leading-6">
+              <div className="justify-start text-zinc-700 text-sm font-medium leading-6">
                 22 October 2024
               </div>
             </div>
@@ -143,17 +143,17 @@ export const CalendarView: React.FC = () => {
               {/* View toggle */}
               <div className="flex">
                 <button className="w-14 px-1 py-0.5 bg-neutral-50 rounded-l-md flex justify-center items-center shadow-sm">
-                  <div className="text-center justify-start text-zinc-500 text-xs font-normal font-['Geist'] leading-4">Week</div>
+                  <div className="text-center justify-start text-zinc-500 text-xs font-normal leading-4">Week</div>
                 </button>
                 <button className="w-14 px-1 py-0.5 bg-white rounded-r-md flex justify-center items-center shadow-sm outline outline-1 outline-offset-[-1px] outline-neutral-100">
-                  <div className="text-center justify-start text-zinc-700 text-xs font-medium font-['Geist'] leading-4">Month</div>
+                  <div className="text-center justify-start text-zinc-700 text-xs font-medium leading-4">Month</div>
                 </button>
               </div>
 
               {/* Filters */}
               <button className="w-20 px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-neutral-200 flex justify-start items-center gap-2 hover:bg-gray-50">
                 <div className="flex-1 self-stretch flex justify-center items-center gap-2">
-                  <div className="flex-1 self-stretch justify-center text-zinc-700 text-xs font-medium font-['Geist'] leading-4">Task</div>
+                  <div className="flex-1 self-stretch justify-center text-zinc-700 text-xs font-medium leading-4">Task</div>
                 </div>
                 <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -162,7 +162,7 @@ export const CalendarView: React.FC = () => {
 
               <button className="w-28 px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-neutral-200 flex justify-start items-center gap-2 hover:bg-gray-50">
                 <div className="flex-1 self-stretch flex justify-center items-center gap-2">
-                  <div className="flex-1 self-stretch justify-center text-zinc-700 text-xs font-medium font-['Geist'] leading-4">All tasks</div>
+                  <div className="flex-1 self-stretch justify-center text-zinc-700 text-xs font-medium leading-4">All tasks</div>
                 </div>
                 <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -170,7 +170,7 @@ export const CalendarView: React.FC = () => {
               </button>
 
               <button className="px-3.5 py-2 bg-sky-100 rounded-md flex justify-center items-center gap-2 hover:bg-sky-200">
-                <div className="justify-center text-blue-600 text-xs font-medium font-['Geist'] leading-4">Show completed</div>
+                <div className="justify-center text-blue-600 text-xs font-medium leading-4">Show completed</div>
               </button>
             </div>
           </div>
@@ -184,13 +184,13 @@ export const CalendarView: React.FC = () => {
               <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium font-['Geist'] leading-4">Search</div>
+              <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Search</div>
             </button>
 
             <div className="flex justify-start items-center gap-4">
               {/* Status toggles */}
               <div className="flex justify-start items-center gap-2">
-                <div className="justify-start text-neutral-500 text-xs font-normal font-['Geist'] leading-4">Pending</div>
+                <div className="justify-start text-neutral-500 text-xs font-normal leading-4">Pending</div>
                 <button
                   onClick={() => setShowPending(!showPending)}
                   className={`w-9 h-4 relative rounded-[54px] overflow-hidden transition-colors ${
@@ -204,7 +204,7 @@ export const CalendarView: React.FC = () => {
               </div>
 
               <div className="flex justify-start items-center gap-2">
-                <div className="justify-start text-neutral-500 text-xs font-normal font-['Geist'] leading-4">Completed</div>
+                <div className="justify-start text-neutral-500 text-xs font-normal leading-4">Completed</div>
                 <button
                   onClick={() => setShowCompleted(!showCompleted)}
                   className={`w-9 h-4 relative rounded-[54px] overflow-hidden transition-colors ${
@@ -218,7 +218,7 @@ export const CalendarView: React.FC = () => {
               </div>
 
               <div className="flex justify-start items-center gap-2">
-                <div className="justify-start text-neutral-500 text-xs font-normal font-['Geist'] leading-4">Calendar event</div>
+                <div className="justify-start text-neutral-500 text-xs font-normal leading-4">Calendar event</div>
                 <button
                   onClick={() => setShowCalendarEvents(!showCalendarEvents)}
                   className={`w-9 h-4 relative rounded-[54px] overflow-hidden transition-colors ${
@@ -245,7 +245,7 @@ export const CalendarView: React.FC = () => {
           {weekDays.map((day, index) => (
             <div key={day} className="w-32 inline-flex flex-col justify-start items-start">
               <div className="self-stretch h-7 bg-neutral-50 border-r border-t border-neutral-200 inline-flex justify-between items-center">
-                <div className="text-center justify-center text-zinc-700 text-xs font-medium font-['Geist'] leading-4">{day}</div>
+                <div className="text-center justify-center text-zinc-700 text-xs font-medium leading-4">{day}</div>
               </div>
             </div>
           ))}
@@ -270,7 +270,7 @@ export const CalendarView: React.FC = () => {
                   >
                     {dayNumber && (
                       <>
-                        <div className={`left-[8px] top-[8px] absolute justify-center text-zinc-700 text-xs font-medium font-['Geist'] leading-4 ${
+                        <div className={`left-[8px] top-[8px] absolute justify-center text-zinc-700 text-xs font-medium leading-4 ${
                           isToday ? 'text-blue-700' : ''
                         } ${!isCurrentMonth ? 'text-zinc-500' : ''}`}>
                           {dayNumber}
@@ -286,13 +286,13 @@ export const CalendarView: React.FC = () => {
                             <div key={event.id} className={`self-stretch h-6 ${getEventColor(event.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
                               <div className={`w-1 self-stretch ${getEventBarColor(event.type)} shadow-[inset_0px_-2px_2px_0px_rgba(0,0,0,0.15)] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.15)]`} />
                               <div className={`flex-1 self-stretch px-1 py-2 rounded-tr rounded-br border-r border-t border-b ${event.type === 'red' ? 'border-red-100' : event.type === 'blue' ? 'border-blue-100' : event.type === 'green' ? 'border-emerald-100' : 'border-orange-100'} inline-flex flex-col justify-between items-start`}>
-                                <div className="w-28 justify-start text-zinc-700 text-xs font-normal font-['Geist'] leading-4 line-clamp-1">{event.title}</div>
+                                <div className="w-28 justify-start text-zinc-700 text-xs font-normal leading-4 line-clamp-1">{event.title}</div>
                               </div>
                             </div>
                           ))}
 
                           {dayEvents.length > 3 && (
-                            <div className="left-[6px] top-[112px] absolute justify-center text-blue-700 text-xs font-medium font-['Geist'] leading-4">
+                            <div className="left-[6px] top-[112px] absolute justify-center text-blue-700 text-xs font-medium leading-4">
                               +{dayEvents.length - 3} more
                             </div>
                           )}
@@ -318,7 +318,7 @@ export const CalendarView: React.FC = () => {
               >
                 <div className="w-3 h-3 left-[2px] top-[2px] absolute bg-blue-700 rounded-sm" />
               </button>
-              <div className="justify-start text-black text-sm font-medium font-['Geist'] leading-6">All Users</div>
+              <div className="justify-start text-black text-sm font-medium leading-6">All Users</div>
             </div>
             <div className="flex justify-start items-center gap-4">
               <button className="p-1 hover:bg-gray-100 rounded">
@@ -353,7 +353,7 @@ export const CalendarView: React.FC = () => {
                     </svg>
                   )}
                 </button>
-                <div className="justify-start text-zinc-700 text-xs font-medium font-['Geist'] leading-4">{user.name}</div>
+                <div className="justify-start text-zinc-700 text-xs font-medium leading-4">{user.name}</div>
               </div>
             ))}
           </div>
