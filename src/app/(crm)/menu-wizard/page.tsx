@@ -404,7 +404,7 @@ export default function MenuWizardPage() {
               <div data-style="Outlined" data-type="Add" className="w-3.5 h-3.5 relative overflow-hidden">
                 <div className="w-3 h-3 left-[0.58px] top-[1.17px] absolute bg-zinc-500" />
               </div>
-              <div className="justify-start"><span class="text-zinc-500 text-xs font-normal leading-4">Drag & Drop files here or </span><span class="text-blue-700 text-xs font-normal leading-4">Upload file</span></div>
+              <div className="justify-start"><span className="text-zinc-500 text-xs font-normal leading-4">Drag & Drop files here or </span><span className="text-blue-700 text-xs font-normal leading-4">Upload file</span></div>
             </div>
           </div>
         </div>

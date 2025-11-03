@@ -3,7 +3,10 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  webpack: (config) => {
+  experimental: {
+    webpackBuildWorker: false,
+  },
+  webpack: (config, { isServer }) => {
     const iconsPath = path.resolve(__dirname, "src/assets/icons");
 
     const oneOfRule = (config.module.rules as any[]).find(

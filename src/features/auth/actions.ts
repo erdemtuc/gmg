@@ -52,8 +52,9 @@ export async function loginAction(
 }
 
 export async function logoutAction(): Promise<void> {
-  const authUser = await getAuthUser();
-  revalidateTag(`user:${authUser.id}`);
+  // No need to revalidate user data on logout since user will be logged out
+  // const authUser = await getAuthUser();
+  // revalidateTag(`user:${authUser.id}`);
 
   await clearAuthCookies();
 
