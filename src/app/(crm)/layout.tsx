@@ -37,5 +37,5 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </aside>
       )}
     </div>
-  );
+  ); 
 }
