@@ -13,10 +13,10 @@ export default function MenuWizardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 menu-wizard-page">
+    <div className="h-screen bg-gray-100 p-6 menu-wizard-page">
       <div className="inline-flex justify-start items-start gap-4">
-        <div className="w-80 h-[817px] inline-flex flex-col justify-start items-start gap-2">
-          <div className="self-stretch h-96 p-6 relative bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
+        <div className="w-80 inline-flex flex-col justify-start items-start gap-2">
+          <div className="self-stretch  p-6 relative bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
             <div className="self-stretch flex flex-col justify-center items-center">
               <div className="self-stretch inline-flex justify-between items-center">
                 <div className="flex-1 justify-start text-zinc-700 text-base font-medium leading-6">Page design</div>
@@ -254,7 +254,7 @@ export default function MenuWizardPage() {
             </div>
           </div>
         </div>
-        <div className="w-[684px] h-[817px] relative bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200">
+        <div className="w-[684px]  relative bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200">
           <div className="w-[655px] h-7 left-[15px] top-[771px] absolute inline-flex justify-between items-center">
             <div className="flex justify-start items-center gap-2">
               <div data-destructive="False" data-show-icon-right="false" data-show-icon="true" data-size="S" data-state="Default" data-variant="Primary" className="px-3.5 py-2 bg-blue-700 rounded flex justify-center items-center gap-1.5 overflow-hidden">
@@ -298,12 +298,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Select source</div>
-                <div data-style="Outlined" data-type="Default" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.06px] top-[2.06px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Select source" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Type</div>
@@ -311,9 +310,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 h-20 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="false" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch flex-1 p-2 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Type web page URL</div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Type web page URL" 
+                className="self-stretch flex-1 p-2 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Description</div>
@@ -321,12 +322,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">03/10/2025</div>
-                <div data-style="Outlined" data-type="LTR" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.25px] top-[2.25px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="03/10/2025" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Due Date</div>
@@ -334,12 +334,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Select source</div>
-                <div data-style="Outlined" data-type="Default" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.06px] top-[2.06px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Select source" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Assigned to</div>
@@ -349,12 +348,11 @@ export default function MenuWizardPage() {
           </div>
           <div className="left-[359px] top-[58px] absolute inline-flex flex-col justify-start items-start gap-4">
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Select source</div>
-                <div data-style="Outlined" data-type="Default" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.06px] top-[2.06px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Select source" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Contact/Client</div>
@@ -362,12 +360,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Select source</div>
-                <div data-style="Outlined" data-type="Default" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.06px] top-[2.06px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Select source" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Opportunity</div>
@@ -375,12 +372,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Select source</div>
-                <div data-style="Outlined" data-type="Default" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.06px] top-[2.06px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Select source" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Proposal/Quote</div>
@@ -388,12 +384,11 @@ export default function MenuWizardPage() {
               </div>
             </div>
             <div data-hint="false" data-input-title="true" data-property-1="Default" className="w-72 relative flex flex-col justify-start items-start gap-[5px]">
-              <div data-destructive="False" data-icons-left="false" data-icons-right="true" data-input-action="false" data-state="Default" data-tags-bar="false" className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden">
-                <div className="flex-1 opacity-0 justify-center text-zinc-400 text-xs font-medium leading-4">Select source</div>
-                <div data-style="Outlined" data-type="Default" className="w-4 h-4 relative overflow-hidden">
-                  <div className="w-3.5 h-3.5 left-[2.06px] top-[2.06px] absolute bg-neutral-500" />
-                </div>
-              </div>
+              <input 
+                type="text" 
+                placeholder="Select source" 
+                className="self-stretch px-2 py-1.5 bg-white rounded-md outline outline-1 outline-offset-[-1px] outline-zinc-400 inline-flex justify-start items-center gap-2 overflow-hidden w-full"
+              />
               <div data-help-icon="false" data-optional-tag="false" data-property-1="Default" className="h-0.5 left-[8px] top-0 absolute bg-white inline-flex justify-start items-center gap-1">
                 <div className="px-1.5 flex justify-start items-center gap-1">
                   <div className="justify-center text-neutral-500 text-xs font-normal leading-4">Order/Job</div>
