@@ -384,10 +384,10 @@ export const CalendarView: React.FC = () => {
 
         <div className="flex flex-col justify-start items-start gap-2">
           {tasksWithoutDue.map((task) => (
-            <div key={task.id} className={`w-64 h-10 ${getEventColor(task.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
+            <div key={task.id} className={`w-64 h-6 ${getEventColor(task.type)} rounded inline-flex justify-start items-start overflow-hidden`}>
               <div className={`w-1 self-stretch ${getEventBarColor(task.type)} shadow-[inset_0px_-2px_2px_0px_rgba(0,0,0,0.15)] shadow-[inset_0px_2px_2px_0px_rgba(255,255,255,0.15)]`} />
               <div className={`flex-1 self-stretch px-1 py-2 rounded-tr rounded-br border-r border-t border-b ${task.type === 'red' ? 'border-red-100' : 'border-orange-100'} inline-flex flex-col justify-between items-start`}>
-                <div className="w-60 justify-start text-zinc-700 text-xs font-normal  leading-4  truncate">{task.title}</div>
+                <div className="w-60 justify-start text-zinc-700 text-xs font-normal font-['Geist'] leading-4 line-clamp-1">{task.title}</div>
               </div>
             </div>
           ))}
