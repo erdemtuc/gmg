@@ -4,26 +4,18 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
   webpack: (config) => {
-    // Remove any existing asset rules that might handle SVGs
-    config.module.rules = config.module.rules.filter((rule: any) => {
-      if (rule && rule.test) {
-        if (rule.test instanceof RegExp) {
-          // If the rule's test regex includes SVG, exclude the rule
-          return !rule.test.test('.svg');
-        } else if (typeof rule.test === 'function') {
-          try {
-            // If the rule's test function accepts SVG, exclude the rule
-            return !rule.test('.svg');
-          } catch (e) {
-            // If test function throws, keep the rule
-            return true;
-          }
-        }
-      }
-      return true;
-    });
+    // Find the file loader rule that handles images/asset files
+    const assetRule = config.module.rules.find((rule: any) =>
+      rule.test && typeof rule.test.test === 'function' && 
+      rule.test.test('.svg')
+    );
 
-    // Add our SVGR rule for SVG files with proper configuration
+    if (assetRule) {
+      // Exclude SVG files from the default asset rule
+      assetRule.exclude = /\.svg$/i;
+    }
+
+    // Add the SVGR rule for SVG files with correct configuration
     config.module.rules.push({
       test: /\.svg$/i,
       use: [
