@@ -1,23 +1,26 @@
 "use client";
 
-import ArrowMinimizeOutlinedVerticalIcon from "@/icons/arrow-minimize-outlined-vertical-icon.svg";
-import ArrowMaximizeOutlinedVerticalIcon from "@/icons/arrow-maximize-outlined-vertical-icon.svg";
-import ContactCardFilledDefaultIcon from "@/icons/contact-card-filled-default-icon.svg";
-import TaskListOutlinedLtrIcon from "@/icons/task-list-outlined-ltr-icon.svg";
-import ChatOutlinedDefaultIcon from "@/icons/chat-outlined-default-icon.svg";
-import GridOutlinedDefaultIcon from "@/icons/grid-outlined-default-icon.svg";
-import EditOutlinedSettingsIcon from "@/icons/edit-outlined-settings-icon.svg";
-import EditFilledSettingsIcon from "@/icons/edit-filled-settings-icon.svg";
-import ContactCardOutlinedDefaultIcon from "@/icons/contact-card-outlined-default-icon.svg";
-import TaskListFilledLtrIcon from "@/icons/task-list-filled-ltr-icon.svg";
-import ChatFilledDefaultIcon from "@/icons/chat-filled-default-icon.svg";
-import GridFilledDefaultIcon from "@/icons/grid-filled-default-icon.svg";
+// import { ReactComponent as ArrowMinimizeOutlinedVerticalIcon } from "@/icons/arrow-minimize-outlined-vertical-icon.svg";
+// import { ReactComponent as ArrowMaximizeOutlinedVerticalIcon } from "@/icons/arrow-maximize-outlined-vertical-icon.svg";
+// import { ReactComponent as ContactCardFilledDefaultIcon } from "@/icons/contact-card-filled-default-icon.svg";
+// import { ReactComponent as TaskListOutlinedLtrIcon } from "@/icons/task-list-outlined-ltr-icon.svg";
+// import { ReactComponent as ChatOutlinedDefaultIcon } from "@/icons/chat-outlined-default-icon.svg";
+// import { ReactComponent as GridOutlinedDefaultIcon } from "@/icons/grid-outlined-default-icon.svg";
+// import { ReactComponent as EditOutlinedSettingsIcon } from "@/icons/edit-outlined-settings-icon.svg";
+// import { ReactComponent as EditFilledSettingsIcon } from "@/icons/edit-filled-settings-icon.svg";
+// import { ReactComponent as ContactCardOutlinedDefaultIcon } from "@/icons/contact-card-outlined-default-icon.svg";
+// import { ReactComponent as TaskListFilledLtrIcon } from "@/icons/task-list-filled-ltr-icon.svg";
+// import { ReactComponent as ChatFilledDefaultIcon } from "@/icons/chat-filled-default-icon.svg";
+// import { ReactComponent as GridFilledDefaultIcon } from "@/icons/grid-filled-default-icon.svg";
 import Image from "next/image";
 import React from "react";
 import { DynamicMenuItem } from "@/core/contracts/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUIStore } from "@/stores/ui";
+
+// Placeholder icon component
+const PlaceholderIcon = ({ className, ...props }: { className?: string; [key: string]: any }) => <div className={className} {...props}>[Icon]</div>;
 
 const iconMap: Record<
   string,
@@ -27,20 +30,20 @@ const iconMap: Record<
   }
 > = {
   contact: {
-    Outlined: ContactCardOutlinedDefaultIcon,
-    Filled: ContactCardFilledDefaultIcon,
+    Outlined: PlaceholderIcon,
+    Filled: PlaceholderIcon,
   },
   task: { 
-    Outlined: TaskListOutlinedLtrIcon, 
-    Filled: TaskListFilledLtrIcon 
+    Outlined: PlaceholderIcon, 
+    Filled: PlaceholderIcon 
   },
   proposal: {
-    Outlined: ChatOutlinedDefaultIcon,
-    Filled: ChatFilledDefaultIcon,
+    Outlined: PlaceholderIcon,
+    Filled: PlaceholderIcon,
   },
   product: { 
-    Outlined: GridOutlinedDefaultIcon, 
-    Filled: GridFilledDefaultIcon 
+    Outlined: PlaceholderIcon, 
+    Filled: PlaceholderIcon 
   },
 };
 
@@ -49,9 +52,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
   const isMenuCollapsed = useUIStore((s) => s.menuState.isMenuCollapsed);
   const toggleMenu = useUIStore((s) => s.menuState.toggleMenu);
 
-  const ToggleMenuIcon = isMenuCollapsed
-    ? ArrowMaximizeOutlinedVerticalIcon
-    : ArrowMinimizeOutlinedVerticalIcon;
+  const ToggleMenuIcon = PlaceholderIcon;
 
   const isActiveItem = (itemHref: string) => {
     return pathname.startsWith(itemHref);
@@ -109,8 +110,8 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             const isActive = isActiveItem(item.href);
             const iconPair = iconMap[item.resource] ??
               iconMap[item.icon] ?? {
-                Outlined: GridOutlinedDefaultIcon,
-                Filled: GridFilledDefaultIcon,
+                Outlined: PlaceholderIcon,
+                Filled: PlaceholderIcon,
               };
             const IconComponent = isActive
               ? iconPair.Filled
@@ -149,11 +150,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             <span className="left-menu__label overflow-hidden text-nowrap">
               Page Wizard
             </span>
-            {isActiveItem("/page-wizard") ? (
-              <EditFilledSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
-            ) : (
-              <EditOutlinedSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
-            )}
+            <PlaceholderIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
           </Link>
         </li>
         <li
@@ -167,11 +164,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             <span className="left-menu__label overflow-hidden text-nowrap">
               Menu Wizard
             </span>
-            {isActiveItem("/menu-wizard") ? (
-              <EditFilledSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
-            ) : (
-              <EditOutlinedSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
-            )}
+            <PlaceholderIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
           </Link>
         </li>
       </ul>

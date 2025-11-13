@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/features/auth/schema";
 import { loginAction } from "@/features/auth/actions";
-import ProgressArc from "@/icons/progress-arc-default.svg";
+// import { ReactComponent as ProgressArc } from "@/icons/progress-arc-default.svg";
 import { useTransition } from "react";
 
 export default function LoginForm({ next }: { next: string | undefined }) {
@@ -95,7 +95,7 @@ export default function LoginForm({ next }: { next: string | undefined }) {
         {busy ? (
           <>
             <span className="text-sm">Signing in</span>
-            <ProgressArc className="arc-spinner size-4 text-white" />
+            <div className="arc-spinner size-4 text-white">[Spinner]</div>
           </>
         ) : (
           "Sign In"

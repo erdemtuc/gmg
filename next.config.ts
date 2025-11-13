@@ -2,15 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // Exclude SVGs from the default asset loader
-    const fileLoaderRule = config.module.rules.find((rule: any) =>
-      rule.test && typeof rule.test.exec === 'function' &&
-      rule.test.exec('temp.svg')
-    );
+    const imageLoader = config.module.rules.find((rule: any) => {
+      if (rule.test && typeof rule.test.exec === 'function') {
+        return rule.test.exec('.svg');
+      }
+    });
 
-    if (fileLoaderRule) {
-      fileLoaderRule.exclude = /\.svg$/;
+    if (imageLoader) {
+      imageLoader.exclude = /\.svg$/;
     }
 
     // Add SVGR loader for SVGs

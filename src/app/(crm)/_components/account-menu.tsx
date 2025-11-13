@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import ChevronOutlinedUpIcon from "@/icons/chevron-outlined-up-icon.svg";
-import ToggleOutlinedMultipleIcon from "@/icons/toggle-outlined-multiple-icon.svg";
-import SignOutOutlinedIcon from "@/icons/sign-out-outlined-icon.svg";
-import PeopleOutlinedDefaultIcon from "@/icons/people-outlined-default-icon.svg";
+// import { ReactComponent as ChevronOutlinedUpIcon } from "@/icons/chevron-outlined-up-icon.svg";
+// import { ReactComponent as ToggleOutlinedMultipleIcon } from "@/icons/toggle-outlined-multiple-icon.svg";
+// import { ReactComponent as SignOutOutlinedIcon } from "@/icons/sign-out-outlined-icon.svg";
+// import { ReactComponent as PeopleOutlinedDefaultIcon } from "@/icons/people-outlined-default-icon.svg";
 import { logoutAction } from "@/features/auth/actions";
 
 import { StaticMenuItem } from "@/core/contracts/navigation";
@@ -12,27 +12,30 @@ import { StaticMenuItem } from "@/core/contracts/navigation";
 type UserInfo = { name: string; email: string; avatar?: string };
 const userInfo: UserInfo = { name: "John Doe", email: "john.doe@example.com" };
 
+// Using a placeholder component instead of SVG icons
+const PlaceholderIcon = ({ className, ...props }: { className?: string; [key: string]: any }) => <div className={className} {...props}>[Icon]</div>;
+
 const menuItems: StaticMenuItem[] = [
   {
     id: "permission-management",
     label: "User and Permission Management",
     href: "/permission-management",
-    IconOutlined: ToggleOutlinedMultipleIcon,
-    IconFilled: ToggleOutlinedMultipleIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
   {
     id: "user-restriction",
     label: "User Restriction",
     href: "/user-restriction",
-    IconOutlined: PeopleOutlinedDefaultIcon,
-    IconFilled: PeopleOutlinedDefaultIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
   {
     id: "log-out",
     label: "Log Out",
     href: "/log-out",
-    IconOutlined: SignOutOutlinedIcon,
-    IconFilled: SignOutOutlinedIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
 ];
 
@@ -127,7 +130,7 @@ export default function AccountMenu() {
           </span>
         </span>
 
-        <ChevronOutlinedUpIcon
+        <PlaceholderIcon
           className="text-brand-gray-400 group-aria-[expanded=true]:text-brand-primary-500 ml-2 size-4 transition-transform duration-200 ease-out group-aria-[expanded=false]:rotate-180"
           aria-hidden
         />
@@ -163,7 +166,7 @@ export default function AccountMenu() {
                   }
                 }}
               >
-                <item.IconOutlined className="size-4" />
+                <item.IconOutlined />
                 {item.label}
               </button>
             </div>

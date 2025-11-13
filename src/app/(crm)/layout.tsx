@@ -3,6 +3,7 @@ import LeftMenuServer from "./_components/left-menu/left-menu-server";
 import LeftMenuSkeleton from "./_components/left-menu/left-menu-skeleton";
 import Reports from "./_components/reports";
 import TopBar from "./_components/top-bar";
+import ClientAppShell from "./_components/ClientAppShell";
 import { Suspense } from "react";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -26,7 +27,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Content */}
       <main className="bg-brand-gray-50 mt-6 mr-4 mb-9 ml-6 flex min-h-0 flex-col">
-        {children}
+        <ClientAppShell>
+          {children}
+        </ClientAppShell>
       </main>
 
       {/* Side Pane - Only show if not calendar page */}

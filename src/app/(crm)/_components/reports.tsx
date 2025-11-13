@@ -1,5 +1,5 @@
-import TasksAppOutlinedIcon from "@/icons/tasks-app-outlined-icon.svg";
-import ChevronOutlinedUpIcon from "@/icons/chevron-outlined-up-icon.svg";
+// import { ReactComponent as TasksAppOutlinedIcon } from "@/icons/tasks-app-outlined-icon.svg";
+// import { ReactComponent as ChevronOutlinedUpIcon } from "@/icons/chevron-outlined-up-icon.svg";
 
 type ReportItem = {
   id: string;
@@ -8,29 +8,32 @@ type ReportItem = {
   records: number;
 };
 
+// Placeholder icon component
+const PlaceholderIcon = ({ className, ...props }: { className?: string; [key: string]: any }) => <div className={className} {...props}>[Icon]</div>;
+
 const reports: ReportItem[] = [
   {
     id: "individuals",
     label: "Individuals",
-    Icon: TasksAppOutlinedIcon,
+    Icon: PlaceholderIcon,
     records: 82,
   },
   {
     id: "companies",
     label: "Companies",
-    Icon: TasksAppOutlinedIcon,
+    Icon: PlaceholderIcon,
     records: 100,
   },
   {
     id: "prospects",
     label: "Prospect List",
-    Icon: TasksAppOutlinedIcon,
+    Icon: PlaceholderIcon,
     records: 100,
   },
   {
     id: "leads",
     label: "Lead List",
-    Icon: TasksAppOutlinedIcon,
+    Icon: PlaceholderIcon,
     records: 100,
   },
 ];
@@ -63,7 +66,7 @@ export default function Reports() {
                 </span>
               </div>
             </div>
-            <ChevronOutlinedUpIcon className="text-brand-gray-300 size-4 rotate-90 self-center" />
+            <PlaceholderIcon className="text-brand-gray-300 size-4 rotate-90 self-center" />
           </div>
         ))}
       </div>

@@ -1,41 +1,44 @@
 import { StaticMenuItem } from "@/core/contracts/navigation";
-import QuestionOutlinedCircleIcon from "@/icons/question-outlined-circle-icon.svg";
+// import { ReactComponent as QuestionOutlinedCircleIcon } from "@/icons/question-outlined-circle-icon.svg";
+
+// Placeholder icon component
+const PlaceholderIcon = ({ className, ...props }: { className?: string; [key: string]: any }) => <div className={className} {...props}>[Icon]</div>;
 
 const helpMenu: StaticMenuItem[] = [
   {
     id: "support",
     label: "Support",
     href: "/support",
-    IconOutlined: QuestionOutlinedCircleIcon,
-    IconFilled: QuestionOutlinedCircleIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
   {
     id: "security",
     label: "Security & Terms of Service",
     href: "/security",
-    IconOutlined: QuestionOutlinedCircleIcon,
-    IconFilled: QuestionOutlinedCircleIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
   {
     id: "pricing",
     label: "Pricing & Features",
     href: "/pricing",
-    IconOutlined: QuestionOutlinedCircleIcon,
-    IconFilled: QuestionOutlinedCircleIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
   {
     id: "faq",
     label: "FAQ",
     href: "/faq",
-    IconOutlined: QuestionOutlinedCircleIcon,
-    IconFilled: QuestionOutlinedCircleIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
   {
     id: "tutorial",
     label: "Tutorial",
     href: "/tutorial",
-    IconOutlined: QuestionOutlinedCircleIcon,
-    IconFilled: QuestionOutlinedCircleIcon,
+    IconOutlined: PlaceholderIcon,
+    IconFilled: PlaceholderIcon,
   },
 ];
 
