@@ -12,25 +12,25 @@ const reports: ReportItem[] = [
   {
     id: "individuals",
     label: "Individuals",
-    Icon: () => <TasksAppOutlinedIcon />,
+    Icon: TasksAppOutlinedIcon,
     records: 82,
   },
   {
     id: "companies",
     label: "Companies",
-    Icon: () => <TasksAppOutlinedIcon />,
+    Icon: TasksAppOutlinedIcon,
     records: 100,
   },
   {
     id: "prospects",
     label: "Prospect List",
-    Icon: () => <TasksAppOutlinedIcon />,
+    Icon: TasksAppOutlinedIcon,
     records: 100,
   },
   {
     id: "leads",
     label: "Lead List",
-    Icon: () => <TasksAppOutlinedIcon />,
+    Icon: TasksAppOutlinedIcon,
     records: 100,
   },
 ];
@@ -53,7 +53,7 @@ export default function Reports() {
             className="hover:bg-brand-gray-100 flex cursor-pointer items-start justify-between rounded px-1 py-2"
           >
             <div className="flex items-center gap-2">
-              <item.Icon />
+              <item.Icon className="text-brand-primary-600 size-4" />
               <div className="flex flex-col">
                 <span className="text-brand-gray-600 text-sm font-normal">
                   {item.label}
@@ -63,7 +63,7 @@ export default function Reports() {
                 </span>
               </div>
             </div>
-            <ChevronOutlinedUpIcon />
+            <ChevronOutlinedUpIcon className="text-brand-gray-300 size-4 rotate-90 self-center" />
           </div>
         ))}
       </div>

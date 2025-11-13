@@ -98,6 +98,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
           <div>
             <ToggleMenuIcon
               aria-hidden
+              className="size-5 rotate-90 cursor-pointer text-white"
             />
           </div>
         </button>
@@ -108,8 +109,8 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             const isActive = isActiveItem(item.href);
             const iconPair = iconMap[item.resource] ??
               iconMap[item.icon] ?? {
-                Outlined: () => <GridOutlinedDefaultIcon />,
-                Filled: () => <GridFilledDefaultIcon />,
+                Outlined: GridOutlinedDefaultIcon,
+                Filled: GridFilledDefaultIcon,
               };
             const IconComponent = isActive
               ? iconPair.Filled
@@ -125,7 +126,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
                   href={item.href}
                   className="inline-flex h-full w-full items-center justify-start gap-3"
                 >
-                  <IconComponent />
+                  <IconComponent className="size-5 shrink-0" />
                   <span className="left-menu__label overflow-hidden text-nowrap">
                     {item.label}
                   </span>
@@ -149,9 +150,9 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
               Page Wizard
             </span>
             {isActiveItem("/page-wizard") ? (
-              <EditFilledSettingsIcon />
+              <EditFilledSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
             ) : (
-              <EditOutlinedSettingsIcon />
+              <EditOutlinedSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
             )}
           </Link>
         </li>
@@ -167,9 +168,9 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
               Menu Wizard
             </span>
             {isActiveItem("/menu-wizard") ? (
-              <EditFilledSettingsIcon />
+              <EditFilledSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
             ) : (
-              <EditOutlinedSettingsIcon />
+              <EditOutlinedSettingsIcon className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
             )}
           </Link>
         </li>

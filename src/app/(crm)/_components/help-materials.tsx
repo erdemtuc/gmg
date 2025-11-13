@@ -6,36 +6,36 @@ const helpMenu: StaticMenuItem[] = [
     id: "support",
     label: "Support",
     href: "/support",
-    IconOutlined: () => <QuestionOutlinedCircleIcon />,
-    IconFilled: () => <QuestionOutlinedCircleIcon />,
+    IconOutlined: QuestionOutlinedCircleIcon,
+    IconFilled: QuestionOutlinedCircleIcon,
   },
   {
     id: "security",
     label: "Security & Terms of Service",
     href: "/security",
-    IconOutlined: () => <QuestionOutlinedCircleIcon />,
-    IconFilled: () => <QuestionOutlinedCircleIcon />,
+    IconOutlined: QuestionOutlinedCircleIcon,
+    IconFilled: QuestionOutlinedCircleIcon,
   },
   {
     id: "pricing",
     label: "Pricing & Features",
     href: "/pricing",
-    IconOutlined: () => <QuestionOutlinedCircleIcon />,
-    IconFilled: () => <QuestionOutlinedCircleIcon />,
+    IconOutlined: QuestionOutlinedCircleIcon,
+    IconFilled: QuestionOutlinedCircleIcon,
   },
   {
     id: "faq",
     label: "FAQ",
     href: "/faq",
-    IconOutlined: () => <QuestionOutlinedCircleIcon />,
-    IconFilled: () => <QuestionOutlinedCircleIcon />,
+    IconOutlined: QuestionOutlinedCircleIcon,
+    IconFilled: QuestionOutlinedCircleIcon,
   },
   {
     id: "tutorial",
     label: "Tutorial",
     href: "/tutorial",
-    IconOutlined: () => <QuestionOutlinedCircleIcon />,
-    IconFilled: () => <QuestionOutlinedCircleIcon />,
+    IconOutlined: QuestionOutlinedCircleIcon,
+    IconFilled: QuestionOutlinedCircleIcon,
   },
 ];
 
@@ -58,7 +58,7 @@ export default function HelpMaterials() {
             key={item.id}
             className="hover:bg-brand-gray-100 flex cursor-pointer items-center gap-2 rounded p-1"
           >
-            <item.IconOutlined />
+            <item.IconOutlined className="text-brand-primary-600 size-4" />
             <span className="text-brand-gray-600 text-sm font-normal">
               {item.label}
             </span>
