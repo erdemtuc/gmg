@@ -20,6 +20,9 @@ import {
   EditFieldGroup,
   FormValues,
 } from "@/features/shared/models/crud-models";
+import { FilesTabContent } from "./files-tab-content";
+
+type Tab = "details" | "files" | "tasks";
 
 export function ContactEditModal() {
   const active = useUIStore((s) => s.modalState.active);
@@ -32,6 +35,8 @@ export function ContactEditModal() {
 
   const isOpen = active?.type === "contactEdit";
   const contactId = active?.type === "contactEdit" ? active.contactId : null;
+
+  const [activeTab, setActiveTab] = useState<Tab>("details");
 
   const idFromUrl = params.get("contact_edit_id");
 
@@ -170,14 +175,42 @@ export function ContactEditModal() {
 
               {/* Contact sub collections */}
               <div className="bg-brand-gray-50 basis-1/3 p-4">
-                <div className="flex items-center gap-4 border-b border-gray-200">
-                  <button className="text-brand-gray-600 hover:border-brand-primary-500 cursor-pointer border-b-2 border-b-transparent text-sm transition-colors focus:outline-none">
+                <div className="flex items-center gap-6 border-b border-gray-200">
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
+                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "files" 
+                        ? "border-b-2 border-blue-600 text-gray-900" 
+                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                    }`}
+                  >
                     Files & Images
                   </button>
-                  <button className="text-brand-gray-600 hover:border-brand-primary-500 cursor-pointer border-b-2 border-b-transparent text-sm transition-colors focus:outline-none">
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
+                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "tasks" 
+                        ? "border-b-2 border-blue-600 text-gray-900" 
+                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                    }`}
+                  >
                     Task & Activities
                   </button>
                 </div>
+
+                {activeTab === "files" && (
+                  <div className="mt-4">
+                    <FilesTabContent />
+                  </div>
+                )}
+
+                {activeTab === "tasks" && (
+                  <div className="mt-4 text-center text-sm text-gray-500">
+                    Tasks & Activities content coming soon
+                  </div>
+                )}
               </div>
             </div>
 

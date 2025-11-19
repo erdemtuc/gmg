@@ -19,6 +19,9 @@ import {
   EditFieldGroup,
   FormValues,
 } from "@/features/shared/models/crud-models";
+import { FilesTabContent } from "./files-tab-content";
+
+type Tab = "details" | "files" | "tasks";
 
 export function ContactAddModal() {
   const active = useUIStore((s) => s.modalState.active);
@@ -32,6 +35,8 @@ export function ContactAddModal() {
   const isOpen = active?.type === "contactAdd";
   const activeType: ContactType | null =
     active?.type === "contactAdd" ? active.contactType : null;
+
+  const [activeTab, setActiveTab] = useState<Tab>("details");
 
   const typeFromUrl = params.get("contact_add_type");
   const typeFromUrlValidated =
@@ -144,14 +149,42 @@ export function ContactAddModal() {
 
               {/* Contact sub collections */}
               <div className="bg-brand-gray-50 basis-1/3 p-4">
-                <div className="flex items-center gap-4 border-b border-gray-200">
-                  <button className="text-brand-gray-600 hover:border-brand-primary-500 cursor-pointer border-b-2 border-b-transparent text-sm transition-colors focus:outline-none">
+                <div className="flex items-center gap-6 border-b border-gray-200">
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
+                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "files" 
+                        ? "border-b-2 border-blue-600 text-gray-900" 
+                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                    }`}
+                  >
                     Files & Images
                   </button>
-                  <button className="text-brand-gray-600 hover:border-brand-primary-500 cursor-pointer border-b-2 border-b-transparent text-sm transition-colors focus:outline-none">
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
+                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "tasks" 
+                        ? "border-b-2 border-blue-600 text-gray-900" 
+                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                    }`}
+                  >
                     Task & Activities
                   </button>
                 </div>
+
+                {activeTab === "files" && (
+                  <div className="mt-4">
+                    <FilesTabContent />
+                  </div>
+                )}
+
+                {activeTab === "tasks" && (
+                  <div className="mt-4 text-center text-sm text-gray-500">
+                    Tasks & Activities content coming soon
+                  </div>
+                )}
               </div>
             </div>
 

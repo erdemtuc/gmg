@@ -13,6 +13,7 @@ type ModalProps = {
   width?: number | string;
   overlayClassName?: string;
   panelClassName?: string;
+  hideCloseButton?: boolean;
 };
 
 export function Modal({
@@ -23,6 +24,7 @@ export function Modal({
   width = 720,
   overlayClassName,
   panelClassName,
+  hideCloseButton,
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const container = useMemo(
@@ -79,13 +81,15 @@ export function Modal({
             </h2>
           </div>
         )}
-        <button
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute top-5 right-4 cursor-pointer leading-none text-[#61646C]"
-        >
-          <Image src={CloseIcon} width={20} height={20} alt="" className="size-5" />
-        </button>
+        {!hideCloseButton && (
+          <button
+            aria-label="Close"
+            onClick={onClose}
+            className="absolute top-5 right-4 cursor-pointer leading-none text-[#61646C]"
+          >
+            <Image src={CloseIcon} width={20} height={20} alt="" className="size-5" />
+          </button>
+        )}
         <div>{children}</div>
       </div>
     </div>,
