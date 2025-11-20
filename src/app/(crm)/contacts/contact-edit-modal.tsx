@@ -21,6 +21,7 @@ import {
   FormValues,
 } from "@/features/shared/models/crud-models";
 import { FilesTabContent } from "./files-tab-content";
+import { Search, UserPlus, Settings, X, History } from "lucide-react";
 
 type Tab = "details" | "files" | "tasks";
 
@@ -134,9 +135,49 @@ export function ContactEditModal() {
       isOpen={!!isOpen}
       onClose={handleClose}
       width="65.5rem"
-      title="Edit contact"
+      hideCloseButton
     >
-      <div>
+      <div className="flex flex-col max-h-[calc(85vh-5rem)]">
+        {/* Modal header with search and actions */}
+        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
+          {/* Search Bar */}
+          <div className="relative w-80">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            </div>
+            <input
+              type="text"
+              className="block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              placeholder="Search in contact details..."
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
+              <UserPlus className="size-4 text-blue-600" />
+              <span className="text-brand-gray-600 text-sm font-medium">Add Person</span>
+            </button>
+
+            <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
+              <Settings className="size-4 text-blue-600" />
+              <span className="text-brand-gray-600 text-sm font-medium">Change layout</span>
+            </button>
+
+            <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
+              <History className="size-4 text-blue-600" />
+              <span className="text-brand-gray-600 text-sm font-medium">History</span>
+            </button>
+
+            <button 
+              onClick={handleClose}
+              className="ml-2 p-1 text-gray-400 hover:text-gray-500 focus:outline-none"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+
         <FormProvider {...form}>
           <FormTypeWatcher
             currentType={
@@ -147,10 +188,10 @@ export function ContactEditModal() {
           />
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col"
+            className="flex flex-col flex-1 min-h-0"
           >
             {/* Contact header and sub collections */}
-            <div className="border-brand-gray-100 flex border-y-1">
+            <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
               {/* Contact header information */}
               <div className="flex basis-2/3 flex-col gap-6 p-4">
                 {formQuery.status === "pending" && (
@@ -219,7 +260,7 @@ export function ContactEditModal() {
               <div
                 className={`details divide-brand-gray-200 grid ${
                   detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-3"
-                } scroll-thin scrollbar-on-white scrollbar-gutter:stable max-h-96 min-h-0 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
+                } scroll-thin scrollbar-on-white scrollbar-gutter:stable flex-1 min-h-0 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
               >
                 {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
                   <div
@@ -256,7 +297,7 @@ export function ContactEditModal() {
             )}
 
             {/* Actions */}
-            <div className="my-4 flex flex-col gap-4 p-4">
+            <div className="my-4 flex flex-col gap-4 p-4 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-4">
                   <button
