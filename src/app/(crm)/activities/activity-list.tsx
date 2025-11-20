@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { apiClientGet } from "@/infra/http/client";
 import type { Activity } from "@/features/shared/models/activity-crud-models";
-import ActivityCard from "./activity-card";
+import ActivityCardWithSuspense from "./activity-card-wrapper";
 
 interface ActivityListProps {
   filters?: unknown;
@@ -85,7 +85,7 @@ export default function ActivityList({ filters, sort }: ActivityListProps) {
   return (
     <div className="scroll-thin scrollbar-on-white scrollbar-gutter:stable flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-4">
       {allActivities.map((activity) => (
-        <ActivityCard key={activity.id} activity={activity} />
+        <ActivityCardWithSuspense key={activity.id} activity={activity} />
       ))}
       <div ref={observerTarget} className="h-4">
         {isFetchingNextPage && (

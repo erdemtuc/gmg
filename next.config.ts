@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Set empty turbopack config to acknowledge use of webpack
+  turbopack: {},
   webpack: (config, { isServer }) => {
     // Exclude SVGs from the default asset loader
     const imageLoader = config.module.rules.find((rule: any) => {

@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import ActivityList from "./activity-list";
-import { AddNewButton } from "./add-new-button";
+import AddNewButtonWithSuspense from "./add-new-button-wrapper";
 import { ActivityDetailModal } from "./activity-detail-modal";
 import { ActivityAddModal } from "./activity-add-modal";
 import { ActivityEditModal } from "./activity-edit-modal";
@@ -17,7 +17,7 @@ export default function ActivitiesPage() {
         <h1 className="text-brand-gray-600 text-lg leading-1 font-medium">
           Tasks & Activities
         </h1>
-        <AddNewButton />
+        <AddNewButtonWithSuspense />
       </div>
       <div className="flex items-center justify-between">
         <div className="flex-start flex items-center gap-2 flex-wrap">
