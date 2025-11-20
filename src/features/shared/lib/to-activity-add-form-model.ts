@@ -57,8 +57,9 @@ export function toActivityAddFormModel(
 }
 
 function mapToEditField(line: LineApiModel): EditField | null {
-  const id = line.fid ?? line.fname;
-  if (!id) return null;
+  const idValue = line.fid ?? line.fname;
+  if (!idValue) return null;
+  const id = String(idValue);
 
   if (line.fid) {
      const type = mapType(line.unit || "text");
@@ -66,7 +67,7 @@ function mapToEditField(line: LineApiModel): EditField | null {
      return {
          id,
          type,
-         name: line.label || id,
+         name: line.label ? String(line.label) : String(id),
          isMulti: line.multi === 1,
          options: mapOptions(line),
          value: line.value ?? null,
@@ -83,7 +84,7 @@ function mapToEditField(line: LineApiModel): EditField | null {
     case "typeTaskid":
       return { id, type: "select", name: "Task Type", options: mapOptions(line), value: line.value ?? null };
     default:
-       return { id, type: "text", name: id, value: line.value ?? null };
+       return { id, type: "text", name: String(id), value: line.value ?? null };
   }
 }
 

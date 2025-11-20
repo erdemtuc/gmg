@@ -3,15 +3,16 @@ import { getActivityDetail } from "@/features/activity/data/get-activity-detail"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const id = Number(params.id);
-  if (isNaN(id)) {
+  const { id } = await params;
+  const numId = Number(id);
+  if (isNaN(numId)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
   try {
-    const activity = await getActivityDetail(id);
+    const activity = await getActivityDetail(numId);
     return NextResponse.json(activity);
   } catch (e) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
