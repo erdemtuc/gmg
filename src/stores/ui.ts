@@ -18,10 +18,16 @@ type ModalState = {
     | { type: "contactDetail"; contactId: string }
     | { type: "contactAdd"; contactType: ContactType | null }
     | { type: "contactEdit"; contactId: string }
+    | { type: "activityDetail"; activityId: number }
+    | { type: "activityAdd" }
+    | { type: "activityEdit"; activityId: number }
     | null;
   openContactDetail: (contactId: string) => void;
   openContactAdd: (contactType: ContactType | null) => void;
   openContactEdit: (contactId: string) => void;
+  openActivityDetail: (activityId: number) => void;
+  openActivityAdd: () => void;
+  openActivityEdit: (activityId: number) => void;
   closeModal: () => void;
 };
 
@@ -66,6 +72,27 @@ export const useUIStore = create<UIState>()(
             modalState: {
               ...s.modalState,
               active: { type: "contactEdit", contactId },
+            },
+          })),
+        openActivityDetail: (activityId) =>
+          set((s) => ({
+            modalState: {
+              ...s.modalState,
+              active: { type: "activityDetail", activityId },
+            },
+          })),
+        openActivityAdd: () =>
+          set((s) => ({
+            modalState: {
+              ...s.modalState,
+              active: { type: "activityAdd" },
+            },
+          })),
+        openActivityEdit: (activityId) =>
+          set((s) => ({
+            modalState: {
+              ...s.modalState,
+              active: { type: "activityEdit", activityId },
             },
           })),
         closeModal: () =>

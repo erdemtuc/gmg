@@ -21,7 +21,7 @@ export function TextInput({ field, control }: TextInputProps) {
         render={({ field: controllerField }) => (
           <input
             id={id}
-            type="text"
+            type={field.type === "datetime-local" ? "datetime-local" : "text"}
             className="input-field b-none"
             {...controllerField}
           />

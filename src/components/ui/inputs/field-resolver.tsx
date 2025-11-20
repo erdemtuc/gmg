@@ -19,6 +19,7 @@ export function FieldResolver({ field, control }: FieldResolverProps) {
 
   switch (field.type) {
     case "text":
+    case "datetime-local":
       return <TextInput {...baseProps} />;
     case "number":
       return <NumberInput {...baseProps} />;

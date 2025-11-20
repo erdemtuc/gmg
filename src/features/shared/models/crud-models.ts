@@ -10,7 +10,8 @@ export type EditFieldType =
   | "textarea"
   | "radio"
   | "select"
-  | "search";
+  | "search"
+  | "datetime-local";
 
 export type EditField = {
   id: string | number;
