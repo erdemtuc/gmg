@@ -112,7 +112,7 @@ export function ContactAddModal() {
       width="65.5rem"
       title="Add contact"
     >
-      <div>
+      <div className="flex flex-col max-h-[calc(85vh-5rem)]">
         <FormProvider {...form}>
           <FormTypeWatcher
             currentType={activeType}
@@ -121,7 +121,7 @@ export function ContactAddModal() {
           />
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col"
+            className="flex flex-col flex-1 min-h-0"
           >
             {/* Contact header and sub collections */}
             <div className="border-brand-gray-100 flex border-y-1">
@@ -193,7 +193,7 @@ export function ContactAddModal() {
               <div
                 className={`details divide-brand-gray-200 grid ${
                   detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-3"
-                } scroll-thin scrollbar-on-white scrollbar-gutter:stable max-h-96 min-h-0 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
+                } scroll-thin scrollbar-on-white scrollbar-gutter:stable flex-1 min-h-0 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
               >
                 {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
                   <div
