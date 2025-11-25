@@ -6,9 +6,11 @@ import { apiClientGet } from "@/infra/http/client";
 import type { Activity } from "@/features/shared/models/activity-crud-models";
 import ActivityCardWithSuspense from "./activity-card-wrapper";
 
+import { ActivityFilter, ActivitySort } from './use-activity-filters';
+
 interface ActivityListProps {
-  filters?: unknown;
-  sort?: unknown;
+  filters?: ActivityFilter[];
+  sort?: ActivitySort | null;
 }
 
 export default function ActivityList({ filters, sort }: ActivityListProps) {
@@ -21,10 +23,26 @@ export default function ActivityList({ filters, sort }: ActivityListProps) {
     error,
   } = useInfiniteQuery({
     queryKey: ["activities", filters, sort],
-    queryFn: ({ pageParam = 1 }) =>
-      apiClientGet<Activity[]>("/api/activities", {
-        query: { page: pageParam },
-      }),
+    queryFn: ({ pageParam = 1 }) => {
+      // Construct query parameters from filters and sort
+      const queryParams: Record<string, any> = { page: pageParam };
+
+      if (filters && filters.length > 0) {
+        filters.forEach((filter, index) => {
+          queryParams[`filter[${index}][field]`] = filter.field;
+          queryParams[`filter[${index}][operator]`] = filter.operator;
+          queryParams[`filter[${index}][value]`] = filter.value;
+        });
+      }
+
+      if (sort && sort.field) {
+        queryParams['sort'] = `${sort.field}:${sort.direction}`;
+      }
+
+      return apiClientGet<Activity[]>("/api/activities", {
+        query: queryParams,
+      });
+    },
     getNextPageParam: (lastPage, pages) => {
       if (lastPage.length === 0) return undefined;
       return pages.length + 1;
