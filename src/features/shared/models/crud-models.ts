@@ -17,6 +17,7 @@ export type EditField = {
   id: string | number;
   type: EditFieldType;
   name: string;
+  label?: string;
   options?: Option[];
   isMulti?: boolean;
   listResource?: string;

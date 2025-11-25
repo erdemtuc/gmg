@@ -22,6 +22,7 @@ export type ActivityDetail = {
 
 export type Field = {
   name: string;
+  label?: string;
   value: string | number | boolean | null;
 };
 
