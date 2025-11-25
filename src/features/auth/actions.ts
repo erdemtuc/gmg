@@ -10,16 +10,20 @@ import { revalidateTag } from "next/cache";
 
 export type LoginResult = { ok: true } | { ok: false; error: string };
 
-export async function loginAction(
-  form: LoginInput,
-  next: string | undefined,
-): Promise<LoginResult | undefined> {
-  const parsed = loginSchema.safeParse(form);
+export async function loginAction({
+  email,
+  password,
+  next,
+}: {
+  email: string;
+  password: string;
+  next?: string;
+}): Promise<LoginResult | undefined> {
+  const parsed = loginSchema.safeParse({ email, password });
   if (!parsed.success) {
     const first = parsed.error.issues[0];
     return { ok: false, error: first?.message ?? "Invalid data." };
   }
-  const { email, password } = parsed.data;
 
   try {
     // Use the API credentials for authentication instead of user credentials

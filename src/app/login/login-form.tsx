@@ -21,7 +21,7 @@ export default function LoginForm({ next }: { next: string | undefined }) {
 
   const onSubmit = handleSubmit((data) => {
     startTransition(async () => {
-      const result = await loginAction(data, next);
+      const result = await loginAction({ ...data, next });
 
       if (!result!.ok) {
         setError("root", {
