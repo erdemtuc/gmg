@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getActivities, ActivityFilter, ActivitySort } from "@/features/activity/data/get-activities";
+import { getOpportunities } from "@/features/opportunity/data/get-opportunities";
 import { getAuthUser } from "@/features/shared/services/auth-user";
+import { OpportunityFilter, OpportunitySort } from "@/features/opportunity/data/get-opportunity-types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   const page = Number(searchParams.get("page") ?? 1);
 
   // Extract filter parameters
-  const filters: ActivityFilter[] = [];
+  const filters: OpportunityFilter[] = [];
   let filterIndex = 0;
   while (searchParams.has(`filter[${filterIndex}][field]`)) {
     const field = searchParams.get(`filter[${filterIndex}][field]`);
@@ -35,21 +36,24 @@ export async function GET(request: NextRequest) {
   }
 
   // Extract sort parameter
-  let sort: ActivitySort | undefined;
-  const sortParam = searchParams.get('sort');
-  if (sortParam) {
-    const [field, direction] = sortParam.split(':');
-    if (field && (direction === 'asc' || direction === 'desc')) {
-      sort = { field, direction };
-    }
+  let sort: OpportunitySort | undefined;
+  const sortField = searchParams.get('sort');
+  const sortDirection = searchParams.get('direction') || 'asc';
+
+  if (sortField && (sortDirection === 'asc' || sortDirection === 'desc')) {
+    sort = {
+      field: sortField,
+      direction: sortDirection
+    };
   }
 
   try {
-    const activities = await getActivities(page, filters, sort);
-    return NextResponse.json(activities);
+    const opportunities = await getOpportunities(page, filters, sort);
+    return NextResponse.json(opportunities);
   } catch (error) {
+    console.error('Error fetching opportunities:', error);
     return NextResponse.json(
-      { error: "Failed to fetch activities" },
+      { error: "Failed to fetch opportunities" },
       { status: 500 }
     );
   }

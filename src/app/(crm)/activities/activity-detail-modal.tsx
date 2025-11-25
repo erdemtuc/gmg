@@ -116,9 +116,9 @@ export function ActivityDetailModal() {
 
   return (
     <Modal isOpen={!!isOpen} onClose={handleClose} width="65.5rem" hideCloseButton>
-      <div className="flex flex-col max-h-[calc(85vh-2rem)]">
+      <div className="flex flex-col h-full max-h-[85vh]">
         {/* Modal header with search and actions */}
-        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
+        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0 rounded-t-xl">
           {/* Search Bar */}
           <div className="relative w-80">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -246,118 +246,121 @@ export function ActivityDetailModal() {
           </div>
         </div>
 
-        {/* Activity header and sub collections */}
-        <div className="border-brand-gray-100 flex border-y-1 min-h-0">
-          {/* Activity header information */}
-          {visibleSections.details && (
-            <div className="flex basis-2/3 flex-col gap-6 p-4 overflow-y-auto">
-              {detailQuery.status === "pending" && (
-                <div className="text-brand-gray-400 text-xs">Loading…</div>
-              )}
-              {detailQuery.status === "error" && (
-                <div className="text-xs text-red-600">
-                  {(detailQuery.error as Error)?.message || "Failed to load"}
-                </div>
-              )}
-              {detailQuery.status === "success" && (
-                <>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h2 className="text-brand-gray-900 text-xl font-semibold">
-                        {detailQuery.data.name}
-                      </h2>
-                      <p className="text-brand-gray-500 text-sm mt-1">
-                        Status: {detailQuery.data.status}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Grouped details */}
-                  <div
-                    className={`details divide-brand-gray-200 grid ${
-                      detailColumnsCount === 2 ? "grid-cols-2" : detailColumnsCount === 3 ? "grid-cols-3" : "grid-cols-1"
-                    } gap-y-3 divide-x`}
-                  >
-                    {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
-                      <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
-                        {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                          <section
-                            key={`${group.groupTitle}-${idx}`}
-                            className="flex flex-col gap-3"
-                          >
-                            <h3 className="text-brand-gray-600 text-sm font-medium">
-                              {group.groupTitle}
-                            </h3>
-                            <ul className="flex flex-col gap-3">
-                              {group.fields.map((field, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex flex-row justify-between text-xs"
-                                >
-                                  <span className="text-brand-gray-400">
-                                    {field.name}
-                                  </span>
-                                  <span className="text-brand-gray-600">
-                                    {String(field.value ?? "—")}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
-                          </section>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Activity sub collections */}
-          {(visibleSections.files || visibleSections.tasks) && (
-            <div className="bg-brand-gray-50 basis-1/3 p-4 flex flex-col min-h-0">
-              <div className="flex items-center gap-6 border-b border-gray-200">
-                {visibleSections.files && (
-                  <button 
-                    type="button"
-                    onClick={() => setActiveTab("files")}
-                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                      activeTab === "files" 
-                        ? "border-b-2 border-blue-600 text-gray-900 font-bold" 
-                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-                    }`}
-                  >
-                    Files & Images
-                  </button>
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white rounded-b-xl">
+          {/* Activity header and sub collections */}
+          <div className="border-brand-gray-100 flex border-y-1">
+            {/* Activity header information */}
+            {visibleSections.details && (
+              <div className="flex basis-2/3 flex-col gap-6 p-4">
+                {detailQuery.status === "pending" && (
+                  <div className="text-brand-gray-400 text-xs">Loading…</div>
                 )}
-                {visibleSections.tasks && (
-                  <button 
-                    type="button"
-                    onClick={() => setActiveTab("tasks")}
-                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                      activeTab === "tasks" 
-                        ? "border-b-2 border-blue-600 text-gray-900 font-bold" 
-                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-                    }`}
-                  >
-                    Task & Activities
-                  </button>
+                {detailQuery.status === "error" && (
+                  <div className="text-xs text-red-600">
+                    {(detailQuery.error as Error)?.message || "Failed to load"}
+                  </div>
+                )}
+                {detailQuery.status === "success" && (
+                  <>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h2 className="text-brand-gray-900 text-xl font-semibold">
+                          {detailQuery.data.name}
+                        </h2>
+                        <p className="text-brand-gray-500 text-sm mt-1">
+                          Status: {detailQuery.data.status}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Grouped details */}
+                    <div
+                      className={`details divide-brand-gray-200 grid ${
+                        detailColumnsCount === 2 ? "grid-cols-2" : detailColumnsCount === 3 ? "grid-cols-3" : "grid-cols-1"
+                      } gap-y-3 divide-x`}
+                    >
+                      {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
+                        <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
+                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
+                            <section
+                              key={`${group.groupTitle}-${idx}`}
+                              className="flex flex-col gap-3"
+                            >
+                              <h3 className="text-brand-gray-600 text-sm font-medium">
+                                {group.groupTitle}
+                              </h3>
+                              <ul className="flex flex-col gap-3">
+                                {group.fields.map((field, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex flex-row justify-between text-xs"
+                                  >
+                                    <span className="text-brand-gray-400">
+                                      {field.name}
+                                    </span>
+                                    <span className="text-brand-gray-600">
+                                      {String(field.value ?? "—")}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </section>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
+            )}
 
-              {visibleSections.files && activeTab === "files" && (
-                <div className="mt-4">
-                  <FilesTabContent />
+            {/* Activity sub collections */}
+            {(visibleSections.files || visibleSections.tasks) && (
+              <div className="bg-brand-gray-50 basis-1/3 p-4 flex flex-col min-h-0">
+                <div className="flex items-center gap-6 border-b border-gray-200">
+                  {visibleSections.files && (
+                    <button 
+                      type="button"
+                      onClick={() => setActiveTab("files")}
+                      className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                        activeTab === "files" 
+                          ? "border-b-2 border-blue-600 text-gray-900 font-bold" 
+                          : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                      }`}
+                    >
+                      Files & Images
+                    </button>
+                  )}
+                  {visibleSections.tasks && (
+                    <button 
+                      type="button"
+                      onClick={() => setActiveTab("tasks")}
+                      className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                        activeTab === "tasks" 
+                          ? "border-b-2 border-blue-600 text-gray-900 font-bold" 
+                          : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                      }`}
+                    >
+                      Task & Activities
+                    </button>
+                  )}
                 </div>
-              )}
 
-              {visibleSections.tasks && activeTab === "tasks" && (
-                <div className="mt-4 max-h-[300px] overflow-y-auto pr-1">
-                  <TasksTabContent />
-                </div>
-              )}
-            </div>
-          )}
+                {visibleSections.files && activeTab === "files" && (
+                  <div className="mt-4">
+                    <FilesTabContent />
+                  </div>
+                )}
+
+                {visibleSections.tasks && activeTab === "tasks" && (
+                  <div className="mt-4 max-h-[300px] overflow-y-auto pr-1">
+                    <TasksTabContent />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Modal>

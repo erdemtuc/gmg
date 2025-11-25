@@ -44,12 +44,12 @@ export async function apiServer<T = unknown>(
         "401 with access token, attempting refresh",
       );
       accessToken = await tryRefreshToken();
+      // Retry the original request with new token
+      return apiServerRaw<T>(path, toRawOptions(opt, accessToken));
     } else {
       throw err;
     }
   }
-
-  return apiServerRaw<T>(path, toRawOptions(opt, accessToken));
 }
 
 async function tryRefreshToken(): Promise<string> {
@@ -67,18 +67,41 @@ async function tryRefreshToken(): Promise<string> {
   const promise = (async () => {
     const logger = getLogger({ mod: "auth", fn: "tryRefreshToken" });
     logger.debug("refresh started");
-    const accessResp = await apiServerRaw<AccessResp>("/jwtAccessToken.php", {
+
+    // Use the API credentials for refreshing the token
+    const API_USER = process.env.API_USER || "abc@xx.com";
+    const API_PASSWORD = process.env.API_PASSWORD || "1qaz2wsx";
+    const basic = Buffer.from(`${API_USER}:${API_PASSWORD}`, "utf8").toString(
+      "base64"
+    );
+
+    // Use the same JWT endpoint for refresh, but with refresh token
+    const response = await apiServerRaw<any>("/api/jwt.php", {
       method: "POST",
-      accessToken: refreshToken,
+      headers: {
+        authorization: `Basic ${basic}`,
+        "Content-Type": "application/json"
+      },
+      body: { refresh_token: refreshToken }, // Send refresh token in the request body
     });
 
-    await setAccessCookie({
-      token: accessResp.access_token,
-      expiresIn: accessResp.expires_in,
+    // Handle different possible response formats
+    const new_access_token = response.access_token || response.accessToken;
+    const new_refresh_token = response.refresh_token || response.refreshToken || refreshToken;
+    const expires_in = response.expires_in || response.expiresIn || 3600; // default to 1 hour
+
+    if (!new_access_token) {
+      throw new Error("No access token received from server during refresh");
+    }
+
+    // Update both tokens
+    await setAuthCookies({
+      access: { token: new_access_token, expiresIn: expires_in },
+      refresh: { token: new_refresh_token, expiresIn: expires_in },
     });
 
     logger.info("refresh succeeded");
-    return accessResp.access_token;
+    return new_access_token;
   })();
 
   refreshInFlightByToken.set(refreshToken, promise);

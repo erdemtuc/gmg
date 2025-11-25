@@ -1,10 +1,10 @@
-import { ContactFilter, useContactFilters } from './use-contact-filters';
+import { ActivityFilter, useActivityFilters } from './use-activity-filters';
 import { X, CirclePlus } from 'lucide-react';
 
 interface FilterItemProps {
-  filter: ContactFilter;
+  filter: ActivityFilter;
   index: number;
-  onUpdate: (index: number, filter: ContactFilter) => void;
+  onUpdate: (index: number, filter: ActivityFilter) => void;
   onRemove: (index: number) => void;
 }
 
@@ -23,19 +23,20 @@ const FilterItem = ({ filter, index, onUpdate, onRemove }: FilterItemProps) => {
 
   return (
     <div className="flex items-center gap-2 bg-brand-gray-50 px-3 py-2 rounded-md">
-      <select 
+      <select
         className="bg-white border border-brand-gray-300 rounded px-2 py-1 text-sm"
         value={filter.field}
         onChange={handleFieldChange}
       >
-        <option value="name">Name</option>
-        <option value="email">Email</option>
-        <option value="company">Company</option>
-        <option value="phone">Phone</option>
+        <option value="title">Title</option>
+        <option value="description">Description</option>
+        <option value="assignee">Assignee</option>
         <option value="status">Status</option>
+        <option value="priority">Priority</option>
+        <option value="dueDate">Due Date</option>
       </select>
-      
-      <select 
+
+      <select
         className="bg-white border border-brand-gray-300 rounded px-2 py-1 text-sm"
         value={filter.operator}
         onChange={handleOperatorChange}
@@ -45,7 +46,7 @@ const FilterItem = ({ filter, index, onUpdate, onRemove }: FilterItemProps) => {
         <option value="startsWith">Starts with</option>
         <option value="endsWith">Ends with</option>
       </select>
-      
+
       <input
         type="text"
         className="bg-white border border-brand-gray-300 rounded px-2 py-1 text-sm flex-1"
@@ -53,8 +54,8 @@ const FilterItem = ({ filter, index, onUpdate, onRemove }: FilterItemProps) => {
         value={filter.value}
         onChange={handleValueChange}
       />
-      
-      <button 
+
+      <button
         onClick={() => onRemove(index)}
         className="text-brand-gray-500 hover:text-brand-gray-700"
       >
@@ -64,23 +65,23 @@ const FilterItem = ({ filter, index, onUpdate, onRemove }: FilterItemProps) => {
   );
 };
 
-interface ContactFiltersProps {
+interface ActivityFiltersProps {
   showFilters: boolean;
   onToggleFilters: () => void;
 }
 
-export const ContactFilters = ({ showFilters, onToggleFilters }: ContactFiltersProps) => {
+export const ActivityFilters = ({ showFilters, onToggleFilters }: ActivityFiltersProps) => {
   const {
     filters,
     addFilter,
     removeFilter,
     updateFilter,
     clearAllFilters
-  } = useContactFilters();
+  } = useActivityFilters();
 
   const handleAddFilter = () => {
     addFilter({
-      field: 'name',
+      field: 'title',
       operator: 'contains',
       value: ''
     });
@@ -111,25 +112,25 @@ export const ContactFilters = ({ showFilters, onToggleFilters }: ContactFiltersP
           />
         ))}
       </div>
-      
+
       <div className="flex items-center gap-2">
-        <button 
+        <button
           className="text-brand-primary-500 bg-brand-primary-50 hover:bg-brand-primary-100 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5 text-sm"
           onClick={handleAddFilter}
         >
           + Add filter
         </button>
-        
+
         {filters.length > 0 && (
-          <button 
+          <button
             className="text-brand-gray-500 hover:bg-brand-gray-100 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5 text-sm"
             onClick={clearAllFilters}
           >
             Clear all
           </button>
         )}
-        
-        <button 
+
+        <button
           className="ml-auto text-brand-gray-500 hover:bg-brand-gray-100 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5 text-sm"
           onClick={onToggleFilters}
         >

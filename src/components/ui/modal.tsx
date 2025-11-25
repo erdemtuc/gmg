@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import CloseIcon from "@/assets/icons/dismiss-outlined-default-icon.svg";
-import Image from "next/image";
+import { X } from "lucide-react";
 
 type ModalProps = {
   isOpen: boolean;
@@ -85,9 +84,9 @@ export function Modal({
           <button
             aria-label="Close"
             onClick={onClose}
-            className="absolute top-5 right-4 cursor-pointer leading-none text-[#61646C]"
+            className="absolute top-5 right-4 cursor-pointer leading-none text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <Image src={CloseIcon} width={20} height={20} alt="" className="size-5" />
+            <X className="h-5 w-5" />
           </button>
         )}
         <div>{children}</div>

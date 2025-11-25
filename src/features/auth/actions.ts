@@ -22,29 +22,45 @@ export async function loginAction(
   const { email, password } = parsed.data;
 
   try {
-    const basic = Buffer.from(`${email}:${password}`, "utf8").toString(
-      "base64",
+    // Use the API credentials for authentication instead of user credentials
+    const API_USER = process.env.API_USER || "abc@xx.com";
+    const API_PASSWORD = process.env.API_PASSWORD || "1qaz2wsx";
+    const basic = Buffer.from(`${API_USER}:${API_PASSWORD}`, "utf8").toString(
+      "base64"
     );
-    const refresh = await apiServer<RefreshResp>("/jwtRefreshToken.php", {
+
+    // Use the correct endpoint for JWT authentication
+    const response = await apiServer<any>("/api/jwt.php", { // Using any since response format might vary
       method: "POST",
-      headers: { authorization: `Basic ${basic}` },
+      headers: {
+        authorization: `Basic ${basic}`,
+        "Content-Type": "application/json"
+      },
+      body: { email, password }, // Send user credentials in the request body
       auth: "omit",
     });
 
-    const access = await apiServer<AccessResp>("/jwtAccessToken.php", {
-      method: "POST",
-      headers: { authorization: `Bearer ${refresh.refresh_token}` },
-      auth: "omit",
-    });
+    // The response might contain both access and refresh tokens
+    // Handle different possible response formats
+    const access_token = response.access_token || response.accessToken;
+    const refresh_token = response.refresh_token || response.refreshToken || response.access_token || response.accessToken;
+    const expires_in = response.expires_in || response.expiresIn || 3600; // default to 1 hour
 
+    if (!access_token) {
+      throw new Error("No access token received from server");
+    }
+
+    // Store the received tokens
     await setAuthCookies({
-      access: { token: access.access_token, expiresIn: access.expires_in },
-      refresh: { token: refresh.refresh_token, expiresIn: refresh.expires_in },
+      access: { token: access_token, expiresIn: expires_in },
+      refresh: { token: refresh_token || access_token, expiresIn: expires_in },
     });
   } catch (e) {
     if (isApiError(e)) {
-      return { ok: false, error: "Login failed." };
+      console.error("Login error:", e);
+      return { ok: false, error: e.description || "Login failed." };
     }
+    console.error("Unexpected error:", e);
     return { ok: false, error: "Unexpected error." };
   }
 

@@ -20,6 +20,8 @@ function resourceToHref(resource: string): string {
       return "/contacts";
     case "task":
       return "/activities";
+    case "opp":
+      return "/opportunity";
     case "proposal":
       return "/proposals";
     case "product":
