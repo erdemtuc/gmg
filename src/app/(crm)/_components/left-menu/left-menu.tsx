@@ -17,11 +17,7 @@ import {
   Settings2,
   Menu,
   X,
-  RotateCcw,
-  Carrot,
-  Salad,
-  Grid2x2,
-  Briefcase
+  RotateCcw
 } from 'lucide-react';
 
 const iconMap: Record<
@@ -39,10 +35,6 @@ const iconMap: Record<
     Outlined: Clipboard,
     Filled: ClipboardList,
   },
-  opportunity: {
-    Outlined: Briefcase,
-    Filled: Briefcase,
-  },
   proposal: {
     Outlined: FileText,
     Filled: FileTextIcon,
@@ -50,14 +42,6 @@ const iconMap: Record<
   product: {
     Outlined: Settings,
     Filled: Settings2,
-  },
-  vegetables: {
-    Outlined: Carrot,
-    Filled: Salad,
-  },
-  greens: {
-    Outlined: Salad,
-    Filled: Carrot,
   },
 };
 
@@ -124,8 +108,8 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             const isActive = isActiveItem(item.href);
             const iconPair = iconMap[item.resource] ??
               iconMap[item.icon] ?? {
-                Outlined: Grid2x2,
-                Filled: Grid2x2,
+                Outlined: RotateCcw,
+                Filled: RotateCcw,
               };
             const IconComponent = isActive
               ? iconPair.Filled
@@ -164,7 +148,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             <span className="left-menu__label overflow-hidden text-nowrap">
               Page Wizard
             </span>
-            <Carrot className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
+            <RotateCcw className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
           </Link>
         </li>
         <li
@@ -178,7 +162,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             <span className="left-menu__label overflow-hidden text-nowrap">
               Menu Wizard
             </span>
-            <Carrot className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
+            <RotateCcw className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
           </Link>
         </li>
       </ul>

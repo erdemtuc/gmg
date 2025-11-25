@@ -96,125 +96,122 @@ export function ActivityAddModal() {
       width="65.5rem"
       title="Add activity"
     >
-      <div className="flex flex-col h-full max-h-[85vh]">
+      <div>
         <FormProvider {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col flex-1 min-h-0 overflow-hidden"
+            className="flex flex-col"
           >
-            {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white">
-              {/* Activity header and sub collections */}
-              <div className="border-brand-gray-100 flex border-y-1">
-                {/* Activity header information */}
-                <div className="flex basis-2/3 flex-col gap-6 p-4">
-                  {formQuery.status === "pending" && (
-                    <div className="text-brand-gray-400 col-span-2 text-xs">
-                      Loading…
-                    </div>
-                  )}
-                  {formQuery.status === "error" && (
-                    <div className="col-span-2 text-xs text-red-600">
-                      {(formQuery.error as Error)?.message || "Failed to load"}
-                    </div>
-                  )}
-                  {formQuery.status === "success" &&
-                    (formQuery.data.mainFields ?? []).map((field) => (
-                      <FieldResolver
-                        key={String(field.id)}
-                        field={field}
-                        control={form.control}
-                      />
-                    ))}
-                </div>
-
-                {/* Activity sub collections */}
-                <div className="bg-brand-gray-50 basis-1/3 p-4 flex flex-col">
-                  <div className="flex items-center gap-6 border-b border-gray-200 flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
-                      className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                        activeTab === "files"
-                          ? "border-b-2 border-blue-600 text-gray-900"
-                          : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-                      }`}
-                    >
-                      Files & Images
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
-                      className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                        activeTab === "tasks"
-                          ? "border-b-2 border-blue-600 text-gray-900"
-                          : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-                      }`}
-                    >
-                      Task & Activities
-                    </button>
+            {/* Activity header and sub collections */}
+            <div className="border-brand-gray-100 flex border-y-1 max-h-[calc(85vh-8rem)]">
+              {/* Activity header information */}
+              <div className="flex basis-2/3 flex-col gap-6 p-4 overflow-y-auto">
+                {formQuery.status === "pending" && (
+                  <div className="text-brand-gray-400 col-span-2 text-xs">
+                    Loading…
                   </div>
-
-                  <div className="overflow-y-auto flex-grow mt-4 min-h-0">
-                    {activeTab === "files" && (
-                      <div>
-                        <FilesTabContent />
-                      </div>
-                    )}
-
-                    {activeTab === "tasks" && (
-                      <div className="text-center text-sm text-gray-500">
-                        Tasks & Activities content coming soon
-                      </div>
-                    )}
+                )}
+                {formQuery.status === "error" && (
+                  <div className="col-span-2 text-xs text-red-600">
+                    {(formQuery.error as Error)?.message || "Failed to load"}
                   </div>
-                </div>
+                )}
+                {formQuery.status === "success" &&
+                  (formQuery.data.mainFields ?? []).map((field) => (
+                    <FieldResolver
+                      key={String(field.id)}
+                      field={field}
+                      control={form.control}
+                    />
+                  ))}
               </div>
 
-              {/* Grouped details */}
-              {formQuery.status === "success" && (
-                <div
-                  className={`details divide-brand-gray-200 grid ${
-                    detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-3"
-                  } gap-y-3 divide-x pe-0 pt-4 pb-8`}
-                >
-                  {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
-                    <div
-                      key={`col-${colIdx}`}
-                      className="flex flex-col gap-3 px-4"
-                    >
-                      {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                        <section
-                          key={`${group.groupTitle}-${idx}`}
-                          className="flex flex-col gap-3"
-                        >
-                          <h3 className="text-brand-gray-600 text-sm font-medium">
-                            {group.groupTitle}
-                          </h3>
-                          <ul className="flex flex-col gap-3">
-                            {group.fields.map((field, idx) => (
-                              <li
-                                key={idx}
-                                className="flex flex-row justify-between text-xs"
-                              >
-                                <FieldResolver
-                                  key={String(field.id)}
-                                  field={field}
-                                  control={form.control}
-                                />
-                              </li>
-                            ))}
-                          </ul>
-                        </section>
-                      ))}
-                    </div>
-                  ))}
+              {/* Activity sub collections */}
+              <div className="bg-brand-gray-50 basis-1/3 p-4 flex flex-col">
+                <div className="flex items-center gap-6 border-b border-gray-200 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
+                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "files"
+                        ? "border-b-2 border-blue-600 text-gray-900"
+                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                    }`}
+                  >
+                    Files & Images
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
+                    className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "tasks"
+                        ? "border-b-2 border-blue-600 text-gray-900"
+                        : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                    }`}
+                  >
+                    Task & Activities
+                  </button>
                 </div>
-              )}
+
+                <div className="overflow-y-auto flex-grow mt-4 min-h-0">
+                  {activeTab === "files" && (
+                    <div>
+                      <FilesTabContent />
+                    </div>
+                  )}
+
+                  {activeTab === "tasks" && (
+                    <div className="text-center text-sm text-gray-500">
+                      Tasks & Activities content coming soon
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Actions - Fixed at bottom */}
-            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white rounded-b-xl">
+            {/* Grouped details */}
+            {formQuery.status === "success" && (
+              <div
+                className={`details divide-brand-gray-200 grid ${
+                  detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-3"
+                } scroll-thin scrollbar-on-white scrollbar-gutter:stable max-h-96 min-h-0 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
+              >
+                {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
+                  <div
+                    key={`col-${colIdx}`}
+                    className="flex flex-col gap-3 px-4"
+                  >
+                    {(detailColumns[colIdx] ?? []).map((group, idx) => (
+                      <section
+                        key={`${group.groupTitle}-${idx}`}
+                        className="flex flex-col gap-3"
+                      >
+                        <h3 className="text-brand-gray-600 text-sm font-medium">
+                          {group.groupTitle}
+                        </h3>
+                        <ul className="flex flex-col gap-3">
+                          {group.fields.map((field, idx) => (
+                            <li
+                              key={idx}
+                              className="flex flex-row justify-between text-xs"
+                            >
+                              <FieldResolver
+                                key={String(field.id)}
+                                field={field}
+                                control={form.control}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="my-4 flex flex-col gap-4 p-4">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-4">
                   <button
@@ -240,7 +237,7 @@ export function ActivityAddModal() {
                 </button>
               </div>
               {submitError ? (
-                <div className="text-brand-error-500 text-xs mt-2">
+                <div className="text-brand-error-500 text-xs">
                   {submitError}
                 </div>
               ) : null}

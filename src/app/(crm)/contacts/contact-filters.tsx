@@ -1,5 +1,7 @@
 import { ContactFilter, useContactFilters } from './use-contact-filters';
-import { X, CirclePlus } from 'lucide-react';
+import { X } from 'lucide-react';
+import AddOutlinedCircleIcon from "@/assets/icons/add-outlined-circle-icon.svg";
+import Image from "next/image";
 
 interface FilterItemProps {
   filter: ContactFilter;
@@ -88,12 +90,12 @@ export const ContactFilters = ({ showFilters, onToggleFilters }: ContactFiltersP
 
   if (!showFilters) {
     return (
-      <button
+      <button 
         className="text-brand-primary-500 bg-brand-primary-50 hover:bg-brand-primary-100 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5"
         onClick={onToggleFilters}
       >
         <span className="text-sm leading-1">Add filters</span>
-        <CirclePlus className="size-3.5" />
+        <Image src={AddOutlinedCircleIcon} width={14} height={14} alt="" className="size-3.5" />
       </button>
     );
   }

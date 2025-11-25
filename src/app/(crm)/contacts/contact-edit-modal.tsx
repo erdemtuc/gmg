@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Modal } from "@/components/ui/modal";
 import { useUIStore } from "@/stores/ui";
 import { apiClientGet } from "@/infra/http/client";
-import { isApiError } from "@/infra/http/errors";
 import type {
   ContactEditForm,
   ContactType,
@@ -38,7 +37,7 @@ export function ContactEditModal() {
   const isOpen = active?.type === "contactEdit";
   const contactId = active?.type === "contactEdit" ? active.contactId : null;
 
-  const [activeTab, setActiveTab] = useState<Tab>("files");
+  const [activeTab, setActiveTab] = useState<Tab>("details");
 
   const idFromUrl = params.get("contact_edit_id");
 
@@ -117,19 +116,8 @@ export function ContactEditModal() {
       }
       handleClose();
     } catch (e) {
-      if (isApiError(e)) {
-        // For API errors, construct a meaningful error message
-        const statusMessage = e.status ? `HTTP ${e.status}` : "";
-        const descriptionMessage = e.description ? e.description : "";
-        const rawMessage = e.raw && typeof e.raw === 'object' && 'error' in e.raw ? (e.raw as any).error : "";
-
-        // Use the most descriptive error message available
-        const errorMessage = descriptionMessage || rawMessage || statusMessage || "Failed to update contact";
-        setSubmitError(errorMessage);
-      } else {
-        const msg = e instanceof Error ? e.message : "Unexpected error";
-        setSubmitError(msg);
-      }
+      const msg = e instanceof Error ? e.message : "Unexpected error";
+      setSubmitError(msg);
     }
   };
 
@@ -151,14 +139,16 @@ export function ContactEditModal() {
     >
       <div className="flex flex-col h-full max-h-[85vh]">
         {/* Modal header with search and actions */}
-        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0 rounded-t-xl">
+        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
-          <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white bg-gradient-to-r from-sky-100/0 to-sky-100 pl-2 ring-2 ring-blue-200">
-            <Search className="size-4 text-zinc-400" aria-hidden />
+          <div className="relative w-80">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            </div>
             <input
               type="text"
-              className="text-height-1 h-full w-80 py-2 pr-1.5 pl-2 text-xs leading-0 font-normal text-gray-600 outline-none placeholder:text-gray-300"
-              placeholder="Search for anything..."
+              className="block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              placeholder="Search in contact details..."
             />
           </div>
 
@@ -310,7 +300,7 @@ export function ContactEditModal() {
             </div>
 
             {/* Actions - Fixed at bottom */}
-            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white rounded-b-xl">
+            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-4">
                   <button

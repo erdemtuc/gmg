@@ -18,22 +18,18 @@ type ModalState = {
     | { type: "contactDetail"; contactId: string }
     | { type: "contactAdd"; contactType: ContactType | null }
     | { type: "contactEdit"; contactId: string }
+    | { type: "opportunityEdit"; opportunityId: string }
     | { type: "activityDetail"; activityId: number }
     | { type: "activityAdd" }
     | { type: "activityEdit"; activityId: number }
-    | { type: "opportunityDetail"; opportunityId: string }
-    | { type: "opportunityAdd" }
-    | { type: "opportunityEdit"; opportunityId: string }
     | null;
   openContactDetail: (contactId: string) => void;
   openContactAdd: (contactType: ContactType | null) => void;
   openContactEdit: (contactId: string) => void;
+  openOpportunityEdit: (opportunityId: string) => void;
   openActivityDetail: (activityId: number) => void;
   openActivityAdd: () => void;
   openActivityEdit: (activityId: number) => void;
-  openOpportunityDetail: (opportunityId: string) => void;
-  openOpportunityAdd: () => void;
-  openOpportunityEdit: (opportunityId: string) => void;
   closeModal: () => void;
 };
 
@@ -99,20 +95,6 @@ export const useUIStore = create<UIState>()(
             modalState: {
               ...s.modalState,
               active: { type: "activityEdit", activityId },
-            },
-          })),
-        openOpportunityDetail: (opportunityId) =>
-          set((s) => ({
-            modalState: {
-              ...s.modalState,
-              active: { type: "opportunityDetail", opportunityId },
-            },
-          })),
-        openOpportunityAdd: () =>
-          set((s) => ({
-            modalState: {
-              ...s.modalState,
-              active: { type: "opportunityAdd" },
             },
           })),
         openOpportunityEdit: (opportunityId) =>

@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { apiClientGet } from "@/infra/http/client";
 import { ContactDetail } from "@/features/shared/models/contact-crud-models";
 import { useRef } from "react";
-import { Building2, User } from "lucide-react";
 
 export default function ContactCard({ contact }: { contact: Contact }) {
   const openContact = useUIStore((s) => s.modalState.openContactDetail);
@@ -78,21 +77,9 @@ export default function ContactCard({ contact }: { contact: Contact }) {
         <h2 className="text-brand-gray-600 text-base leading-1.5 font-medium">
           {contact.name}
         </h2>
-        <div className="text-brand-primary-500 text-xs font-medium flex items-center gap-1">
-          {contact.type === "O" ? (
-            <>
-              <Building2 className="size-3.5" />
-              <span>Org</span>
-            </>
-          ) : contact.type === "P" ? (
-            <>
-              <User className="size-3.5" />
-              <span>Person</span>
-            </>
-          ) : (
-            <span>{contact.type}</span>
-          )}
-        </div>
+        <span className="text-brand-primary-500 text-xs font-medium">
+          {contact.type}
+        </span>
       </div>
       <hr className="border-brand-gray-200 my-2 border-0 border-t" />
       <div className="divide-brand-gray-200 grid grid-cols-2 divide-x">

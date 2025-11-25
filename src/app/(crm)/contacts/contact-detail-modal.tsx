@@ -13,7 +13,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import EditIcon from "@/assets/icons/edit-outlined-default-icon.svg";
 import CopyIcon from "@/assets/icons/copy-outlined-default-icon.svg";
-import AddActivityIcon from "@/assets/icons/carrot-icon.svg";
+import AddActivityIcon from "@/assets/icons/add-outlined-square-icon.svg";
 import HistoryIcon from "@/assets/icons/history-outlined-default-icon.svg";
 import EllipseIcon from "@/assets/icons/ellipse-filled-default-icon.svg";
 import { distributeGroupsToColumns } from "@/features/shared/lib/distribute-groups-to-columns";
@@ -54,7 +54,7 @@ export function ContactDetailModal() {
   const contactId = active?.type === "contactDetail" ? active.contactId : null;
 
   const idFromUrl = params.get("contact_id");
-  const [activeTab, setActiveTab] = useState<Tab>("files");
+  const [activeTab, setActiveTab] = useState<Tab>("details");
   
   // Layout Menu State
   const [isLayoutMenuOpen, setIsLayoutMenuOpen] = useState(false);
@@ -131,23 +131,23 @@ export function ContactDetailModal() {
     <Modal isOpen={!!isOpen} onClose={handleClose} width="65.5rem" hideCloseButton>
       <div className="flex flex-col max-h-[calc(85vh-2rem)]">
         {/* Modal header with search and actions */}
-        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0 rounded-t-xl">
+        <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
-          <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white bg-gradient-to-r from-sky-100/0 to-sky-100 pl-2 ring-2 ring-blue-200">
-            <Search className="size-4 text-zinc-400" aria-hidden />
+          <div className="relative w-80">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            </div>
             <input
               type="text"
-              className="text-height-1 h-full w-80 py-2 pr-1.5 pl-2 text-xs leading-0 font-normal text-gray-600 outline-none placeholder:text-gray-300"
-              placeholder="Search for anything..."
+              className="block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              placeholder="Search in contact details..."
             />
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-3">
             <ActionButton label="Edit" Icon={EditIcon} onClick={handleEdit} />
-
-            <ActionButton label="Add Activity" Icon={AddActivityIcon} onClick={() => {}} />
-
+            
             <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
               <UserPlus className="size-4 text-blue-600" />
               <span className="text-brand-gray-600 text-sm font-medium">Add Person</span>
@@ -239,7 +239,10 @@ export function ContactDetailModal() {
               )}
             </div>
 
-            <ActionButton label="History" Icon={HistoryIcon} onClick={() => {}} />
+            <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
+              <History className="size-4 text-blue-600" />
+              <span className="text-brand-gray-600 text-sm font-medium">History</span>
+            </button>
 
             <button 
               onClick={handleClose}
@@ -333,7 +336,7 @@ export function ContactDetailModal() {
           <div
             className={`details divide-brand-gray-200 grid ${
               detailColumnsCount === 3 ? "grid-cols-3" : detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-1"
-            } scroll-thin scrollbar-on-white scrollbar-gutter:stable min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8 rounded-b-xl`}
+            } scroll-thin scrollbar-on-white scrollbar-gutter:stable min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
           >
             {detailQuery.status === "pending" && (
               <div
