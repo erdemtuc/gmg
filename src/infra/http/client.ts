@@ -101,3 +101,89 @@ export async function apiClientGet<T = unknown>(
     clearTimeout(timer);
   }
 }
+
+type PostOptions = {
+  timeoutMs?: number; // default 10s
+  cache?: RequestCache; // default 'no-store'
+  body?: unknown;
+  headers?: Record<string, string>;
+  next?: NextFetchRequestConfig;
+};
+
+/**
+ * POST fetch to your Next.js API routes (/api/*) from the browser.
+ * Sends same-origin cookies automatically; NEVER handles tokens.
+ */
+export async function apiClientPost<T = unknown>(
+  path: string,
+  opt: PostOptions = {},
+): Promise<T> {
+  if (!path.startsWith("/api/")) {
+    throw new ApiError({
+      status: 0,
+      code: "invalid_path",
+      description: "Client can only call /api/* routes",
+    });
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), opt.timeoutMs ?? 10_000);
+
+  try {
+    const res = await fetch(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...opt.headers,
+      },
+      body: opt.body ? JSON.stringify(opt.body) : undefined,
+      cache: opt.cache ?? "no-store",
+      credentials: "same-origin",
+      signal: controller.signal,
+      next: opt.next,
+    });
+
+    const contentType = res.headers.get("content-type") || "";
+    const isJson = contentType.includes("application/json");
+    const payload = isJson
+      ? await res.json().catch(() => ({}))
+      : await res.text();
+
+    if (!res.ok) {
+      const code = (isJson && (payload?.error as string)) || undefined;
+
+      const description =
+        (isJson && (payload?.error_description as string)) ||
+        (typeof payload === "string" ? payload : undefined) ||
+        undefined;
+
+      throw new ApiError({
+        status: res.status,
+        code,
+        description,
+        raw: payload,
+      });
+    }
+
+    return payload as unknown as T;
+  } catch (err: unknown) {
+    if (isApiError(err)) throw err;
+
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError({
+        status: 0,
+        code: "timeout",
+        description: "Request timed out",
+      });
+    }
+
+    const description = err instanceof Error ? err.message : "Network error";
+    throw new ApiError({
+      status: 0,
+      code: "network_error",
+      description,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
