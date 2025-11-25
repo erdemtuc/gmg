@@ -3,14 +3,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/features/auth/schema";
-import { apiClientPost } from "@/infra/http/client";
-import { isApiError } from "@/infra/http/errors";
-import { useRouter } from "next/navigation";
+import { loginAction } from "@/features/auth/actions";
+// import { ReactComponent as ProgressArc } from "@/icons/progress-arc-default.svg";
 import { useTransition } from "react";
 
 export default function LoginForm({ next }: { next: string | undefined }) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -23,35 +21,14 @@ export default function LoginForm({ next }: { next: string | undefined }) {
 
   const onSubmit = handleSubmit((data) => {
     startTransition(async () => {
-      try {
-        const result = await apiClientPost<{ ok: boolean; error?: string }>(
-          "/api/auth/login",
-          { body: data }
-        );
+      const result = await loginAction({ ...data, next });
 
-        if (!result.ok) {
-          setError("root", {
-            type: "server",
-            message: result.error || "Login failed.",
-          });
-          return;
-        }
-
-        // Redirect on success
-        router.push(next || "/");
-        router.refresh();
-      } catch (error) {
-        if (isApiError(error)) {
-          setError("root", {
-            type: "server",
-            message: error.description || "Login failed.",
-          });
-        } else {
-          setError("root", {
-            type: "server",
-            message: "An unexpected error occurred.",
-          });
-        }
+      if (!result!.ok) {
+        setError("root", {
+          type: "server",
+          message: result!.error || "Login failed.",
+        });
+        return;
       }
     });
   });

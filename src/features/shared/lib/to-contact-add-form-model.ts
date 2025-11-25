@@ -102,14 +102,14 @@ function mapToEditField(line: LineApiModel): EditField | null {
       return {
         id,
         type: "text",
-        name: line.label ?? "Organization Type",
+        name: id,
         value: line.value ?? null,
       };
     case "organizationTypeId":
       return {
         id,
         type: "select",
-        name: line.label ?? "Organization Type",
+        name: id,
         options: mapOptions(line),
         value: line.value ?? null,
       };
@@ -117,7 +117,7 @@ function mapToEditField(line: LineApiModel): EditField | null {
       return {
         id,
         type: "radio",
-        name: line.label ?? "Type",
+        name: id,
         value: line.value ?? null,
         options: [
           {
@@ -134,49 +134,49 @@ function mapToEditField(line: LineApiModel): EditField | null {
       return {
         id,
         type: "textarea",
-        name: line.label ?? "Address",
+        name: id,
         value: line.value ?? null,
       };
     case "organizationName":
       return {
         id,
         type: "text",
-        name: line.label ?? "Organization Name",
+        name: id,
         value: line.value ?? null,
       };
     case "organizationID":
       return {
         id,
         type: "text",
-        name: line.label ?? "Organization ID",
+        name: id,
         value: line.value ?? null,
       };
     case "name":
       return {
         id,
         type: "text",
-        name: line.label ?? "Name",
+        name: id,
         value: line.value ?? null,
       };
     case "email":
       return {
         id,
         type: "text",
-        name: line.label ?? "Email",
+        name: id,
         value: line.value ?? null,
       };
     case "phone":
       return {
         id,
         type: "text",
-        name: line.label ?? "Phone",
+        name: id,
         value: line.value ?? null,
       };
     case "title":
       return {
         id,
         type: "select",
-        name: line.label ?? "Title",
+        name: id,
         options: mapOptions(line),
         value: line.value ?? null,
       };

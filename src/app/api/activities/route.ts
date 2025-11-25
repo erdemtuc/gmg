@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getActivities, ActivityFilter, ActivitySort } from "@/features/activity/data/get-activities";
+import { getActivities } from "@/features/activity/data/get-activities";
 import { getAuthUser } from "@/features/shared/services/auth-user";
 
 export async function GET(request: NextRequest) {
@@ -16,36 +16,8 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const page = Number(searchParams.get("page") ?? 1);
 
-  // Extract filter parameters
-  const filters: ActivityFilter[] = [];
-  let filterIndex = 0;
-  while (searchParams.has(`filter[${filterIndex}][field]`)) {
-    const field = searchParams.get(`filter[${filterIndex}][field]`);
-    const operator = searchParams.get(`filter[${filterIndex}][operator]`);
-    const value = searchParams.get(`filter[${filterIndex}][value]`);
-
-    if (field && operator && value !== null) {
-      filters.push({
-        field,
-        operator,
-        value,
-      });
-    }
-    filterIndex++;
-  }
-
-  // Extract sort parameter
-  let sort: ActivitySort | undefined;
-  const sortParam = searchParams.get('sort');
-  if (sortParam) {
-    const [field, direction] = sortParam.split(':');
-    if (field && (direction === 'asc' || direction === 'desc')) {
-      sort = { field, direction };
-    }
-  }
-
   try {
-    const activities = await getActivities(page, filters, sort);
+    const activities = await getActivities(page);
     return NextResponse.json(activities);
   } catch (error) {
     return NextResponse.json(
