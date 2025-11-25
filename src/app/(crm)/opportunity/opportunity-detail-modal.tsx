@@ -122,7 +122,7 @@ export function OpportunityDetailModal({ isOpen, onClose, opportunityId }: Oppor
               onClick={() => {
                 // Open the edit opportunity modal and close the detail modal
                 handleClose();
-                useUIStore.getState().modalState.openOpportunityEdit(opportunityId || '');
+                useUIStore.getState().modalState.openOpportunityEdit(opportunityId ? String(opportunityId) : '');
               }}
             >
               <Edit className="size-4 text-gray-700" />

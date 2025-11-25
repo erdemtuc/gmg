@@ -6,6 +6,7 @@ import {
   getAccessCookie,
   getRefreshCookie,
   setAccessCookie,
+  setAuthCookies,
 } from "../auth/cookies-server";
 import { HttpOptionsBase } from "./_internal/options-base";
 import { AccessResp } from "@/core/contracts/auth";
