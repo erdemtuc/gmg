@@ -106,12 +106,12 @@ export function OpportunityDetailModal({ isOpen, onClose, opportunityId }: Oppor
         {/* Header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 flex-shrink-0">
           {/* Search Bar */}
-          <div className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white pl-3 pr-2 py-1.5">
-            <Search className="size-4 text-gray-500" aria-hidden />
+          <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white bg-gradient-to-r from-sky-100/0 to-sky-100 pl-2 ring-2 ring-blue-200">
+            <Search className="size-4 text-zinc-400" aria-hidden />
             <input
               type="text"
-              className="w-64 text-sm text-gray-700 outline-none placeholder:text-gray-400"
-              placeholder="Search in contact details..."
+              className="text-height-1 h-full w-80 py-2 pr-1.5 pl-2 text-xs leading-0 font-normal text-gray-600 outline-none placeholder:text-gray-300"
+              placeholder="Search for anything..."
             />
           </div>
 
@@ -289,12 +289,12 @@ export function OpportunityDetailModal({ isOpen, onClose, opportunityId }: Oppor
                 <div className="space-y-3">
                   {/* Filter/Sort Bar */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className="relative flex-1 mr-2">
-                      <Search className="absolute left-2 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
+                    <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white bg-gradient-to-r from-sky-100/0 to-sky-100 pl-2 ring-2 ring-blue-200 flex-1 mr-2">
+                      <Search className="size-4 text-zinc-400" aria-hidden />
                       <input
                         type="text"
-                        placeholder="Search..."
-                        className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        className="text-height-1 h-full w-full py-1.5 pr-1.5 pl-2 text-xs leading-0 font-normal text-gray-600 outline-none placeholder:text-gray-300"
+                        placeholder="Search for anything..."
                       />
                     </div>
                     <select className="text-xs border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-700 bg-white">

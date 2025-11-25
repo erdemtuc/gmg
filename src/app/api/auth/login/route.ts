@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Call the JWT authentication endpoint
-    const response = await apiServer<any>("/api/jwt.php", {
+    const response = await apiServer<any>("/jwt.php", {
       method: "POST",
       headers: {
         authorization: `Basic ${basic}`,

@@ -4,7 +4,7 @@ import { apiServer } from "@/infra/http/server";
 import { getAuthUser } from "@/features/shared/services/auth-user";
 import type { DynamicMenuItem } from "@/core/contracts/navigation";
 
-const MENU_ENDPOINT = "/api/resource.php?resource_type=menu";
+const MENU_ENDPOINT = "/resource.php?resource_type=menu";
 const MENU_REVALIDATE_SECONDS = 1800;
 
 type RawMenuEntry = {
