@@ -34,7 +34,7 @@ export async function loginAction({
     );
 
     // Use the correct endpoint for JWT authentication
-    const response = await apiServer<any>("/api/jwt.php", { // Using any since response format might vary
+    const response = await apiServer<any>("/jwt.php", { // Using any since response format might vary
       method: "POST",
       headers: {
         authorization: `Basic ${basic}`,

@@ -3,6 +3,7 @@ import { EditField } from "@/features/shared/models/crud-models";
 import RadioFilledIcon from "@/assets/icons/radio-filled-button-icon.svg";
 import RadioOutlinedIcon from "@/assets/icons/radio-outlined-button-icon.svg";
 import Image from "next/image";
+import { formatFieldLabel } from "@/utils/format-label";
 
 interface RadioInputProps {
   field: EditField;
@@ -12,7 +13,7 @@ interface RadioInputProps {
 
 export function RadioInput({ field, control }: RadioInputProps) {
   const id = String(field.id);
-  const label = field.name;
+  const label = field.label || formatFieldLabel(String(field.name));
 
   return (
     <div className="input-wrapper h-auto min-h-10">

@@ -1,5 +1,6 @@
 import { Control, Controller, FieldValues } from "react-hook-form";
 import { EditField } from "@/features/shared/models/crud-models";
+import { formatFieldLabel } from "@/utils/format-label";
 
 interface TextInputProps {
   field: EditField;
@@ -8,7 +9,7 @@ interface TextInputProps {
 
 export function TextInput({ field, control }: TextInputProps) {
   const id = String(field.id);
-  const label = field.name;
+  const label = field.label || formatFieldLabel(String(field.name));
 
   return (
     <div className="input-wrapper">

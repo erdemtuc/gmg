@@ -77,7 +77,7 @@ async function tryRefreshToken(): Promise<string> {
     );
 
     // Use the same JWT endpoint for refresh, but with refresh token
-    const response = await apiServerRaw<any>("/api/jwt.php", {
+    const response = await apiServerRaw<any>("/jwt.php", {
       method: "POST",
       headers: {
         authorization: `Basic ${basic}`,

@@ -6,6 +6,7 @@ import { loginSchema, type LoginInput } from "@/features/auth/schema";
 import { loginAction } from "@/features/auth/actions";
 // import { ReactComponent as ProgressArc } from "@/icons/progress-arc-default.svg";
 import { useTransition } from "react";
+import { ActivityIcon, LoaderIcon } from "lucide-react";
 
 export default function LoginForm({ next }: { next: string | undefined }) {
   const [isPending, startTransition] = useTransition();
@@ -95,7 +96,7 @@ export default function LoginForm({ next }: { next: string | undefined }) {
         {busy ? (
           <>
             <span className="text-sm">Signing in</span>
-            <div className="arc-spinner size-4 text-white">[Spinner]</div>
+            <div className="arc-spinner size-4 text-white"><LoaderIcon /></div>
           </>
         ) : (
           "Sign In"

@@ -16,6 +16,7 @@ import {
   FormValues,
 } from "@/features/shared/models/crud-models";
 import { FilesTabContent } from "../contacts/files-tab-content";
+import { TasksTabContent } from "../contacts/tasks-tab-content";
 
 type Tab = "details" | "files" | "tasks";
 
@@ -79,11 +80,53 @@ export function ActivityEditModal() {
         ...(formQuery.data.fieldGroups ?? []).flatMap((g) => g.fields),
       ];
       allFields.forEach((field) => {
-        form.setValue(String(field.id), field.value);
+        // Process the field value to handle objects and arrays appropriately
+        const processedValue = processFieldValue(field.value);
+        form.setValue(String(field.id), processedValue);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formQuery.status, formQuery.data]);
+
+  function processFieldValue(value: any): any {
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    // Handle object with option/id structure (like contacts)
+    if (typeof value === "object" && value.option !== undefined) {
+      return value.option || "";
+    }
+
+    // Handle object with name/id structure (like users)
+    if (typeof value === "object" && value.name !== undefined) {
+      return value.name || "";
+    }
+
+    // Handle arrays of objects (like assigned users)
+    if (Array.isArray(value) && value.length > 0 && typeof value[0] === "object") {
+      // For arrays of objects with name property
+      if (value[0].name !== undefined) {
+        return value.map(item => item.name).join(", ");
+      }
+      // For arrays of objects with option property
+      if (value[0].option !== undefined) {
+        return value.map(item => item.option).join(", ");
+      }
+      // For arrays of objects with id property
+      if (value[0].id !== undefined) {
+        return value.map(item => item.name || item.option || item.id).join(", ");
+      }
+    }
+
+    // Handle simple arrays
+    if (Array.isArray(value)) {
+      return value.join(", ");
+    }
+
+    // Return as is for simple values
+    return String(value);
+  }
 
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -119,16 +162,16 @@ export function ActivityEditModal() {
       width="65.5rem"
       title="Edit activity"
     >
-      <div>
+      <div className="flex flex-col h-full">
         <FormProvider {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col"
+            className="flex flex-col flex-grow min-h-0"
           >
             {/* Activity header and sub collections */}
-            <div className="border-brand-gray-100 flex border-y-1">
+            <div className="border-brand-gray-100 flex border-y-1 max-h-[calc(85vh-16rem)] overflow-hidden flex-grow min-h-0">
               {/* Activity header information */}
-              <div className="flex basis-2/3 flex-col gap-6 p-4">
+              <div className="flex basis-2/3 flex-col gap-6 p-4 overflow-y-auto overflow-x-hidden">
                 {formQuery.status === "pending" && (
                   <div className="text-brand-gray-400 col-span-2 text-xs">
                     Loading…
@@ -150,25 +193,25 @@ export function ActivityEditModal() {
               </div>
 
               {/* Activity sub collections */}
-              <div className="bg-brand-gray-50 basis-1/3 p-4">
-                <div className="flex items-center gap-6 border-b border-gray-200">
-                  <button 
+              <div className="bg-brand-gray-50 basis-1/3 p-4 overflow-hidden flex flex-col">
+                <div className="flex items-center gap-6 border-b border-gray-200 flex-shrink-0">
+                  <button
                     type="button"
                     onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
                     className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                      activeTab === "files" 
-                        ? "border-b-2 border-blue-600 text-gray-900" 
+                      activeTab === "files"
+                        ? "border-b-2 border-blue-600 text-gray-900"
                         : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
                     }`}
                   >
                     Files & Images
                   </button>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
                     className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                      activeTab === "tasks" 
-                        ? "border-b-2 border-blue-600 text-gray-900" 
+                      activeTab === "tasks"
+                        ? "border-b-2 border-blue-600 text-gray-900"
                         : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
                     }`}
                   >
@@ -176,17 +219,19 @@ export function ActivityEditModal() {
                   </button>
                 </div>
 
-                {activeTab === "files" && (
-                  <div className="mt-4">
-                    <FilesTabContent />
-                  </div>
-                )}
+                <div className="overflow-y-auto overflow-x-hidden flex-grow mt-4 min-h-0">
+                  {activeTab === "files" && (
+                    <div className="overflow-x-hidden">
+                      <FilesTabContent />
+                    </div>
+                  )}
 
-                {activeTab === "tasks" && (
-                  <div className="mt-4 text-center text-sm text-gray-500">
-                    Tasks & Activities content coming soon
-                  </div>
-                )}
+                  {activeTab === "tasks" && (
+                    <div className="overflow-x-hidden">
+                      <TasksTabContent />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -200,7 +245,7 @@ export function ActivityEditModal() {
                 {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
                   <div
                     key={`col-${colIdx}`}
-                    className="flex flex-col gap-3 px-4"
+                    className="flex flex-col gap-3 px-4 overflow-x-hidden"
                   >
                     {(detailColumns[colIdx] ?? []).map((group, idx) => (
                       <section
@@ -210,11 +255,11 @@ export function ActivityEditModal() {
                         <h3 className="text-brand-gray-600 text-sm font-medium">
                           {group.groupTitle}
                         </h3>
-                        <ul className="flex flex-col gap-3">
+                        <ul className="flex flex-col gap-3 overflow-x-hidden">
                           {group.fields.map((field, idx) => (
                             <li
                               key={idx}
-                              className="flex flex-row justify-between text-xs"
+                              className="flex flex-row justify-between text-xs overflow-x-hidden"
                             >
                               <FieldResolver
                                 key={String(field.id)}
@@ -232,7 +277,7 @@ export function ActivityEditModal() {
             )}
 
             {/* Actions */}
-            <div className="my-4 flex flex-col gap-4 p-4">
+            <div className="flex-shrink-0 flex flex-col gap-4 p-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-4">
                   <button

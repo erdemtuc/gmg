@@ -8,7 +8,7 @@ export async function fetchMenuItems() {
     // TODO: Remove this once we have a proper routing setup
     const updatedItems = items.map((item) => {
       if (
-        !["/contacts", "/activities", "/proposals", "/products"].includes(
+        !["/contacts", "/activities", "/proposals", "/products", "/opportunities"].includes(
           item.href,
         )
       ) {

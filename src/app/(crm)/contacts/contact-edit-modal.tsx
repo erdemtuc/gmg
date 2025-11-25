@@ -21,6 +21,7 @@ import {
   FormValues,
 } from "@/features/shared/models/crud-models";
 import { FilesTabContent } from "./files-tab-content";
+import { TasksTabContent } from "./tasks-tab-content";
 import { Search, UserPlus, Settings, X, History } from "lucide-react";
 
 type Tab = "details" | "files" | "tasks";
@@ -250,8 +251,8 @@ export function ContactEditModal() {
                   )}
 
                   {activeTab === "tasks" && (
-                    <div className="mt-4 text-center text-sm text-gray-500">
-                      Tasks & Activities content coming soon
+                    <div className="mt-4">
+                      <TasksTabContent />
                     </div>
                   )}
                 </div>

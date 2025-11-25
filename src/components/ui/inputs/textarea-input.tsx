@@ -1,5 +1,6 @@
 import { Control, Controller, FieldValues } from "react-hook-form";
 import { EditField } from "@/features/shared/models/crud-models";
+import { formatFieldLabel } from "@/utils/format-label";
 
 interface TextareaInputProps {
   field: EditField;
@@ -8,7 +9,7 @@ interface TextareaInputProps {
 
 export function TextareaInput({ field, control }: TextareaInputProps) {
   const id = String(field.id);
-  const label = field.name;
+  const label = field.label || formatFieldLabel(String(field.name));
 
   return (
     <div className="input-wrapper h-auto">

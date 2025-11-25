@@ -1,6 +1,7 @@
 import { Control, Controller, FieldValues } from "react-hook-form";
 import { EditField, Option } from "@/features/shared/models/crud-models";
 import { useState, useRef, useEffect } from "react";
+import { formatFieldLabel } from "@/utils/format-label";
 
 interface SelectInputProps {
   field: EditField;
@@ -9,7 +10,7 @@ interface SelectInputProps {
 
 export function SelectInput({ field, control }: SelectInputProps) {
   const id = String(field.id);
-  const label = field.name;
+  const label = field.label || formatFieldLabel(String(field.name));
   const options = field.options ?? [];
 
   return (

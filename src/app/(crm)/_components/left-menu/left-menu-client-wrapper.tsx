@@ -20,7 +20,9 @@ export default function LeftMenuClientWrapper() {
   // Fetch menu items on mount
   useEffect(() => {
     const loadMenuItems = async () => {
+      console.log('loading menu items');
       const items = await fetchMenuItems();
+      console.log('menuitems', items);
       setMenuItems(items);
     };
 

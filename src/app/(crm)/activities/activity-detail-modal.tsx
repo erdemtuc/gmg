@@ -8,6 +8,7 @@ import { useUIStore } from "@/stores/ui";
 import { apiClientGet } from "@/infra/http/client";
 import type { ActivityDetail } from "@/features/shared/models/activity-crud-models";
 import { distributeGroupsToColumns } from "@/features/shared/lib/distribute-groups-to-columns";
+import { formatFieldLabel } from "@/utils/format-label";
 import {
   Search,
   UserPlus,
@@ -261,52 +262,68 @@ export function ActivityDetailModal() {
               )}
               {detailQuery.status === "success" && (
                 <>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h2 className="text-brand-gray-900 text-xl font-semibold">
-                        {detailQuery.data.name}
-                      </h2>
-                      <p className="text-brand-gray-500 text-sm mt-1">
-                        Status: {detailQuery.data.status}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Grouped details */}
-                  <div
-                    className={`details divide-brand-gray-200 grid ${
-                      detailColumnsCount === 2 ? "grid-cols-2" : detailColumnsCount === 3 ? "grid-cols-3" : "grid-cols-1"
-                    } gap-y-3 divide-x`}
-                  >
-                    {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
-                      <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
-                        {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                          <section
-                            key={`${group.groupTitle}-${idx}`}
-                            className="flex flex-col gap-3"
-                          >
-                            <h3 className="text-brand-gray-600 text-sm font-medium">
-                              {group.groupTitle}
-                            </h3>
-                            <ul className="flex flex-col gap-3">
-                              {group.fields.map((field, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex flex-row justify-between text-xs"
-                                >
-                                  <span className="text-brand-gray-400">
-                                    {field.name}
-                                  </span>
-                                  <span className="text-brand-gray-600">
-                                    {String(field.value ?? "—")}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
-                          </section>
-                        ))}
+                  {/* Main header fields */}
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h2 className="text-brand-gray-900 text-xl font-semibold">
+                          {detailQuery.data.name}
+                        </h2>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Important top-level fields */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="flex flex-col">
+                        <span className="text-brand-gray-400 text-xs">Status</span>
+                        <span className="text-brand-gray-600">{detailQuery.data.status}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-brand-gray-400 text-xs">Created By</span>
+                        <span className="text-brand-gray-600">{detailQuery.data.createdBy}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-brand-gray-400 text-xs">Created At</span>
+                        <span className="text-brand-gray-600">{detailQuery.data.createdAt}</span>
+                      </div>
+                    </div>
+
+                    {/* Grouped details */}
+                    <div
+                      className={`details divide-brand-gray-200 grid ${
+                        detailColumnsCount === 2 ? "grid-cols-2" : detailColumnsCount === 3 ? "grid-cols-3" : "grid-cols-1"
+                      } gap-y-3 divide-x`}
+                    >
+                      {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
+                        <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
+                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
+                            <section
+                              key={`${group.groupTitle}-${idx}`}
+                              className="flex flex-col gap-3"
+                            >
+                              <h3 className="text-brand-gray-600 text-sm font-medium">
+                                {group.groupTitle}
+                              </h3>
+                              <ul className="flex flex-col gap-3">
+                                {group.fields.map((field, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex flex-row justify-between text-xs"
+                                  >
+                                    <span className="text-brand-gray-400">
+                                      {field.label || formatFieldLabel(field.name)}
+                                    </span>
+                                    <span className="text-brand-gray-600">
+                                      {String(field.value ?? "—")}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </section>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
