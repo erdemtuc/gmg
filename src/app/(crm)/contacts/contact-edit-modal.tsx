@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -20,11 +20,19 @@ import {
   EditFieldGroup,
   FormValues,
 } from "@/features/shared/models/crud-models";
+import { useFieldVisibility } from "@/utils/use-field-visibility";
 import { FilesTabContent } from "./files-tab-content";
 import { TasksTabContent } from "./tasks-tab-content";
-import { Search, UserPlus, Settings, X, History } from "lucide-react";
+import { Search, UserPlus, Settings, X, History, LayoutGrid, Columns, Rows, Eye } from "lucide-react";
 
 type Tab = "details" | "files" | "tasks";
+type LayoutType = "grid" | "column" | "row";
+
+interface SectionVisibility {
+  details: boolean;
+  tasks: boolean;
+  files: boolean;
+}
 
 export function ContactEditModal() {
   const active = useUIStore((s) => s.modalState.active);
@@ -40,7 +48,30 @@ export function ContactEditModal() {
 
   const [activeTab, setActiveTab] = useState<Tab>("details");
 
+  // Layout Menu State
+  const [isLayoutMenuOpen, setIsLayoutMenuOpen] = useState(false);
+  const [layout, setLayout] = useState<LayoutType>("grid");
+  const [visibleSections, setVisibleSections] = useState<SectionVisibility>({
+    details: true,
+    tasks: true,
+    files: true,
+  });
+  const layoutMenuRef = useRef<HTMLDivElement>(null);
+
   const idFromUrl = params.get("contact_edit_id");
+
+  // Close layout menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (layoutMenuRef.current && !layoutMenuRef.current.contains(event.target as Node)) {
+        setIsLayoutMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (idFromUrl && (!isOpen || contactId !== idFromUrl)) {
@@ -72,7 +103,27 @@ export function ContactEditModal() {
     refetchOnWindowFocus: "always",
   });
 
+  // Handle field visibility based on render function
+  const { visibleFields, updateFieldValues, currentFieldValues } = useFieldVisibility({
+    formRenderFunction: formQuery.data?.renderfnc,
+    mainFields: formQuery.data?.mainFields || [],
+    fieldGroups: formQuery.data?.fieldGroups || [],
+  });
+
+  // When tasks tab is active, always use 2 columns for details to make space for expanded tasks
+  const detailColumnsCount = activeTab === "tasks" ? 2 : 3; // Default to 3, but use 2 when tasks active
+  const detailColumns: EditFieldGroup[][] =
+    formQuery.status !== "success"
+      ? []
+      : distributeGroupsToColumns(
+          visibleFields.fieldGroups,
+          detailColumnsCount,
+        );
+
   const form = useForm<FormValues>({});
+
+  // Watch for changes in form values to update field visibility
+  const watchedValues = form.watch(); // Watch all form values
 
   // Reset form when data is loaded
   useEffect(() => {
@@ -100,6 +151,13 @@ export function ContactEditModal() {
     }
   }, [formQuery.data, form]);
 
+  // Update field visibility when form values change
+  useEffect(() => {
+    Object.entries(watchedValues).forEach(([fieldId, value]) => {
+      updateFieldValues(fieldId, value);
+    });
+  }, [watchedValues, updateFieldValues]);
+
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const onSubmit = async (values: FormValues) => {
@@ -122,14 +180,8 @@ export function ContactEditModal() {
     }
   };
 
-  const detailColumnsCount: number = 3;
-  const detailColumns: EditFieldGroup[][] =
-    formQuery.status !== "success"
-      ? []
-      : distributeGroupsToColumns(
-          formQuery.data.fieldGroups,
-          detailColumnsCount,
-        );
+  // detailColumns is already calculated using the detailColumnsCount defined earlier
+  // using the original calculation from above
 
   return (
     <Modal
@@ -138,7 +190,7 @@ export function ContactEditModal() {
       width="65.5rem"
       hideCloseButton
     >
-      <div className="flex flex-col h-full max-h-[85vh]">
+      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
@@ -158,17 +210,98 @@ export function ContactEditModal() {
               <span className="text-brand-gray-600 text-sm font-medium">Add Person</span>
             </button>
 
-            <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
-              <Settings className="size-4 text-blue-600" />
-              <span className="text-brand-gray-600 text-sm font-medium">Change layout</span>
-            </button>
+            <div className="relative" ref={layoutMenuRef}>
+              <button
+                onClick={() => setIsLayoutMenuOpen(!isLayoutMenuOpen)}
+                className={`border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors ${isLayoutMenuOpen ? 'bg-blue-50 border-blue-200' : 'bg-white'}`}
+              >
+                <Settings className="size-4 text-blue-600" />
+                <span className="text-brand-gray-600 text-sm font-medium">Change layout</span>
+              </button>
+
+              {/* Layout Dropdown */}
+              {isLayoutMenuOpen && (
+                <div className="absolute right-0 z-50 mt-2 w-72 rounded-md bg-white p-4 shadow-lg ring-1 ring-black ring-opacity-5">
+                  <h3 className="text-sm font-semibold text-gray-900">Change layout</h3>
+                  <p className="mt-1 text-xs text-gray-500 mb-4">
+                    You can customize the layout of the page, hide or show the sections you need
+                  </p>
+
+                  <div className="space-y-3">
+                    {/* Layout Options */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="layout"
+                          checked={layout === "grid"}
+                          onChange={() => setLayout("grid")}
+                          className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        />
+                        <LayoutGrid className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-700">Grid</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="layout"
+                          checked={layout === "column"}
+                          onChange={() => setLayout("column")}
+                          className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        />
+                        <Columns className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-700">Column</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="layout"
+                          checked={layout === "row"}
+                          onChange={() => setLayout("row")}
+                          className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        />
+                        <Rows className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-700">Row</span>
+                      </label>
+                    </div>
+
+                    <hr className="border-gray-200" />
+
+                    {/* Visibility Toggles */}
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setVisibleSections(s => ({ ...s, details: !s.details }))}
+                        className="flex w-full items-center gap-3 text-left hover:bg-gray-50 rounded px-1 py-1"
+                      >
+                        <Eye className={`h-4 w-4 ${visibleSections.details ? 'text-gray-700' : 'text-gray-400'}`} />
+                        <span className={`text-sm ${visibleSections.details ? 'text-gray-900' : 'text-gray-500'}`}>Details</span>
+                      </button>
+                      <button
+                        onClick={() => setVisibleSections(s => ({ ...s, tasks: !s.tasks }))}
+                        className="flex w-full items-center gap-3 text-left hover:bg-gray-50 rounded px-1 py-1"
+                      >
+                        <Eye className={`h-4 w-4 ${visibleSections.tasks ? 'text-gray-700' : 'text-gray-400'}`} />
+                        <span className={`text-sm ${visibleSections.tasks ? 'text-gray-900' : 'text-gray-500'}`}>Tasks</span>
+                      </button>
+                      <button
+                        onClick={() => setVisibleSections(s => ({ ...s, files: !s.files }))}
+                        className="flex w-full items-center gap-3 text-left hover:bg-gray-50 rounded px-1 py-1"
+                      >
+                        <Eye className={`h-4 w-4 ${visibleSections.files ? 'text-gray-700' : 'text-gray-400'}`} />
+                        <span className={`text-sm ${visibleSections.files ? 'text-gray-900' : 'text-gray-500'}`}>Files & Images</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <button className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-3 py-1.5 transition-colors bg-white">
               <History className="size-4 text-blue-600" />
               <span className="text-brand-gray-600 text-sm font-medium">History</span>
             </button>
 
-            <button 
+            <button
               onClick={handleClose}
               className="ml-2 p-1 text-gray-400 hover:text-gray-500 focus:outline-none"
             >
@@ -190,9 +323,9 @@ export function ContactEditModal() {
             className="flex flex-col flex-1 min-h-0 overflow-hidden"
           >
             {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white">
+            <div className="flex-1 min-h-0">
               {/* Contact header and sub collections */}
-              <div className="border-brand-gray-100 flex border-y-1">
+              <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
                 {/* Contact header information */}
                 <div className="flex basis-2/3 flex-col gap-6 p-4">
                   {formQuery.status === "pending" && (
@@ -206,7 +339,7 @@ export function ContactEditModal() {
                     </div>
                   )}
                   {formQuery.status === "success" &&
-                    (formQuery.data.mainFields ?? []).map((field) => (
+                    (visibleFields.mainFields ?? []).map((field) => (
                       <FieldResolver
                         key={String(field.id)}
                         field={field}
@@ -215,26 +348,26 @@ export function ContactEditModal() {
                     ))}
                 </div>
 
-                {/* Contact sub collections */}
+                {/* Contact sub collections - conditional rendering */}
                 <div className="bg-brand-gray-50 basis-1/3 p-4">
-                  <div className="flex items-center gap-6 border-b border-gray-200">
-                    <button 
+                  <div className="flex items-center gap-6 border-b border-gray-200 p-4">
+                    <button
                       type="button"
                       onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
                       className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                        activeTab === "files" 
-                          ? "border-b-2 border-blue-600 text-gray-900" 
+                        activeTab === "files"
+                          ? "border-b-2 border-blue-600 text-gray-900"
                           : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
                       }`}
                     >
                       Files & Images
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
                       className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                        activeTab === "tasks" 
-                          ? "border-b-2 border-blue-600 text-gray-900" 
+                        activeTab === "tasks"
+                          ? "border-b-2 border-blue-600 text-gray-900"
                           : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
                       }`}
                     >
@@ -242,60 +375,116 @@ export function ContactEditModal() {
                     </button>
                   </div>
 
-                  {activeTab === "files" && (
-                    <div className="mt-4">
+                  <div className="p-4 flex-1 overflow-y-auto">
+                    {activeTab === "files" && (
                       <FilesTabContent />
-                    </div>
-                  )}
-
-                  {activeTab === "tasks" && (
-                    <div className="mt-4">
-                      <TasksTabContent />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Grouped details */}
-              {formQuery.status === "success" && (
-                <div
-                  className={`details divide-brand-gray-200 grid ${
-                    detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-3"
-                  } gap-y-3 divide-x pe-0 pt-4 pb-8`}
-                >
-                  {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
+              {/* Main content area - adjust layout based on active tab */}
+              {visibleSections.details && activeTab === "tasks" ? (
+                // Special layout when tasks tab is active - 2 detail cols + tasks as 3rd col
+                <div className="flex flex-1 min-h-0 max-h-full">
+                  {/* 2 columns of detail fields */}
+                  <div
+                    className="details divide-brand-gray-200 grid grid-cols-2 w-2/3 scroll-thin scrollbar-on-white min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-0 pb-0"
+                  >
+                    {formQuery.status === "pending" && (
+                      <div className="text-brand-gray-400 col-span-2 p-2 text-xs">
+                        Loading…
+                      </div>
+                    )}
+                    {formQuery.status === "error" && (
+                      <div className="text-brand-gray-400 col-span-2 p-2 text-xs text-red-600">
+                        {(formQuery.error as Error)?.message || "Failed to load"}
+                      </div>
+                    )}
+                    {formQuery.status === "success" &&
+                      Array.from({ length: 2 }).map((_, colIdx) => (
+                        <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
+                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
+                            <section
+                              key={`${group.groupTitle}-${idx}`}
+                              className="flex flex-col gap-3"
+                            >
+                              <h3 className="text-brand-gray-600 text-sm font-medium">
+                                {group.groupTitle}
+                              </h3>
+                              <ul className="flex flex-col gap-3">
+                                {group.fields.map((field, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex flex-row justify-between text-xs"
+                                  >
+                                    <FieldResolver
+                                      key={String(field.id)}
+                                      field={field}
+                                      control={form.control}
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            </section>
+                          ))}
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Tasks as third column */}
+                  <div className="w-1/3 bg-brand-gray-50 border-l border-gray-200 flex flex-col min-h-0">
+                    <div className="p-4 flex-1 overflow-y-auto max-h-full">
+                      <TasksTabContent />
+                    </div>
+                  </div>
+                </div>
+              ) : visibleSections.details ? (
+                // Default layout when tasks tab is not active
+                <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white">
+                  {/* Grouped details */}
+                  {formQuery.status === "success" && (
                     <div
-                      key={`col-${colIdx}`}
-                      className="flex flex-col gap-3 px-4"
+                      className={`details divide-brand-gray-200 ${
+                        detailColumnsCount === 3 ? "grid grid-cols-3 w-full" :
+                        detailColumnsCount === 2 ? "grid grid-cols-2 w-full" : "grid grid-cols-1 w-full"
+                      } scroll-thin scrollbar-on-white min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-0 pb-0 max-h-full`}
                     >
-                      {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                        <section
-                          key={`${group.groupTitle}-${idx}`}
-                          className="flex flex-col gap-3"
+                      {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
+                        <div
+                          key={`col-${colIdx}`}
+                          className="flex flex-col gap-3 px-4"
                         >
-                          <h3 className="text-brand-gray-600 text-sm font-medium">
-                            {group.groupTitle}
-                          </h3>
-                          <ul className="flex flex-col gap-3">
-                            {group.fields.map((field, idx) => (
-                              <li
-                                key={idx}
-                                className="flex flex-row justify-between text-xs"
-                              >
-                                <FieldResolver
-                                  key={String(field.id)}
-                                  field={field}
-                                  control={form.control}
-                                />
-                              </li>
-                            ))}
-                          </ul>
-                        </section>
+                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
+                            <section
+                              key={`${group.groupTitle}-${idx}`}
+                              className="flex flex-col gap-3"
+                            >
+                              <h3 className="text-brand-gray-600 text-sm font-medium">
+                                {group.groupTitle}
+                              </h3>
+                              <ul className="flex flex-col gap-3">
+                                {group.fields.map((field, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex flex-row justify-between text-xs"
+                                  >
+                                    <FieldResolver
+                                      key={String(field.id)}
+                                      field={field}
+                                      control={form.control}
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            </section>
+                          ))}
+                        </div>
                       ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Actions - Fixed at bottom */}

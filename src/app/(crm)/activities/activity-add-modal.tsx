@@ -15,6 +15,7 @@ import {
   EditFieldGroup,
   FormValues,
 } from "@/features/shared/models/crud-models";
+import { useFieldVisibility } from "@/utils/use-field-visibility";
 import { FilesTabContent } from "../contacts/files-tab-content";
 import { TasksTabContent } from "../contacts/tasks-tab-content";
 
@@ -62,7 +63,24 @@ export function ActivityAddModal() {
     refetchOnWindowFocus: "always",
   });
 
+  // Handle field visibility based on render function
+  const { visibleFields, updateFieldValues, currentFieldValues } = useFieldVisibility({
+    formRenderFunction: formQuery.data?.renderfnc,
+    mainFields: formQuery.data?.mainFields || [],
+    fieldGroups: formQuery.data?.fieldGroups || [],
+  });
+
   const form = useForm<FormValues>({});
+
+  // Watch for changes in form values to update field visibility
+  const watchedValues = form.watch(); // Watch all form values
+
+  // Update field visibility when form values change
+  useEffect(() => {
+    Object.entries(watchedValues).forEach(([fieldId, value]) => {
+      updateFieldValues(fieldId, value);
+    });
+  }, [watchedValues, updateFieldValues]);
 
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -86,7 +104,7 @@ export function ActivityAddModal() {
     formQuery.status !== "success"
       ? []
       : distributeGroupsToColumns(
-          formQuery.data.fieldGroups,
+          visibleFields.fieldGroups,
           detailColumnsCount,
         );
 
@@ -118,7 +136,7 @@ export function ActivityAddModal() {
                   </div>
                 )}
                 {formQuery.status === "success" &&
-                  (formQuery.data.mainFields ?? []).map((field) => (
+                  (visibleFields.mainFields ?? []).map((field) => (
                     <FieldResolver
                       key={String(field.id)}
                       field={field}

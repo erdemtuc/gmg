@@ -9,6 +9,7 @@ export type EditFieldType =
   | "number"
   | "textarea"
   | "radio"
+  | "checkbox"
   | "select"
   | "search"
   | "datetime-local";

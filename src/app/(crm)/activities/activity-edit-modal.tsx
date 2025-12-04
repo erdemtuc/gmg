@@ -15,6 +15,7 @@ import {
   EditFieldGroup,
   FormValues,
 } from "@/features/shared/models/crud-models";
+import { useFieldVisibility } from "@/utils/use-field-visibility";
 import { FilesTabContent } from "../contacts/files-tab-content";
 import { TasksTabContent } from "../contacts/tasks-tab-content";
 
@@ -71,7 +72,17 @@ export function ActivityEditModal() {
     refetchOnWindowFocus: "always",
   });
 
+  // Handle field visibility based on render function
+  const { visibleFields, updateFieldValues, currentFieldValues } = useFieldVisibility({
+    formRenderFunction: formQuery.data?.renderfnc,
+    mainFields: formQuery.data?.mainFields || [],
+    fieldGroups: formQuery.data?.fieldGroups || [],
+  });
+
   const form = useForm<FormValues>({});
+
+  // Watch for changes in form values to update field visibility
+  const watchedValues = form.watch(); // Watch all form values
 
   useEffect(() => {
     if (formQuery.status === "success") {
@@ -87,6 +98,13 @@ export function ActivityEditModal() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formQuery.status, formQuery.data]);
+
+  // Update field visibility when form values change
+  useEffect(() => {
+    Object.entries(watchedValues).forEach(([fieldId, value]) => {
+      updateFieldValues(fieldId, value);
+    });
+  }, [watchedValues, updateFieldValues]);
 
   function processFieldValue(value: any): any {
     if (value === null || value === undefined) {
@@ -151,7 +169,7 @@ export function ActivityEditModal() {
     formQuery.status !== "success"
       ? []
       : distributeGroupsToColumns(
-          formQuery.data.fieldGroups,
+          visibleFields.fieldGroups,
           detailColumnsCount,
         );
 
@@ -183,7 +201,7 @@ export function ActivityEditModal() {
                   </div>
                 )}
                 {formQuery.status === "success" &&
-                  (formQuery.data.mainFields ?? []).map((field) => (
+                  (visibleFields.mainFields ?? []).map((field) => (
                     <FieldResolver
                       key={String(field.id)}
                       field={field}

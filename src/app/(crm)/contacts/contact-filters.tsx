@@ -95,7 +95,7 @@ export const ContactFilters = ({ showFilters, onToggleFilters }: ContactFiltersP
         onClick={onToggleFilters}
       >
         <span className="text-sm leading-1">Add filters</span>
-        <Image src={AddOutlinedCircleIcon} width={14} height={14} alt="" className="size-3.5" />
+        <Image src={AddOutlinedCircleIcon || null} width={14} height={14} alt="" className="size-3.5" />
       </button>
     );
   }

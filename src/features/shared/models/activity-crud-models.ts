@@ -34,6 +34,7 @@ export type FieldGroup = {
 export interface ActivityAddForm {
   mainFields: EditField[];
   fieldGroups: EditFieldGroup[];
+  renderfnc?: string;
 }
 
 export interface ActivityEditForm extends ActivityAddForm {

@@ -7,31 +7,69 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClientGet } from "@/infra/http/client";
 import {
   ContactDetail,
-  FieldGroup,
 } from "@/features/shared/models/contact-crud-models";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import EditIcon from "@/assets/icons/edit-outlined-default-icon.svg";
-import CopyIcon from "@/assets/icons/copy-outlined-default-icon.svg";
-import AddActivityIcon from "@/assets/icons/add-outlined-square-icon.svg";
-import HistoryIcon from "@/assets/icons/history-outlined-default-icon.svg";
-import EllipseIcon from "@/assets/icons/ellipse-filled-default-icon.svg";
-import { distributeGroupsToColumns } from "@/features/shared/lib/distribute-groups-to-columns";
 import { useState, useRef, useEffect as useReactEffect } from "react";
 import { FilesTabContent } from "./files-tab-content";
 import { TasksTabContent } from "./tasks-tab-content";
-import { 
-  UserPlus, 
-  Settings, 
-  X, 
-  LayoutGrid, 
-  Columns, 
-  Rows, 
+import {
+  UserPlus,
+  Settings,
+  X,
+  LayoutGrid,
+  Columns,
+  Rows,
   Eye,
   History
 } from "lucide-react";
 
-type Tab = "details" | "files" | "tasks";
+// Utility function to format complex values properly
+function formatValue(value: any): string {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  // Handle array of objects (like phone numbers)
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return "";
+    }
+    // If array contains objects with 'number' property (like phones)
+    if (value.some(item => typeof item === 'object' && item.number)) {
+      return value.map(item => item.number).join(", ");
+    }
+    // If array contains simple values
+    return value.join(", ");
+  }
+
+  // Handle object with 'option' property (like dropdowns)
+  if (typeof value === 'object' && value.option) {
+    return value.option;
+  }
+
+  // Handle object with 'name' property (like UserAdded)
+  if (typeof value === 'object' && value.name) {
+    return value.name;
+  }
+
+  // Handle object with 'id' and 'option' properties
+  if (typeof value === 'object' && value.id !== undefined && value.option !== undefined) {
+    return value.option;
+  }
+
+  // Handle any other object by returning a string representation of its values
+  if (typeof value === 'object') {
+    const values = Object.values(value);
+    return values.join(", ");
+  }
+
+  // For everything else, convert to string
+  return String(value);
+}
+
+type Tab = "files" | "tasks";
 type LayoutType = "grid" | "column" | "row";
 
 interface SectionVisibility {
@@ -54,7 +92,7 @@ export function ContactDetailModal() {
   const contactId = active?.type === "contactDetail" ? active.contactId : null;
 
   const idFromUrl = params.get("contact_id");
-  const [activeTab, setActiveTab] = useState<Tab>("details");
+  const [activeTab, setActiveTab] = useState<Tab>("tasks");
   
   // Layout Menu State
   const [isLayoutMenuOpen, setIsLayoutMenuOpen] = useState(false);
@@ -118,18 +156,9 @@ export function ContactDetailModal() {
     gcTime: 2 * 60_000,
   });
 
-  const detailColumnsCount = layout === "grid" ? 3 : layout === "row" ? 2 : 1;
-  const detailColumns: FieldGroup[][] =
-    detailQuery.status !== "success"
-      ? []
-      : distributeGroupsToColumns(
-          detailQuery.data.fieldGroups,
-          detailColumnsCount,
-        );
-
   return (
     <Modal isOpen={!!isOpen} onClose={handleClose} width="65.5rem" hideCloseButton>
-      <div className="flex flex-col max-h-[calc(85vh-2rem)]">
+      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
@@ -251,141 +280,112 @@ export function ContactDetailModal() {
           </div>
         </div>
 
-        {/* Contact header and sub collections */}
-        <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
-          {/* Contact header information */}
-          <div className="flex basis-2/3 flex-col p-4">
-            <h1 className="text-brand-gray-600 text-lg leading-6 font-medium">
-              {detailQuery.data?.name || "Contact"}
-            </h1>
-            <div className="flex flex-row items-center justify-between">
-              <span className="text-brand-gray-600 text-xs">Active</span>
-              <div className="flex flex-row items-center gap-2">
-                <span className="text-brand-gray-400 text-xs">
-                  ID:{detailQuery.data?.id ?? ""}
+        {/* Contact header and content */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left Column - Main Content */}
+          <div className="flex-1 overflow-y-auto p-6 border-r border-gray-200">
+            {/* Contact Title - Full information */}
+            <div className="mb-6">
+              <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+                {detailQuery.data?.name || "Contact"}
+              </h1>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="text-sm text-gray-700">Active</span>
                 </span>
-                <EllipseIcon 
-                  className="text-brand-gray-400 size-1.5"
-                  aria-hidden
-                />
+              </div>
+              <div className="text-right text-xs text-gray-500 mb-4">
                 <div>
-                  <span className="text-brand-gray-400 text-xs">
-                    Created {detailQuery.data?.createdAt ?? ""} by
-                  </span>{" "}
-                  <span className="text-brand-primary-600 text-xs">
-                    {detailQuery.data?.createdBy ?? ""}
-                  </span>
+                  ID:{detailQuery.data?.id ?? ""} • Created {detailQuery.data?.createdAt ?? ""} by{" "}
+                  <span className="text-blue-600">{detailQuery.data?.createdBy ?? ""}</span>
                 </div>
               </div>
             </div>
-            <div className="mt-3 flex flex-col gap-1">
-              <h2 className="text-brand-gray-600 text-sm font-medium">Notes</h2>
-              <p className="text-brand-gray-500 text-xs">
+
+            {/* Notes */}
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Notes</h3>
+              <p className="text-sm text-gray-700 leading-relaxed">
                 Jeff Karsten, a representative of the Green Valley Farmers Cooperative, is located in Baxter Springs, Cherokee County. You can reach them at (620) 856-2365.
               </p>
             </div>
+
+            {/* Details - Multi-column layout */}
+            {visibleSections.details && detailQuery.status === "success" && detailQuery.data?.fieldGroups && (
+              <div className={`grid ${
+                layout === "grid" ? "grid-cols-2" :
+                layout === "row" ? "grid-cols-2" : "grid-cols-1"
+              } gap-x-8 gap-y-6`}>
+                {(detailQuery.data?.fieldGroups || []).map((group, idx) => (
+                  <section key={`${group.groupTitle}-${idx}`} className="flex flex-col gap-3">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">{group.groupTitle}</h3>
+                    <div className="space-y-3">
+                      {(group.fields || []).map((field, fieldIdx) => (
+                        <div key={fieldIdx} className="flex justify-between">
+                          <span className="text-sm text-gray-600">{field.name}</span>
+                          <span className="text-sm text-gray-900">{formatValue(field.value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+            
+            {detailQuery.status === "pending" && (
+              <div className="text-gray-400 p-2 text-xs">Loading…</div>
+            )}
+            {detailQuery.status === "error" && (
+              <div className="text-red-600 p-2 text-xs">
+                {(detailQuery.error as Error)?.message || "Failed to load"}
+              </div>
+            )}
           </div>
 
-          {/* Contact sub collections */}
-          <div className="bg-brand-gray-50 basis-1/3 p-4">
-            <div className="flex items-center gap-6 border-b border-gray-200">
+          {/* Right Column - Tasks & Activities */}
+          <div className="w-96 bg-gray-50 border-l border-gray-200 flex flex-col">
+            {/* Tabs */}
+            <div className="flex border-b border-gray-200 px-4 py-0 flex-shrink-0">
               {visibleSections.files && (
-                <button 
-                  onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
-                  className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                    activeTab === "files" 
-                      ? "border-b-2 border-blue-600 text-gray-900" 
-                      : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("files")}
+                  className={`pb-3 pt-4 px-2 text-sm font-medium transition-colors focus:outline-none ${
+                    activeTab === "files"
+                      ? "border-b-2 border-blue-600 text-gray-900"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   Files & Images
                 </button>
               )}
               {visibleSections.tasks && (
-                <button 
-                  onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
-                  className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                    activeTab === "tasks" 
-                      ? "border-b-2 border-blue-600 text-gray-900" 
-                      : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("tasks")}
+                  className={`pb-3 pt-4 px-2 text-sm font-medium transition-colors focus:outline-none ${
+                    activeTab === "tasks"
+                      ? "border-b-2 border-blue-600 text-gray-900"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   Task & Activities
                 </button>
               )}
             </div>
-            
-            {visibleSections.files && activeTab === "files" && (
-              <div className="mt-4">
-                <FilesTabContent />
-              </div>
-            )}
 
-            {visibleSections.tasks && activeTab === "tasks" && (
-              <div className="mt-4 max-h-[300px] overflow-y-auto pr-1">
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeTab === "files" && visibleSections.files && (
+                <FilesTabContent />
+              )}
+              {activeTab === "tasks" && visibleSections.tasks && (
                 <TasksTabContent />
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Grouped details */}
-        {visibleSections.details && (
-          <div
-            className={`details divide-brand-gray-200 grid ${
-              detailColumnsCount === 3 ? "grid-cols-3" : detailColumnsCount === 2 ? "grid-cols-2" : "grid-cols-1"
-            } scroll-thin scrollbar-on-white scrollbar-gutter:stable min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-4 pb-8`}
-          >
-            {detailQuery.status === "pending" && (
-              <div
-                className={`text-brand-gray-400 ${
-                  detailColumnsCount === 3 ? "col-span-3" : detailColumnsCount === 2 ? "col-span-2" : "col-span-1"
-                } p-2 text-xs`}
-              >
-                Loading…
-              </div>
-            )}
-            {detailQuery.status === "error" && (
-              <div
-                className={`${
-                  detailColumnsCount === 3 ? "col-span-3" : detailColumnsCount === 2 ? "col-span-2" : "col-span-1"
-                } p-2 text-xs text-red-600`}
-              >
-                {(detailQuery.error as Error)?.message || "Failed to load"}
-              </div>
-            )}
-            {detailQuery.status === "success" &&
-              Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
-                <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
-                  {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                    <section
-                      key={`${group.groupTitle}-${idx}`}
-                      className="flex flex-col gap-3"
-                    >
-                      <h3 className="text-brand-gray-600 text-sm font-medium">
-                        {group.groupTitle}
-                      </h3>
-                      <ul className="flex flex-col gap-3">
-                        {group.fields.map((field, idx) => (
-                          <li
-                            key={idx}
-                            className="flex flex-row justify-between text-xs"
-                          >
-                            <span className="text-brand-gray-400">
-                              {field.name}
-                            </span>
-                            <span className="text-brand-gray-500">
-                              {String(field.value ?? "")}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </section>
-                  ))}
-                </div>
-              ))}
-          </div>
-        )}
       </div>
     </Modal>
   );
@@ -406,9 +406,9 @@ function ActionButton({
       className="border-brand-gray-200 hover:border-brand-primary-400 inline-flex cursor-pointer items-center gap-2 rounded-sm border-1 px-2 py-1.5 transition-colors"
     >
       {Icon ? (
-        <Icon 
-          className="size-4 flex-shrink-0 text-brand-primary-500" 
-          aria-hidden 
+        <Icon
+          className="size-4 flex-shrink-0 text-brand-primary-500"
+          aria-hidden
         />
       ) : null}
       <span className="text-brand-gray-600 text-sm font-medium">{label}</span>

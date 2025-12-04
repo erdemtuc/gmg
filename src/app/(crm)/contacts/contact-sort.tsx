@@ -31,7 +31,7 @@ export const ContactSortComponent = ({ showSort, onToggleSort }: ContactSortComp
             <ChevronUp className="size-3.5" /> : 
             <ChevronDown className="size-3.5" />
         ) : (
-          <Image src={ChevronOutlinedUpIcon} width={14} height={14} alt="" className="size-3.5 rotate-180" />
+          <Image src={ChevronOutlinedUpIcon || null} width={14} height={14} alt="" className="size-3.5 rotate-180" />
         )}
       </button>
       

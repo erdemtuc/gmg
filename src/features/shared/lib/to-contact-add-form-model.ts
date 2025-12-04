@@ -59,6 +59,7 @@ export function toContactAddFormModel(
       (field): field is EditField => field !== null,
     ),
     fieldGroups,
+    renderfnc: apiContactAddForm.renderfnc,
   };
 }
 

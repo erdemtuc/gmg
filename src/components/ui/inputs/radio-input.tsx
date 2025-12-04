@@ -41,11 +41,15 @@ export function RadioInput({ field, control }: RadioInputProps) {
                     }}
                     className="sr-only"
                   />
-                  {isChecked ? (
-                    <Image src={RadioFilledIcon} width={16} height={16} alt="" className="text-brand-primary-500 h-4 w-4" />
-                  ) : (
-                    <Image src={RadioOutlinedIcon} width={16} height={16} alt="" className="text-brand-gray-400 h-4 w-4" />
-                  )}
+                  <div className={`flex items-center justify-center w-4 h-4 rounded-full border-2 ${
+                    isChecked
+                      ? 'border-brand-primary-500 bg-brand-primary-500'
+                      : 'border-brand-gray-400'
+                  }`}>
+                    {isChecked && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                    )}
+                  </div>
                   <span>{opt.value}</span>
                 </label>
               );

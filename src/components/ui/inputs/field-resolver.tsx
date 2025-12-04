@@ -6,6 +6,7 @@ import {
   RadioInput,
   SelectInput,
   MultiSelectInput,
+  CheckboxInput,
 } from "./index";
 import { EditField } from "@/features/shared/models/crud-models";
 
@@ -27,6 +28,8 @@ export function FieldResolver({ field, control }: FieldResolverProps) {
       return <TextareaInput {...baseProps} />;
     case "radio":
       return <RadioInput {...baseProps} />;
+    case "checkbox":
+      return <CheckboxInput {...baseProps} />;
     case "select": {
       const isMulti = !!field.isMulti;
       return isMulti ? (

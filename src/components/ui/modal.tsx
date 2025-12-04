@@ -87,7 +87,7 @@ export function Modal({
             onClick={onClose}
             className="absolute top-5 right-4 cursor-pointer leading-none text-[#61646C]"
           >
-            <Image src={CloseIcon} width={20} height={20} alt="" className="size-5" />
+            <Image src={CloseIcon || null} width={20} height={20} alt="" className="size-5" />
           </button>
         )}
         <div>{children}</div>

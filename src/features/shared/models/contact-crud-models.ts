@@ -33,6 +33,7 @@ export type ContactType = "O" | "P";
 export interface ContactAddForm {
   mainFields: EditField[];
   fieldGroups: EditFieldGroup[];
+  renderfnc?: string;
 }
 
 export interface ContactEditForm extends ContactAddForm {

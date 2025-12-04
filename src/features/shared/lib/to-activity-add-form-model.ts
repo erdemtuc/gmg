@@ -53,6 +53,7 @@ export function toActivityAddFormModel(
       (field): field is EditField => field !== null,
     ),
     fieldGroups,
+    renderfnc: apiActivityAddForm.renderfnc,
   };
 }
 

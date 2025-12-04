@@ -40,9 +40,10 @@ export default function ContactCard({ contact }: { contact: Contact }) {
     openContact(String(contact.id));
   };
 
-  const mid = Math.ceil(contact.additionalFields.length / 2);
-  const left = contact.additionalFields.slice(0, mid);
-  const right = contact.additionalFields.slice(mid);
+  const additionalFields = contact.additionalFields || [];
+  const mid = Math.ceil(additionalFields.length / 2);
+  const left = additionalFields.slice(0, mid);
+  const right = additionalFields.slice(mid);
 
   return (
     <div
