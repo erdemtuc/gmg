@@ -37,6 +37,10 @@ export function useFieldVisibility({
     displayed: new Set(),
     hidden: new Set(),
   });
+  const [visibleFields, setVisibleFields] = useState<{ mainFields: EditField[]; fieldGroups: EditFieldGroup[] }>({
+    mainFields: [],
+    fieldGroups: [],
+  });
 
   // Collect all fields in a flat structure for processing visibility
   const getAllFields = useCallback((): FormField[] => {
@@ -66,7 +70,16 @@ export function useFieldVisibility({
       currentFieldValues
     );
     setFieldVisibility(visibility);
-  }, [formRenderFunction, currentFieldValues, getAllFields]);
+
+    // Update visible fields based on new visibility
+    setVisibleFields({
+      mainFields: mainFields.filter(field => visibility.displayed.has(field.id)),
+      fieldGroups: fieldGroups.map(group => ({
+        ...group,
+        fields: group.fields.filter(field => visibility.displayed.has(field.id))
+      }))
+    });
+  }, [formRenderFunction, currentFieldValues, mainFields, fieldGroups]);
 
   // Update field values and trigger visibility recalculation
   const updateFieldValues = useCallback((fieldId: string | number, value: any) => {
@@ -76,24 +89,9 @@ export function useFieldVisibility({
     }));
   }, []);
 
-  // Function to get currently visible fields
-  const getVisibleFields = useCallback((): { mainFields: EditField[]; fieldGroups: EditFieldGroup[] } => {
-    if (!formRenderFunction) {
-      // If no render function, show all fields
-      return { mainFields, fieldGroups };
-    }
-
-    return {
-      mainFields: mainFields.filter(field => fieldVisibility.displayed.has(field.id)),
-      fieldGroups: fieldGroups.map(group => ({
-        ...group,
-        fields: group.fields.filter(field => fieldVisibility.displayed.has(field.id))
-      }))
-    };
-  }, [mainFields, fieldGroups, fieldVisibility, formRenderFunction]);
 
   return {
-    visibleFields: getVisibleFields(),
+    visibleFields,
     fieldVisibility,
     updateFieldValues,
     currentFieldValues,
