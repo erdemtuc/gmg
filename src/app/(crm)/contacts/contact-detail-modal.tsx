@@ -13,7 +13,6 @@ import { Search } from "lucide-react";
 import EditIcon from "@/assets/icons/edit-outlined-default-icon.svg";
 import { useState, useRef, useEffect as useReactEffect } from "react";
 import { FilesTabContent } from "./files-tab-content";
-import { TasksTabContent } from "./tasks-tab-content";
 import {
   UserPlus,
   Settings,
@@ -22,10 +21,37 @@ import {
   Columns,
   Rows,
   Eye,
-  History
+  History,
+  Calendar,
+  CheckSquare,
+  AlignLeft
 } from "lucide-react";
 
-// Utility function to format complex values properly
+// --- Types ---
+
+interface TaskLine {
+  [key: string]: any;
+}
+
+interface ContactTask {
+  id: number;
+  ttname: string;
+  note: string;
+  dueDate: string;
+  lines: TaskLine[];
+}
+
+type Tab = "files" | "tasks";
+type LayoutType = "grid" | "column" | "row";
+
+interface SectionVisibility {
+  details: boolean;
+  tasks: boolean;
+  files: boolean;
+}
+
+// --- Helper Functions ---
+
 function formatValue(value: any): string {
   if (value === null || value === undefined) {
     return "";
@@ -69,14 +95,99 @@ function formatValue(value: any): string {
   return String(value);
 }
 
-type Tab = "files" | "tasks";
-type LayoutType = "grid" | "column" | "row";
+// --- Local Component: TasksTabContent ---
 
-interface SectionVisibility {
-  details: boolean;
-  tasks: boolean;
-  files: boolean;
+function TasksTabContent({ contactId }: { contactId: string | null }) {
+  const { data: tasks, status, error } = useQuery({
+    queryKey: ["contact-tasks", contactId],
+    enabled: !!contactId,
+    queryFn: async () => {
+      // Use native fetch to bypass the "Client can only call /api/* routes" restriction
+      // in apiClientGet when calling an external URL.
+      const response = await fetch(
+        `https://api.mybasiccrm.com/api/resource.php?resource_type=task`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`External API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data as ContactTask[];
+    },
+  });
+
+  if (!contactId) return null;
+
+  if (status === "pending") {
+    return (
+      <div className="flex flex-col gap-2 animate-pulse">
+        <div className="h-24 bg-gray-100 rounded-lg border border-gray-200"></div>
+        <div className="h-24 bg-gray-100 rounded-lg border border-gray-200"></div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+        <p className="font-medium">Failed to load tasks</p>
+        <p className="text-xs mt-1 opacity-80">
+          {(error as Error).message}
+        </p>
+      </div>
+    );
+  }
+
+  if (!tasks || tasks.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-400 bg-gray-50/50 rounded-lg border border-dashed border-gray-200">
+        <CheckSquare className="size-10 mb-2 opacity-10" />
+        <p className="text-sm font-medium">No tasks found</p>
+        <p className="text-xs">There are no tasks associated with this contact.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 pb-4">
+      {tasks.map((task) => (
+        <div
+          key={task.id}
+          className="group relative flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
+        >
+          {/* Header: Title and ID */}
+          <div className="flex items-start justify-between gap-3">
+            <h4 className="text-sm font-semibold text-gray-900 leading-tight">
+              {task.ttname}
+            </h4>
+            <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+              #{task.id}
+            </span>
+          </div>
+
+          {/* Due Date */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Calendar className="size-3.5 text-gray-400" />
+            <span className={task.dueDate.includes("ago") ? "text-orange-600 font-medium" : ""}>
+              {task.dueDate}
+            </span>
+          </div>
+
+          {/* Note */}
+          {task.note && (
+            <div className="mt-1 flex items-start gap-2 rounded-lg bg-gray-50 p-2.5 text-xs text-gray-600">
+              <AlignLeft className="size-3.5 mt-0.5 text-gray-400 shrink-0" />
+              <p className="line-clamp-3">{task.note}</p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
+
+// --- Main Component ---
 
 export function ContactDetailModal() {
   const active = useUIStore((s) => s.modalState.active);
@@ -381,7 +492,7 @@ export function ContactDetailModal() {
                 <FilesTabContent />
               )}
               {activeTab === "tasks" && visibleSections.tasks && (
-                <TasksTabContent />
+                <TasksTabContent contactId={contactId} />
               )}
             </div>
           </div>

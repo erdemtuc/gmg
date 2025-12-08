@@ -7,6 +7,28 @@ import { withAuth } from "./middlewares/withAuth";
 import { REFRESH_COOKIE_NAME } from "@/infra/auth/cookies-constants";
 
 export default async function middleware(req: NextRequest) {
+  // Check if auth bypass is enabled at the middleware level
+  const bypassAuth = process.env.BYPASS_AUTH === "true" || process.env.BYPASS_AUTH === "1";
+
+  if (bypassAuth) {
+    // If bypass is enabled, allow all requests without authentication
+    // Just ensure the auth cookie is set so the frontend knows there's a "user"
+    const response = NextResponse.next();
+    const hasToken = req.cookies.get(REFRESH_COOKIE_NAME)?.value;
+
+    if (!hasToken) {
+      response.cookies.set(REFRESH_COOKIE_NAME, "bypass_fake_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: "/",
+        sameSite: "strict",
+      });
+    }
+    return response;
+  }
+
+  // Use the original withAuth functionality when bypass is not enabled
   const handler = chain(
     withAuth({
       publicRoutes: ["/login", "/api/health"],

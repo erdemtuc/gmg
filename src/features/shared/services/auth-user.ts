@@ -34,6 +34,20 @@ export const getAuthUser = async (): Promise<AuthUser> => {
   }
 
   const logger = getLogger({ mod: "auth", fn: "getAuthUser" });
+
+  // Check if auth bypass is enabled
+  const bypassAuth = process.env.BYPASS_AUTH === "true" || process.env.BYPASS_AUTH === "1";
+  if (bypassAuth) {
+    const fakeUser = {
+      id: "bypass_user_1",
+      orgId: "bypass_org_1",
+    };
+    // Cache the fake user for 1 minute
+    cachedUser = fakeUser;
+    cacheExpiry = now + 60000; // 1 minute in milliseconds
+    return fakeUser;
+  }
+
   const refreshToken = await getRefreshCookie();
   if (!refreshToken) {
     logger.warn("unauthenticated: missing refresh token");

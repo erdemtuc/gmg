@@ -1,6 +1,6 @@
 import { Contact } from "@/features/shared/models/contact-crud-models";
 import { useUIStore } from "@/stores/ui";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation"; // Removed useRouter
 import { useQueryClient } from "@tanstack/react-query";
 import { apiClientGet } from "@/infra/http/client";
 import { ContactDetail } from "@/features/shared/models/contact-crud-models";
@@ -8,7 +8,7 @@ import { useRef } from "react";
 
 export default function ContactCard({ contact }: { contact: Contact }) {
   const openContact = useUIStore((s) => s.modalState.openContactDetail);
-  const router = useRouter();
+  // const router = useRouter(); // You can remove this if not used elsewhere
   const pathname = usePathname();
   const params = useSearchParams();
   const queryClient = useQueryClient();
@@ -18,7 +18,7 @@ export default function ContactCard({ contact }: { contact: Contact }) {
     const key = ["contact", String(contact.id)];
     const state = queryClient.getQueryState<ContactDetail>(key);
     const now = Date.now();
-    // Skip if we already have fresh data within staleTime
+    
     if (
       state?.status === "success" &&
       state.dataUpdatedAt &&
@@ -33,11 +33,19 @@ export default function ContactCard({ contact }: { contact: Contact }) {
       gcTime: 2 * 60_000,
     });
   };
+
   const open = () => {
-    const sp = new URLSearchParams(Array.from(params.entries()));
-    sp.set("contact_id", String(contact.id));
-    router.push(`${pathname}?${sp.toString()}`, { scroll: false });
+    // 1. Update store state (Opens the modal visually)
     openContact(String(contact.id));
+
+    // 2. Build new URL with search params
+    const newSearchParams = new URLSearchParams(params.toString());
+    newSearchParams.set("contact_id", String(contact.id));
+    const newUrl = `${pathname}?${newSearchParams.toString()}`;
+
+    // 3. Update browser URL immediately using native History API
+    // This bypasses the Next.js server roundtrip, making it instant
+    window.history.pushState(null, "", newUrl);
   };
 
   const additionalFields = contact.additionalFields || [];

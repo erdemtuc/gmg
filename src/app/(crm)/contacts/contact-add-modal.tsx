@@ -111,14 +111,14 @@ export function ContactAddModal() {
   });
 
   // Handle field visibility based on render function
-  const { visibleFields, updateFieldValues, currentFieldValues } = useFieldVisibility({
+  const { visibleFields, updateFieldValues } = useFieldVisibility({
     formRenderFunction: formQuery.data?.renderfnc,
     mainFields: formQuery.data?.mainFields || [],
     fieldGroups: formQuery.data?.fieldGroups || [],
   });
 
   // When tasks tab is active, always use 2 columns for details to make space for expanded tasks
-  const detailColumnsCount = activeTab === "tasks" ? 2 : 3; // Default to 3, but use 2 when tasks active
+  const detailColumnsCount = activeTab === "tasks" ? 2 : 3;
   const detailColumns: EditFieldGroup[][] =
     formQuery.status !== "success"
       ? []
@@ -130,7 +130,72 @@ export function ContactAddModal() {
   const form = useForm<FormValues>({});
 
   // Watch for changes in form values to update field visibility
-  const watchedValues = form.watch(); // Watch all form values
+  const watchedValues = form.watch();
+
+  // Reset form when data is loaded
+  useEffect(() => {
+    if (formQuery.data) {
+      const formValues: FormValues = {};
+
+      // --- FIX START: Sanitize Values ---
+      // This ensures that Objects (like {id: 'P', value: 'Person'}) returned by API
+      // are converted to Primitives ('P') so the visibility logic works.
+      const sanitizeValue = (val: any, fieldType: string) => {
+        if (val === null || val === undefined) return "";
+        
+        // 1. Handle Arrays
+        if (Array.isArray(val)) {
+          if (val.length === 0) return ""; 
+
+          const firstItem = val[0];
+
+          // Handle Phone Structure [{ number: "(532)...", type: "" }]
+          if (firstItem && typeof firstItem === "object" && "number" in firstItem) {
+             return val.map((item: any) => item.number).join(", ");
+          }
+
+          // Handle Email/Text Structure ["email@test.com"]
+          if (typeof firstItem === "string" && (fieldType === "text" || fieldType === "textarea")) {
+            return val.join(", ");
+          }
+          
+          return val; // Return raw array for Multi-Select components
+        }
+        
+        // 2. Handle Objects
+        if (typeof val === "object" && !(val instanceof Date)) {
+          // Handle Organization Structure { id: 21, option: "Kahveci" }
+          if ("option" in val) return val.option;
+          
+          // Standard lookups
+          if ("value" in val) return val.value;
+          if ("id" in val) return val.id;
+          if ("key" in val) return val.key;
+        }
+        
+        return val;
+      };
+      // --- FIX END ---
+
+      // Add main fields
+      if (formQuery.data.mainFields) {
+        formQuery.data.mainFields.forEach((field) => {
+          formValues[field.name] = sanitizeValue(field.value, field.type);
+        });
+      }
+
+      // Add grouped fields
+      if (formQuery.data.fieldGroups) {
+        formQuery.data.fieldGroups.forEach((group) => {
+          group.fields.forEach((field) => {
+            formValues[field.name] = sanitizeValue(field.value, field.type);
+          });
+        });
+      }
+
+      form.reset(formValues);
+    }
+  }, [formQuery.data, form]);
 
   // Update field visibility when form values change
   useEffect(() => {

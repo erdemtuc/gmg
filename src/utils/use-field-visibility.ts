@@ -69,17 +69,82 @@ export function useFieldVisibility({
       allFields,
       currentFieldValues
     );
-    setFieldVisibility(visibility);
+
+    // Only update state if visibility has actually changed
+    setFieldVisibility(prevVisibility => {
+      // Compare the previous visibility with the new one
+      if (areFieldVisibilityEqual(prevVisibility, visibility)) {
+        return prevVisibility; // No change, return previous to prevent re-render
+      }
+      return visibility;
+    });
 
     // Update visible fields based on new visibility
-    setVisibleFields({
-      mainFields: mainFields.filter(field => visibility.displayed.has(field.id)),
-      fieldGroups: fieldGroups.map(group => ({
+    setVisibleFields(prevVisibleFields => {
+      // Check if the visible fields have actually changed
+      const newMainFields = mainFields.filter(field => visibility.displayed.has(field.id));
+      const newFieldGroups = fieldGroups.map(group => ({
         ...group,
         fields: group.fields.filter(field => visibility.displayed.has(field.id))
-      }))
+      }));
+
+      // Only return new object if there are actual changes
+      if (areVisibleFieldsEqual(prevVisibleFields, { mainFields: newMainFields, fieldGroups: newFieldGroups })) {
+        return prevVisibleFields;
+      }
+
+      return {
+        mainFields: newMainFields,
+        fieldGroups: newFieldGroups
+      };
     });
-  }, [formRenderFunction, currentFieldValues, mainFields, fieldGroups]);
+  }, [formRenderFunction, currentFieldValues, getAllFields, mainFields, fieldGroups]);
+
+  // Helper function to compare FieldVisibility objects
+  const areFieldVisibilityEqual = useCallback((a: FieldVisibility, b: FieldVisibility) => {
+    if (a.displayed.size !== b.displayed.size || a.hidden.size !== b.hidden.size) {
+      return false;
+    }
+
+    for (const id of a.displayed) {
+      if (!b.displayed.has(id)) return false;
+    }
+
+    for (const id of a.hidden) {
+      if (!b.hidden.has(id)) return false;
+    }
+
+    return true;
+  }, []);
+
+  // Helper function to compare visible fields objects
+  const areVisibleFieldsEqual = useCallback((a: { mainFields: EditField[]; fieldGroups: EditFieldGroup[] },
+                                           b: { mainFields: EditField[]; fieldGroups: EditFieldGroup[] }) => {
+    if (a.mainFields.length !== b.mainFields.length || a.fieldGroups.length !== b.fieldGroups.length) {
+      return false;
+    }
+
+    // Check if main fields have the same ids in the same order
+    for (let i = 0; i < a.mainFields.length; i++) {
+      if (a.mainFields[i].id !== b.mainFields[i].id) return false;
+    }
+
+    // Check if field groups have the same structure
+    for (let i = 0; i < a.fieldGroups.length; i++) {
+      const groupA = a.fieldGroups[i];
+      const groupB = b.fieldGroups[i];
+
+      if (groupA.groupTitle !== groupB.groupTitle || groupA.fields.length !== groupB.fields.length) {
+        return false;
+      }
+
+      for (let j = 0; j < groupA.fields.length; j++) {
+        if (groupA.fields[j].id !== groupB.fields[j].id) return false;
+      }
+    }
+
+    return true;
+  }, []);
 
   // Update field values and trigger visibility recalculation
   const updateFieldValues = useCallback((fieldId: string | number, value: any) => {

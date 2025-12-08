@@ -9,7 +9,6 @@ import { useUIStore } from "@/stores/ui";
 import { apiClientGet } from "@/infra/http/client";
 import type {
   ContactEditForm,
-  ContactType,
 } from "@/features/shared/models/contact-crud-models";
 import { getContactTypeFromForm } from "@/features/shared/models/contact-crud-models";
 import { updateContactAction } from "@/features/contact/actions";
@@ -104,14 +103,14 @@ export function ContactEditModal() {
   });
 
   // Handle field visibility based on render function
-  const { visibleFields, updateFieldValues, currentFieldValues } = useFieldVisibility({
+  const { visibleFields, updateFieldValues } = useFieldVisibility({
     formRenderFunction: formQuery.data?.renderfnc,
     mainFields: formQuery.data?.mainFields || [],
     fieldGroups: formQuery.data?.fieldGroups || [],
   });
 
   // When tasks tab is active, always use 2 columns for details to make space for expanded tasks
-  const detailColumnsCount = activeTab === "tasks" ? 2 : 3; // Default to 3, but use 2 when tasks active
+  const detailColumnsCount = activeTab === "tasks" ? 2 : 3;
   const detailColumns: EditFieldGroup[][] =
     formQuery.status !== "success"
       ? []
@@ -123,18 +122,57 @@ export function ContactEditModal() {
   const form = useForm<FormValues>({});
 
   // Watch for changes in form values to update field visibility
-  const watchedValues = form.watch(); // Watch all form values
+  const watchedValues = form.watch();
 
   // Reset form when data is loaded
   useEffect(() => {
     if (formQuery.data) {
-      // Convert the ContactEditForm to FormValues format
       const formValues: FormValues = {};
+
+      // Helper to sanitize values and prevent [object Object] in inputs
+      // Now checks field type and specific object keys like 'number' and 'option'
+      const sanitizeValue = (val: any, fieldType: string) => {
+        if (val === null || val === undefined) return "";
+        
+        // 1. Handle Arrays
+        if (Array.isArray(val)) {
+          if (val.length === 0) return ""; 
+
+          const firstItem = val[0];
+
+          // FIX: Handle Phone Structure [{ number: "(532)...", type: "" }]
+          if (firstItem && typeof firstItem === "object" && "number" in firstItem) {
+             // Extract the numbers and join them with a comma (usually there's just one)
+             return val.map((item: any) => item.number).join(", ");
+          }
+
+          // FIX: Handle Email/Text Structure ["email@test.com"]
+          // If the input type is 'text' but value is array of strings, join them
+          if (typeof firstItem === "string" && (fieldType === "text" || fieldType === "textarea")) {
+            return val.join(", ");
+          }
+          
+          return val; // Return raw array for Multi-Select components
+        }
+        
+        // 2. Handle Objects
+        if (typeof val === "object" && !(val instanceof Date)) {
+          // FIX: Handle Organization Structure { id: 21, option: "Kahveci" }
+          if ("option" in val) return val.option;
+          
+          // Standard lookups
+          if ("value" in val) return val.value;
+          if ("id" in val) return val.id;
+          if ("key" in val) return val.key;
+        }
+        
+        return val;
+      };
 
       // Add main fields
       if (formQuery.data.mainFields) {
         formQuery.data.mainFields.forEach((field) => {
-          formValues[field.name] = field.value;
+          formValues[field.name] = sanitizeValue(field.value, field.type);
         });
       }
 
@@ -142,7 +180,7 @@ export function ContactEditModal() {
       if (formQuery.data.fieldGroups) {
         formQuery.data.fieldGroups.forEach((group) => {
           group.fields.forEach((field) => {
-            formValues[field.name] = field.value;
+            formValues[field.name] = sanitizeValue(field.value, field.type);
           });
         });
       }
@@ -179,9 +217,6 @@ export function ContactEditModal() {
       setSubmitError(msg);
     }
   };
-
-  // detailColumns is already calculated using the detailColumnsCount defined earlier
-  // using the original calculation from above
 
   return (
     <Modal

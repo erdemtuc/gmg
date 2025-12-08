@@ -23,8 +23,32 @@ export async function apiServer<T = unknown>(
   path: string,
   opt: HttpOptions = {},
 ): Promise<T> {
-  const requiredAuth = opt.auth !== "omit";
-  if (!requiredAuth) {
+  // Check if auth bypass is enabled
+  const bypassAuth = process.env.BYPASS_AUTH === "true" || process.env.BYPASS_AUTH === "1";
+
+  if (bypassAuth) {
+    // In bypass mode, we may need to use the same API credentials as in the refresh flow
+    // This allows the backend to be accessed using the API credentials instead of user authentication
+    const API_USER = process.env.API_USER || "abc@xx.com";
+    const API_PASSWORD = process.env.API_PASSWORD || "1qaz2wsx";
+    const basic = Buffer.from(`${API_USER}:${API_PASSWORD}`, "utf8").toString(
+      "base64"
+    );
+
+    // Add basic auth headers to the request
+    const headersWithBasicAuth = {
+      ...opt.headers,
+      authorization: `Basic ${basic}`,
+    };
+
+    return apiServerRaw<T>(path, {
+      ...toRawOptions(opt),
+      headers: headersWithBasicAuth,
+    });
+  }
+
+  // If auth is explicitly omitted, make request without authentication
+  if (opt.auth === "omit") {
     return apiServerRaw<T>(path, toRawOptions(opt));
   }
 
