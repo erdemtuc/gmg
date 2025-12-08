@@ -90,7 +90,11 @@ export function Modal({
             <Image src={CloseIcon || null} width={20} height={20} alt="" className="size-5" />
           </button>
         )}
-        <div>{children}</div>
+        <div className="flex-1 overflow-hidden flex flex-col rounded-b-xl">
+          <div className="flex-1 overflow-y-auto">
+            {children}
+          </div>
+        </div>
       </div>
     </div>,
     container,
