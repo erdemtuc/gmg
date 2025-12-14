@@ -103,11 +103,13 @@ export function ContactAddModal() {
       apiClientGet<ContactAddForm>(`/api/contacts/add-form`, {
         query: { type: activeType ?? null },
       }),
-    staleTime: 0,
-    gcTime: 60_000,
-    refetchOnMount: "always",
-    refetchOnReconnect: "always",
-    refetchOnWindowFocus: "always",
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes - use gcTime instead of cacheTime
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    retry: 1, // Only retry once on failure
+    retryDelay: 3000, // Wait 3 seconds before retry
   });
 
   // Handle field visibility based on render function
@@ -134,7 +136,7 @@ export function ContactAddModal() {
 
   // Reset form when data is loaded
   useEffect(() => {
-    if (formQuery.data) {
+    if (formQuery.data && formQuery.data.mainFields && formQuery.data.fieldGroups) {
       const formValues: FormValues = {};
 
       // --- FIX START: Sanitize Values ---
@@ -142,10 +144,10 @@ export function ContactAddModal() {
       // are converted to Primitives ('P') so the visibility logic works.
       const sanitizeValue = (val: any, fieldType: string) => {
         if (val === null || val === undefined) return "";
-        
+
         // 1. Handle Arrays
         if (Array.isArray(val)) {
-          if (val.length === 0) return ""; 
+          if (val.length === 0) return "";
 
           const firstItem = val[0];
 
@@ -158,40 +160,36 @@ export function ContactAddModal() {
           if (typeof firstItem === "string" && (fieldType === "text" || fieldType === "textarea")) {
             return val.join(", ");
           }
-          
+
           return val; // Return raw array for Multi-Select components
         }
-        
+
         // 2. Handle Objects
         if (typeof val === "object" && !(val instanceof Date)) {
           // Handle Organization Structure { id: 21, option: "Kahveci" }
           if ("option" in val) return val.option;
-          
+
           // Standard lookups
           if ("value" in val) return val.value;
           if ("id" in val) return val.id;
           if ("key" in val) return val.key;
         }
-        
+
         return val;
       };
       // --- FIX END ---
 
       // Add main fields
-      if (formQuery.data.mainFields) {
-        formQuery.data.mainFields.forEach((field) => {
-          formValues[field.name] = sanitizeValue(field.value, field.type);
-        });
-      }
+      formQuery.data.mainFields.forEach((field) => {
+        formValues[field.name] = sanitizeValue(field.value, field.type);
+      });
 
       // Add grouped fields
-      if (formQuery.data.fieldGroups) {
-        formQuery.data.fieldGroups.forEach((group) => {
-          group.fields.forEach((field) => {
-            formValues[field.name] = sanitizeValue(field.value, field.type);
-          });
+      formQuery.data.fieldGroups.forEach((group) => {
+        group.fields.forEach((field) => {
+          formValues[field.name] = sanitizeValue(field.value, field.type);
         });
-      }
+      });
 
       form.reset(formValues);
     }
@@ -228,7 +226,7 @@ export function ContactAddModal() {
       width="65.5rem"
       hideCloseButton
     >
-      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full">
+      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full rounded-b-xl overflow-hidden">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
@@ -274,7 +272,7 @@ export function ContactAddModal() {
                           name="layout"
                           checked={layout === "grid"}
                           onChange={() => setLayout("grid")}
-                          className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <LayoutGrid className="h-4 w-4 text-gray-400" />
                         <span className="text-sm text-gray-700">Grid</span>
@@ -285,7 +283,7 @@ export function ContactAddModal() {
                           name="layout"
                           checked={layout === "column"}
                           onChange={() => setLayout("column")}
-                          className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Columns className="h-4 w-4 text-gray-400" />
                         <span className="text-sm text-gray-700">Column</span>
@@ -296,7 +294,7 @@ export function ContactAddModal() {
                           name="layout"
                           checked={layout === "row"}
                           onChange={() => setLayout("row")}
-                          className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Rows className="h-4 w-4 text-gray-400" />
                         <span className="text-sm text-gray-700">Row</span>
@@ -359,7 +357,7 @@ export function ContactAddModal() {
             className="flex flex-col flex-1 min-h-0 overflow-hidden"
           >
             {/* Scrollable content area */}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
               {/* Contact header and sub collections */}
               <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
                 {/* Contact header information */}
@@ -374,14 +372,25 @@ export function ContactAddModal() {
                       {(formQuery.error as Error)?.message || "Failed to load"}
                     </div>
                   )}
-                  {formQuery.status === "success" &&
-                    (visibleFields.mainFields ?? []).map((field) => (
+                  {formQuery.status === "success" && visibleFields.mainFields && visibleFields.mainFields.length > 0 ? (
+                    visibleFields.mainFields.map((field) => (
                       <FieldResolver
                         key={String(field.id)}
                         field={field}
                         control={form.control}
                       />
-                    ))}
+                    ))
+                  ) : formQuery.status === "pending" ? (
+                    <div className="text-brand-gray-400 text-xs">
+                      Loading…
+                    </div>
+                  ) : formQuery.status === "error" ? (
+                    <div className="text-red-600 text-xs">
+                      {(formQuery.error as Error)?.message || "Failed to load"}
+                    </div>
+                  ) : (
+                    <div className="text-gray-500 text-sm">No main fields available</div>
+                  )}
                 </div>
 
                 {/* Contact sub collections - conditional rendering */}
@@ -524,7 +533,7 @@ export function ContactAddModal() {
             </div>
 
             {/* Actions - Fixed at bottom */}
-            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white">
+            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white rounded-b-xl">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-4">
                   <button

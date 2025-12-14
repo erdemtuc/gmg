@@ -12,7 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="dashboard-layout flex h-full flex-col p-4 overflow-x-hidden space-y-6">
+    <div className="dashboard-layout flex h-full flex-col space-y-6 overflow-x-hidden p-4">
       <Frame />
       <DashboardContentWrapper />
       {children}

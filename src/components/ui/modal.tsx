@@ -51,10 +51,10 @@ export function Modal({
   if (!isOpen || !container) return null;
 
   return createPortal(
-    <div aria-hidden={!isOpen}>
+    <div aria-hidden={!isOpen} className="z-[100]">
       <div
         className={
-          "fixed inset-0 bg-black/50 backdrop-blur-[2px]" +
+          "fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[100]" +
           (overlayClassName ? " " + overlayClassName : "")
         }
         onClick={onClose}
@@ -66,16 +66,16 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         className={
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 " +
+          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] " +
           "max-h-[85vh] w-[calc(100%_-_32px)] rounded-xl bg-white text-[#000]" +
-          "shadow-[0_20px_50px_rgba(0,0,0,0.25)]" +
+          "shadow-[0_20px_50px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden" +
           (panelClassName ? " " + panelClassName : "")
         }
         style={{ maxWidth: width }}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
-          <div className="p-4">
+          <div className="p-4 flex-shrink-0">
             <h2 className="text-brand-gray-600 text-base font-medium">
               {title}
             </h2>
@@ -85,15 +85,13 @@ export function Modal({
           <button
             aria-label="Close"
             onClick={onClose}
-            className="absolute top-5 right-4 cursor-pointer leading-none text-[#61646C]"
+            className="absolute top-5 right-4 cursor-pointer leading-none text-[#61646C] z-[102]"
           >
             <Image src={CloseIcon || null} width={20} height={20} alt="" className="size-5" />
           </button>
         )}
-        <div className="flex-1 overflow-hidden flex flex-col rounded-b-xl">
-          <div className="flex-1 overflow-y-auto">
-            {children}
-          </div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden rounded-b-xl">
+          {children}
         </div>
       </div>
     </div>,

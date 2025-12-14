@@ -225,7 +225,7 @@ export function ContactEditModal() {
       width="65.5rem"
       hideCloseButton
     >
-      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full">
+      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full rounded-b-xl overflow-hidden">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
@@ -358,7 +358,7 @@ export function ContactEditModal() {
             className="flex flex-col flex-1 min-h-0 overflow-hidden"
           >
             {/* Scrollable content area */}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
               {/* Contact header and sub collections */}
               <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
                 {/* Contact header information */}
@@ -523,7 +523,7 @@ export function ContactEditModal() {
             </div>
 
             {/* Actions - Fixed at bottom */}
-            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white">
+            <div className="border-t border-gray-200 p-4 flex-shrink-0 bg-white rounded-b-xl">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-4">
                   <button

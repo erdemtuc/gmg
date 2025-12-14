@@ -1,3 +1,5 @@
+'use client';
+
 import HelpMaterials from "./_components/help-materials";
 import LeftMenuClientWrapper from "./_components/left-menu/left-menu-client-wrapper";
 import LeftMenuSkeleton from "./_components/left-menu/left-menu-skeleton";
@@ -5,11 +7,22 @@ import Reports from "./_components/reports";
 import TopBar from "./_components/top-bar";
 import ClientAppShell from "./_components/ClientAppShell";
 import { Suspense } from "react";
+import { usePathname } from 'next/navigation';
+import { useSelectedLayoutSegment } from 'next/navigation';
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+// Client wrapper component that has access to router
+function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
+  'use client';
+
+  const pathname = usePathname();
+  const segment = useSelectedLayoutSegment();
+
   // Check if this is the calendar page by checking for a specific class on the child
   const isCalendarPage = typeof children === 'object' && children !== null &&
     (children as { props?: { className?: string } }).props?.className?.includes('calendar-page');
+
+  // Check if this is the dashboard page
+  const isDashboardPage = pathname === '/dashboard' || pathname.startsWith('/dashboard/');
 
   return (
     <div className="bg-brand-gray-50 min-h-screen w-full flex">
@@ -36,15 +49,38 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </ClientAppShell>
           </main>
 
-          {/* Side Pane - Only show if not calendar page */}
+          {/* Side Pane - Show different content based on page */}
           {!isCalendarPage && (
             <aside className="mt-6 mr-6 mb-9 space-y-4 w-96 flex-shrink-0">
-              <Reports />
-              <HelpMaterials />
+              {isDashboardPage ? (
+                <>
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Agenda</h4>
+                    <p className="text-xs text-gray-600">Upcoming tasks and events</p>
+                  </div>
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Help Materials</h4>
+                    <p className="text-xs text-gray-600">Resources and documentation</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Reports />
+                  <HelpMaterials />
+                </>
+              )}
             </aside>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <ClientLayoutWrapper>
+      {children}
+    </ClientLayoutWrapper>
   );
 }

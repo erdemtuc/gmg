@@ -63,7 +63,47 @@ function SearchableMultiSelect({
     if (!isOpen) {
       setSearchTerm("");
       setHighlightedIndex(-1);
-      setTimeout(() => inputRef.current?.focus(), 0);
+      setTimeout(() => {
+        inputRef.current?.focus();
+
+        // Auto-scroll to make sure the dropdown is visible when opened
+        setTimeout(() => {
+          if (dropdownRef.current) {
+            const dropdown = dropdownRef.current;
+            const dropdownRect = dropdown.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            // Check if dropdown goes beyond viewport
+            if (dropdownRect.bottom > viewportHeight) {
+              // Calculate how much to scroll to bring dropdown into view
+              const neededScroll = dropdownRect.bottom - viewportHeight + 20; // 20px buffer
+
+              // Try to find the nearest scrollable parent
+              let scrollableParent: HTMLElement | null = dropdown.parentElement;
+              while (scrollableParent) {
+                const style = window.getComputedStyle(scrollableParent);
+                if (style.overflowY === 'auto' || style.overflowY === 'scroll' ||
+                    style.overflow === 'auto' || style.overflow === 'scroll') {
+                  // Found a scrollable parent
+                  scrollableParent.scrollTop += neededScroll;
+                  break;
+                }
+                // If we reach the body or document element, scroll the page
+                if (scrollableParent === document.body || scrollableParent === document.documentElement) {
+                  window.scrollBy(0, neededScroll);
+                  break;
+                }
+                scrollableParent = scrollableParent.parentElement;
+              }
+
+              // As fallback, scroll the window if no scrollable parent found
+              if (!scrollableParent) {
+                window.scrollBy(0, neededScroll);
+              }
+            }
+          }
+        }, 0);
+      }, 0);
     }
   };
 
@@ -140,7 +180,7 @@ function SearchableMultiSelect({
   }, [searchTerm, isOpen]);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <div
         className="input-field flex min-h-10 cursor-pointer items-start justify-between py-2"
         onClick={handleToggle}
@@ -194,7 +234,10 @@ function SearchableMultiSelect({
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-lg">
+        <div
+          ref={dropdownRef}
+          className="absolute z-50 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-lg"
+        >
           <div className="p-2">
             <input
               ref={inputRef}
