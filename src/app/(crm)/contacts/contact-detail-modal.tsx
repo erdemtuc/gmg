@@ -394,10 +394,10 @@ export function ContactDetailModal() {
     <Modal
       isOpen={!!isOpen}
       onClose={handleClose}
-      width="65.5rem"
+      width="min(1200px, 90vw)"
       hideCloseButton
     >
-      <div className="flex h-full max-h-[calc(85vh-2rem)] flex-col">
+      <div className="flex h-full max-h-[calc(90vh-2rem)] flex-col">
         {/* Modal header with search and actions */}
         <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4">
           {/* Search Bar */}
@@ -558,7 +558,7 @@ export function ContactDetailModal() {
         {/* Contact header and content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left Column - Main Content */}
-          <div className="flex-1 overflow-y-auto border-r border-gray-200 p-6">
+          <div className="flex-1 overflow-y-auto border-r border-gray-200 px-6 py-4">
             {/* Contact Title - Full information */}
             <div className="mb-6">
               <h1 className="mb-2 text-2xl font-semibold text-gray-900">
@@ -614,18 +614,21 @@ export function ContactDetailModal() {
                   {(detailQuery.data?.fieldGroups || []).map((group, idx) => (
                     <section
                       key={`${group.groupTitle}-${idx}`}
-                      className={`relative flex flex-col gap-3 ${(layout === "grid" || layout === "row") && detailQuery.data?.fieldGroups.length > 1 ? (idx === 0 ? "pr-4" : "pl-4") : ""}`}
+                      className={`relative flex flex-col gap-3`}
                     >
                       <h3 className="mb-3 text-sm font-semibold text-gray-900">
                         {group.groupTitle}
                       </h3>
                       <div className="space-y-3">
                         {(group.fields || []).map((field, fieldIdx) => (
-                          <div key={fieldIdx} className="flex justify-between">
-                            <span className="text-sm text-gray-600">
+                          <div
+                            key={fieldIdx}
+                            className="flex items-start justify-between gap-4"
+                          >
+                            <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
                               {field.name}
                             </span>
-                            <span className="text-sm text-gray-900">
+                            <span className="ml-auto flex-1 text-right text-sm break-words break-all text-gray-900">
                               {formatValue(field.value)}
                             </span>
                           </div>
@@ -647,7 +650,7 @@ export function ContactDetailModal() {
           </div>
 
           {/* Right Column - Tasks & Activities */}
-          <div className="flex w-96 flex-col border-l border-gray-200 bg-gray-50">
+          <div className="flex w-1/3 flex-col border-l border-gray-200 bg-gray-50">
             {/* Tabs */}
             <div className="flex flex-shrink-0 border-b border-gray-200 px-4 py-0">
               {visibleSections.files && (
