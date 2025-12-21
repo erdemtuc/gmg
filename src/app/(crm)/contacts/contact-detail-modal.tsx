@@ -135,7 +135,7 @@ function formatValue(value: any): string {
 
 // --- Local Component: TasksTabContent ---
 
-function TasksTabContent({ contactId }: { contactId: string | null }) {
+function TasksTabContent({ contactId }: { contactId?: string | null }) {
   const [displayOption, setDisplayOption] = useState<
     "all" | "active" | "completed"
   >("all");
@@ -154,7 +154,7 @@ function TasksTabContent({ contactId }: { contactId: string | null }) {
       // Use native fetch to bypass the "Client can only call /api/* routes" restriction
       // in apiClientGet when calling an external URL.
       const response = await fetch(
-        `https://api.mybasiccrm.com/api/resource.php?resource_type=task`,
+        `https://api.mybasiccrm.com/api/resource.php?resource_type=task&contact_id=${contactId}`,
       );
 
       if (!response.ok) {
@@ -633,7 +633,7 @@ export function ContactDetailModal() {
             {visibleSections.details &&
               detailQuery.status === "success" &&
               detailQuery.data?.fieldGroups && (
-                <div className="flex gap-x-8 relative">
+                <div className="relative flex gap-x-8">
                   {/* Left Column */}
                   <div className="flex flex-1 flex-col">
                     {(detailQuery.data?.fieldGroups || [])
@@ -646,7 +646,7 @@ export function ContactDetailModal() {
                       .map((group, idx) => (
                         <section
                           key={`${group.groupTitle}-${idx}`}
-                          className="relative flex flex-col mb-8"
+                          className="relative mb-8 flex flex-col"
                         >
                           <h3 className="mb-4 text-sm font-semibold text-gray-900">
                             {group.groupTitle}
@@ -706,7 +706,7 @@ export function ContactDetailModal() {
                       .map((group, idx) => (
                         <section
                           key={`${group.groupTitle}-${idx}`}
-                          className="relative flex flex-col mb-8"
+                          className="relative mb-8 flex flex-col"
                         >
                           <h3 className="mb-4 text-sm font-semibold text-gray-900">
                             {group.groupTitle}
@@ -802,7 +802,7 @@ export function ContactDetailModal() {
                 <FilesTabContent />
               )}
               {activeTab === "tasks" && visibleSections.tasks && (
-                <TasksTabContent contactId={contactId} />
+                <TasksTabContent contactId={idFromUrl} />
               )}
             </div>
           </div>

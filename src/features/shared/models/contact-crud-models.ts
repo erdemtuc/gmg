@@ -21,6 +21,7 @@ export type ContactDetail = {
 export type Field = {
   name: string;
   value: string | number | boolean | null;
+  multi?: number; // Indicates if field supports multiple values (1 for true, 0 or undefined for false)
 };
 
 export type FieldGroup = {
