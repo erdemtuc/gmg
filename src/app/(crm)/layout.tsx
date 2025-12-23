@@ -6,6 +6,8 @@ import LeftMenuSkeleton from "./_components/left-menu/left-menu-skeleton";
 import Reports from "./_components/reports";
 import TopBar from "./_components/top-bar";
 import ClientAppShell from "./_components/ClientAppShell";
+import { Agenda } from "./dashboard/_components/sidebar/Agenda";
+import { HelpMaterials as DashboardHelpMaterials } from "./dashboard/_components/sidebar/HelpMaterials";
 import { Suspense } from "react";
 import { usePathname } from 'next/navigation';
 import { useSelectedLayoutSegment } from 'next/navigation';
@@ -54,14 +56,8 @@ function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
             <aside className="mt-6 mr-6 mb-9 space-y-4 w-96 flex-shrink-0">
               {isDashboardPage ? (
                 <>
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Agenda</h4>
-                    <p className="text-xs text-gray-600">Upcoming tasks and events</p>
-                  </div>
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Help Materials</h4>
-                    <p className="text-xs text-gray-600">Resources and documentation</p>
-                  </div>
+                  <Agenda />
+                  <DashboardHelpMaterials />
                 </>
               ) : (
                 <>

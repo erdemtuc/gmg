@@ -16,7 +16,7 @@ function withQuery(path: string, query?: GetOptions["query"]) {
   if (!query) return path;
   const url = new URL(
     path,
-    typeof window !== "undefined" ? window.location.origin : "http://localhost",
+    typeof window !== "undefined" ? window.location.origin : "https://api.mybasiccrm.com/api",
   );
   Object.entries(query).forEach(([k, v]) => {
     if (v === undefined || v === null) return;
