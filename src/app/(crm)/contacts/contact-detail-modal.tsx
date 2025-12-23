@@ -48,6 +48,42 @@ interface SectionVisibility {
   files: boolean;
 }
 
+// --- Helper Component: FieldValue ---
+function FieldValue({ value, isMulti }: { value: any; isMulti?: boolean }) {
+  if (value === null || value === undefined) {
+    return <span className="text-gray-400 italic">—</span>;
+  }
+
+  // Handle arrays with multi-value fields
+  if (Array.isArray(value) && isMulti) {
+    if (value.length === 0) {
+      return <span className="text-gray-400 italic">—</span>;
+    }
+    return (
+      <div className="flex flex-col gap-1 text-right">
+        {value.map((item, idx) => (
+          <div key={idx} className="flex items-center justify-end gap-2">
+            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-400">
+              {idx + 1}
+            </span>
+            <span className="text-sm text-gray-900">{formatValue(item)}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Handle regular arrays (comma-separated)
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return <span className="text-gray-400 italic">—</span>;
+    }
+    return <span>{formatValue(value)}</span>;
+  }
+
+  return <span>{formatValue(value)}</span>;
+}
+
 // --- Helper Functions ---
 
 function formatValue(value: any): string {
@@ -99,7 +135,7 @@ function formatValue(value: any): string {
 
 // --- Local Component: TasksTabContent ---
 
-function TasksTabContent({ contactId }: { contactId: string | null }) {
+function TasksTabContent({ contactId }: { contactId?: string | null }) {
   const [displayOption, setDisplayOption] = useState<
     "all" | "active" | "completed"
   >("all");
@@ -118,7 +154,7 @@ function TasksTabContent({ contactId }: { contactId: string | null }) {
       // Use native fetch to bypass the "Client can only call /api/* routes" restriction
       // in apiClientGet when calling an external URL.
       const response = await fetch(
-        `https://api.mybasiccrm.com/api/resource.php?resource_type=task`,
+        `https://api.mybasiccrm.com/api/resource.php?resource_type=task&contact_id=${contactId}`,
       );
 
       if (!response.ok) {
@@ -263,7 +299,7 @@ function TasksTabContent({ contactId }: { contactId: string | null }) {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-6">
         {filteredTasks.map((task) => (
           <div
             key={task.id}
@@ -558,7 +594,7 @@ export function ContactDetailModal() {
         {/* Contact header and content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left Column - Main Content */}
-          <div className="flex-1 overflow-y-auto border-r border-gray-200 px-6 py-4">
+          <div className="flex flex-1 flex-col overflow-y-auto border-r border-gray-200 px-6 py-4">
             {/* Contact Title - Full information */}
             <div className="mb-6">
               <h1 className="mb-2 text-2xl font-semibold text-gray-900">
@@ -597,45 +633,124 @@ export function ContactDetailModal() {
             {visibleSections.details &&
               detailQuery.status === "success" &&
               detailQuery.data?.fieldGroups && (
-                <div
-                  className={`relative grid ${
-                    layout === "grid"
-                      ? "grid-cols-2"
-                      : layout === "row"
-                        ? "grid-cols-2"
-                        : "grid-cols-1"
-                  } gap-x-8 gap-y-6`}
-                >
-                  {/* Vertical separator for multi-column layouts - grid and row layouts */}
-                  {(layout === "grid" || layout === "row") &&
-                    detailQuery.data?.fieldGroups.length > 1 && (
-                      <div className="absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 transform bg-gray-200"></div>
-                    )}
-                  {(detailQuery.data?.fieldGroups || []).map((group, idx) => (
-                    <section
-                      key={`${group.groupTitle}-${idx}`}
-                      className={`relative flex flex-col gap-3`}
-                    >
-                      <h3 className="mb-3 text-sm font-semibold text-gray-900">
-                        {group.groupTitle}
-                      </h3>
-                      <div className="space-y-3">
-                        {(group.fields || []).map((field, fieldIdx) => (
-                          <div
-                            key={fieldIdx}
-                            className="flex items-start justify-between gap-4"
-                          >
-                            <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
-                              {field.name}
-                            </span>
-                            <span className="ml-auto flex-1 text-right text-sm break-words break-all text-gray-900">
-                              {formatValue(field.value)}
-                            </span>
+                <div className="relative flex gap-x-8">
+                  {/* Left Column */}
+                  <div className="flex flex-1 flex-col">
+                    {(detailQuery.data?.fieldGroups || [])
+                      .slice(
+                        0,
+                        Math.ceil(
+                          (detailQuery.data?.fieldGroups || []).length / 2,
+                        ),
+                      )
+                      .map((group, idx) => (
+                        <section
+                          key={`${group.groupTitle}-${idx}`}
+                          className="relative mb-8 flex flex-col"
+                        >
+                          <h3 className="mb-4 text-sm font-semibold text-gray-900">
+                            {group.groupTitle}
+                          </h3>
+                          <div className="flex flex-col gap-3">
+                            {(group.fields || [])
+                              .filter((field) => {
+                                // Filter out empty values
+                                if (
+                                  field.value === null ||
+                                  field.value === undefined ||
+                                  field.value === ""
+                                ) {
+                                  return false;
+                                }
+                                // Filter out empty arrays
+                                if (
+                                  Array.isArray(field.value) &&
+                                  field.value.length === 0
+                                ) {
+                                  return false;
+                                }
+                                return true;
+                              })
+                              .map((field, fieldIdx) => (
+                                <div
+                                  key={fieldIdx}
+                                  className="flex items-start justify-between gap-4"
+                                >
+                                  <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
+                                    {field.name}
+                                  </span>
+                                  <span className="ml-auto flex-1 text-right text-sm break-words text-gray-900">
+                                    <FieldValue
+                                      value={field.value}
+                                      isMulti={field.multi === 1}
+                                    />
+                                  </span>
+                                </div>
+                              ))}
                           </div>
-                        ))}
-                      </div>
-                    </section>
-                  ))}
+                        </section>
+                      ))}
+                  </div>
+
+                  {/* Vertical Separator */}
+                  <div className="w-px bg-gray-200"></div>
+
+                  {/* Right Column */}
+                  <div className="flex flex-1 flex-col">
+                    {(detailQuery.data?.fieldGroups || [])
+                      .slice(
+                        Math.ceil(
+                          (detailQuery.data?.fieldGroups || []).length / 2,
+                        ),
+                      )
+                      .map((group, idx) => (
+                        <section
+                          key={`${group.groupTitle}-${idx}`}
+                          className="relative mb-8 flex flex-col"
+                        >
+                          <h3 className="mb-4 text-sm font-semibold text-gray-900">
+                            {group.groupTitle}
+                          </h3>
+                          <div className="flex flex-col gap-3">
+                            {(group.fields || [])
+                              .filter((field) => {
+                                // Filter out empty values
+                                if (
+                                  field.value === null ||
+                                  field.value === undefined ||
+                                  field.value === ""
+                                ) {
+                                  return false;
+                                }
+                                // Filter out empty arrays
+                                if (
+                                  Array.isArray(field.value) &&
+                                  field.value.length === 0
+                                ) {
+                                  return false;
+                                }
+                                return true;
+                              })
+                              .map((field, fieldIdx) => (
+                                <div
+                                  key={fieldIdx}
+                                  className="flex items-start justify-between gap-4"
+                                >
+                                  <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
+                                    {field.name}
+                                  </span>
+                                  <span className="ml-auto flex-1 text-right text-sm break-words text-gray-900">
+                                    <FieldValue
+                                      value={field.value}
+                                      isMulti={field.multi === 1}
+                                    />
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
+                        </section>
+                      ))}
+                  </div>
                 </div>
               )}
 
@@ -687,7 +802,7 @@ export function ContactDetailModal() {
                 <FilesTabContent />
               )}
               {activeTab === "tasks" && visibleSections.tasks && (
-                <TasksTabContent contactId={contactId} />
+                <TasksTabContent contactId={idFromUrl} />
               )}
             </div>
           </div>
