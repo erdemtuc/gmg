@@ -16,14 +16,14 @@ function withQuery(path: string, query?: GetOptions["query"]) {
   if (!query) return path;
   const url = new URL(
     path,
-    typeof window !== "undefined" ? window.location.origin : "https://api.mybasiccrm.com/api",
+    typeof window !== "undefined" ? "https://api.mybasiccrm.com" : "https://api.mybasiccrm.com",
   );
   Object.entries(query).forEach(([k, v]) => {
     if (v === undefined || v === null) return;
     url.searchParams.set(k, String(v));
   });
-  // Return only the path + search (keeps it relative)
-  return url.pathname + url.search;
+  console.log("Built URL:", url);
+  return url
 }
 
 /**
@@ -47,7 +47,7 @@ export async function apiClientGet<T = unknown>(
 
   try {
     const url = withQuery(path, opt.query);
-
+    console.log("Fetching URL:", url);
     const res = await fetch(url, {
       method: "GET", // enforce GET
       cache: opt.cache ?? "no-store",
@@ -141,6 +141,83 @@ export async function apiClientPost<T = unknown>(
       credentials: "same-origin",
       signal: controller.signal,
       next: opt.next,
+    });
+
+    const contentType = res.headers.get("content-type") || "";
+    const isJson = contentType.includes("application/json");
+    const payload = isJson
+      ? await res.json().catch(() => ({}))
+      : await res.text();
+
+    if (!res.ok) {
+      const code = (isJson && (payload?.error as string)) || undefined;
+
+      const description =
+        (isJson && (payload?.error_description as string)) ||
+        (typeof payload === "string" ? payload : undefined) ||
+        undefined;
+
+      throw new ApiError({
+        status: res.status,
+        code,
+        description,
+        raw: payload,
+      });
+    }
+
+    return payload as unknown as T;
+  } catch (err: unknown) {
+    if (isApiError(err)) throw err;
+
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError({
+        status: 0,
+        code: "timeout",
+        description: "Request timed out",
+      });
+    }
+
+    const description = err instanceof Error ? err.message : "Network error";
+    throw new ApiError({
+      status: 0,
+      code: "network_error",
+      description,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * GET fetch to external API with Authorization header
+ */
+export async function apiClientGetExternal<T = unknown>(
+  path: string,
+  token: string,
+  opt: GetOptions = {},
+): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), opt.timeoutMs ?? 10_000);
+
+  try {
+    // Build the full URL with query parameters
+    const url = new URL(path, "https://api.mybasiccrm.com");
+    if (opt.query) {
+      Object.entries(opt.query).forEach(([k, v]) => {
+        if (v === undefined || v === null) return;
+        url.searchParams.set(k, String(v));
+      });
+    }
+
+    console.log("Fetching external URL:", url.toString());
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        ...opt.headers,
+      },
+      cache: opt.cache ?? "no-store",
+      signal: controller.signal,
     });
 
     const contentType = res.headers.get("content-type") || "";

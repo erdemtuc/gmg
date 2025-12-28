@@ -226,7 +226,7 @@ export function ContactAddModal() {
       width="65.5rem"
       hideCloseButton
     >
-      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full rounded-b-xl overflow-hidden">
+      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full rounded-b-xl overflow-y-auto">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
@@ -356,8 +356,8 @@ export function ContactAddModal() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col flex-1 min-h-0 overflow-hidden"
           >
-            {/* Scrollable content area */}
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+            {/* Scrollable content area - now handles overflow at the main container level */}
+            <div className="flex-1 min-h-0 overflow-x-hidden">
               {/* Contact header and sub collections */}
               <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
                 {/* Contact header information */}
@@ -420,7 +420,7 @@ export function ContactAddModal() {
                     </button>
                   </div>
 
-                  <div className="p-4 flex-1 overflow-y-auto">
+                  <div className="p-4 flex-1">
                     {activeTab === "files" && (
                       <FilesTabContent />
                     )}
@@ -479,7 +479,7 @@ export function ContactAddModal() {
 
                   {/* Tasks as third column */}
                   <div className="w-1/3 bg-brand-gray-50 border-l border-gray-200 flex flex-col min-h-0">
-                    <div className="p-4 flex-1 overflow-y-auto max-h-full">
+                    <div className="p-4 flex-1 max-h-full">
                       <TasksTabContent />
                     </div>
                   </div>

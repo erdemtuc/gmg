@@ -151,19 +151,17 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
     queryKey: ["contact-tasks", contactId],
     enabled: !!contactId,
     queryFn: async () => {
-      // Use native fetch to bypass the "Client can only call /api/* routes" restriction
-      // in apiClientGet when calling an external URL.
-      const response = await fetch(
-        `https://api.mybasiccrm.com/api/resource.php?resource_type=task&contact_id=${contactId}`,
+      // Use the existing apiClientGet to call our Next.js API route which acts as a proxy
+      // This allows the server-side to handle authentication without exposing tokens to the client
+      const data = await apiClientGet<ContactTask[]>(
+        `/api/tasks`,
+        {
+          query: {
+            resource_type: 'task',
+            contact_id: contactId,
+          }
+        }
       );
-
-      if (!response.ok) {
-        throw new Error(
-          `External API Error: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const data = await response.json();
 
       // Check if the response indicates no resources
       if (
@@ -173,7 +171,7 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
         throw new Error(JSON.stringify(data));
       }
 
-      return data as ContactTask[];
+      return data;
     },
   });
 
@@ -433,7 +431,7 @@ export function ContactDetailModal() {
       width="min(1200px, 90vw)"
       hideCloseButton
     >
-      <div className="flex h-full max-h-[calc(90vh-2rem)] flex-col">
+      <div className="flex h-full max-h-[calc(90vh-2rem)] flex-col overflow-y-auto">
         {/* Modal header with search and actions */}
         <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4">
           {/* Search Bar */}
@@ -594,7 +592,7 @@ export function ContactDetailModal() {
         {/* Contact header and content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left Column - Main Content */}
-          <div className="flex flex-1 flex-col overflow-y-auto border-r border-gray-200 px-6 py-4">
+          <div className="flex flex-1 flex-col border-r border-gray-200 px-6 py-4">
             {/* Contact Title - Full information */}
             <div className="mb-6">
               <h1 className="mb-2 text-2xl font-semibold text-gray-900">
@@ -797,7 +795,7 @@ export function ContactDetailModal() {
             </div>
 
             {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 p-4">
               {activeTab === "files" && visibleSections.files && (
                 <FilesTabContent />
               )}
