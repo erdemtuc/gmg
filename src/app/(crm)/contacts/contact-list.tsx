@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { apiClientGet } from "@/infra/http/client";
 import { Contact } from "@/features/shared/models/contact-crud-models";
@@ -21,14 +21,14 @@ export default function ContactList({ filters, sort }: ContactListProps) {
   const query = useInfiniteQuery({
     queryKey: ["contacts"], // Keep query key stable
     initialPageParam: PAGE_START,
-    queryFn: async ({ pageParam }) => {
+    queryFn: useCallback(async ({ pageParam }: { pageParam: number }) => {
       const page = typeof pageParam === "number" ? pageParam : PAGE_START;
       // Fetch all contacts for now, filtering will be done client-side
       return apiClientGet<Contact[]>("/api/contacts", { query: { page } });
-    },
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length > 0 ? allPages.length + PAGE_START : undefined;
-    },
+    }, []),
+    getNextPageParam: useCallback((lastPage: Contact[], allPages: Contact[][]) => {
+      return lastPage.length > 0 ? allPages.length + 1 : undefined;
+    }, []),
   });
 
   const { hasNextPage, fetchNextPage } = query;

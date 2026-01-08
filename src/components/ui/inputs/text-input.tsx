@@ -23,7 +23,7 @@ export function TextInput({ field, control }: TextInputProps) {
           <input
             id={id}
             type={field.type === "datetime-local" ? "datetime-local" : "text"}
-            className="input-field b-none"
+            className="input-field border-none"
             {...controllerField}
           />
         )}

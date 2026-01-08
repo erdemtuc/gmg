@@ -41,15 +41,16 @@ type ApiActivityDetail = {
   name: string;
   status: string;
   other_flds: ApiOtherFields;
-  Lines: Record<
-    string,
-    | string
-    | number
-    | boolean
-    | undefined
-    | null
-    | Record<string, string | number | boolean | null>
-  >;
+  Lines: Array<{
+    fname?: string;
+    fid?: string;
+    label?: string;
+    value: any;
+    unit?: string;
+    multi?: number;
+    Tab_name?: string; // For field groups
+    alternativeLabel?: string;
+  }>;
 };
 
 type ApiOtherFields = {
@@ -62,25 +63,36 @@ function generateFieldGroups(apiActivityDetail: ApiActivityDetail) {
   let currentGroupTitle: string | null = null;
   let accumulatedFields: Field[] = [];
 
-  Object.entries(apiActivityDetail.Lines || {}).forEach(([key, value]) => {
-    if (!isNaN(Number(key))) {
-      const valueObj = value as Record<Field["name"], Field["value"]>;
-      if ("Tab_name" in valueObj) {
-        if (currentGroupTitle !== null) {
-          fieldGroups.push({
-            groupTitle: currentGroupTitle,
-            fields: accumulatedFields,
-          });
-        }
-        currentGroupTitle = valueObj.Tab_name as string;
-        accumulatedFields = [];
-      } else if (currentGroupTitle !== null) {
-        for (const [k, v] of Object.entries(valueObj)) {
-          accumulatedFields.push({ name: k, value: v });
-        }
+  // Handle the Lines array structure similar to contacts
+  for (const line of apiActivityDetail.Lines || []) {
+    if (line.Tab_name) {
+      if (currentGroupTitle !== null) {
+        fieldGroups.push({
+          groupTitle: currentGroupTitle,
+          fields: accumulatedFields,
+        });
+      }
+      currentGroupTitle = line.Tab_name;
+      accumulatedFields = [];
+    } else {
+      // Add field with multi property if it exists
+      const field: Field = {
+        name: line.label || line.fname || line.fid || 'unknown',
+        value: line.value,
+        multi: line.multi
+      };
+      if (currentGroupTitle !== null) {
+        accumulatedFields.push(field);
+      } else {
+        // Create a default group if no group is defined
+        fieldGroups.push({
+          groupTitle: "Details",
+          fields: [field]
+        });
+        currentGroupTitle = "Details";
       }
     }
-  });
+  }
 
   if (currentGroupTitle !== null) {
     fieldGroups.push({

@@ -11,9 +11,11 @@ export async function getActivities(page: number): Promise<Activity[]> {
   );
   return activities.map((activity) => ({
     ...activity,
-    additionalFields: Object.entries(activity.Lines?.[0] ?? {}).map(
-      ([name, value]) => ({ name, value }),
-    ),
+    additionalFields: (activity.Lines || []).map((line: any) => ({
+      name: line.label || line.fname || line.fid || 'unknown',
+      value: line.value,
+      multi: line.multi // Include the multi property to indicate if field supports multiple values
+    })).filter((field: any) => field.name && field.name !== 'unknown'),
   }));
 }
 
@@ -23,7 +25,15 @@ type ApiActivity = {
   status: string;
   dueDate: string;
   assignedTo: string;
-  Lines: Record<string, string | number | boolean | null>[];
+  Lines: Array<{
+    fname?: string;
+    fid?: string;
+    label?: string;
+    value: any;
+    unit?: string;
+    multi?: number;
+    alternativeLabel?: string;
+  }>;
   createdAt: string;
   createdBy: string;
 };

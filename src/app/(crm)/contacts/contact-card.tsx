@@ -137,7 +137,20 @@ export default function ContactCard({ contact }: { contact: Contact }) {
                         >
                           <span className="text-xs text-black">{field.name}</span>
                           <span className="text-xs font-medium text-black">
-                            {field.value}
+                            {Array.isArray(field.value) && field.multi === 1 ? (
+                              <div className="flex flex-col gap-1">
+                                {field.value.map((item, idx) => (
+                                  <div key={idx} className="flex justify-between">
+                                    <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
+                                      {idx + 1}
+                                    </span>
+                                    <span className="text-xs text-right max-w-[70%] truncate">{String(item)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              field.value
+                            )}
                           </span>
                         </div>
                       ))}
@@ -150,7 +163,20 @@ export default function ContactCard({ contact }: { contact: Contact }) {
                         >
                           <span className="text-xs text-black">{field.name}</span>
                           <span className="text-xs font-medium text-black">
-                            {field.value}
+                            {Array.isArray(field.value) && field.multi === 1 ? (
+                              <div className="flex flex-col gap-1">
+                                {field.value.map((item, idx) => (
+                                  <div key={idx} className="flex justify-between">
+                                    <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
+                                      {idx + 1}
+                                    </span>
+                                    <span className="text-xs text-right max-w-[70%] truncate">{String(item)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              field.value
+                            )}
                           </span>
                         </div>
                       ))}
@@ -193,7 +219,39 @@ export default function ContactCard({ contact }: { contact: Contact }) {
 function renderAdditionalField(
   label: string,
   value: string | number | boolean | undefined | null,
+  multi?: number
 ) {
+  // Handle multi-value fields
+  if (Array.isArray(value) && multi === 1) {
+    if (value.length === 0) {
+      return (
+        <div className="flex justify-between">
+          <span className="text-brand-gray-400 text-xs font-normal">{label}:</span>
+          <span className="text-brand-gray-400 text-xs font-normal italic">—</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col">
+        <div className="flex justify-between">
+          <span className="text-brand-gray-400 text-xs font-normal">{label}:</span>
+          <span className="text-brand-gray-600 text-xs font-normal"></span>
+        </div>
+        <div className="flex flex-col gap-1 mt-1">
+          {value.map((item, idx) => (
+            <div key={idx} className="flex justify-between">
+              <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
+                {idx + 1}
+              </span>
+              <span className="text-xs text-gray-600 text-right max-w-[70%] truncate">{String(item)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-between">
       <span className="text-brand-gray-400 text-xs font-normal">{label}:</span>

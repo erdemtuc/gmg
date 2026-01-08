@@ -94,7 +94,21 @@ export default function ActivitiesTable() {
                         <div>
                           {activity.additionalFields.slice(0, 2).map((field, idx) => (
                             <div key={idx} className="truncate">
-                              <span className="font-medium">{field.name}:</span> {field.value}
+                              <span className="font-medium">{field.name}:</span>{" "}
+                              {Array.isArray(field.value) && field.multi === 1 ? (
+                                <div className="flex flex-col gap-1">
+                                  {field.value.map((item, itemIdx) => (
+                                    <div key={itemIdx} className="flex justify-between">
+                                      <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
+                                        {itemIdx + 1}
+                                      </span>
+                                      <span className="text-xs text-right max-w-[70%] truncate">{String(item)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                field.value
+                              )}
                             </div>
                           ))}
                           {activity.additionalFields.length > 2 && (

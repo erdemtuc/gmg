@@ -5,7 +5,7 @@ import { useUIStore } from "@/stores/ui";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClientGet } from "@/infra/http/client";
-import { ContactDetail } from "@/features/shared/models/contact-crud-models";
+import { ContactDetail, ContactTask } from "@/features/shared/models/contact-crud-models";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import EditIcon from "@/components/ui/edit-icon";
@@ -23,20 +23,17 @@ import {
   Calendar,
   CheckSquare,
   AlignLeft,
+  ChevronDown,
+  User,
+  Clock,
+  MoreHorizontal,
+  Plus
 } from "lucide-react";
 
 // --- Types ---
 
 interface TaskLine {
   [key: string]: any;
-}
-
-interface ContactTask {
-  id: number;
-  ttname: string;
-  note: string;
-  dueDate: string;
-  lines: TaskLine[];
 }
 
 type Tab = "files" | "tasks";
@@ -60,13 +57,13 @@ function FieldValue({ value, isMulti }: { value: any; isMulti?: boolean }) {
       return <span className="text-gray-400 italic">—</span>;
     }
     return (
-      <div className="flex flex-col gap-1 text-right">
+      <div className="flex flex-col gap-1">
         {value.map((item, idx) => (
-          <div key={idx} className="flex items-center justify-end gap-2">
-            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-400">
+          <div key={idx} className="flex justify-between  ml-auto">
+            <span className="flex items-center justify-center bg-gray-200 text-xs font-medium text-gray-700 min-w-[20px] h-fit px-1">
               {idx + 1}
             </span>
-            <span className="text-sm text-gray-900">{formatValue(item)}</span>
+            <span className="text-sm text-gray-900 text-right w-20 truncate">{formatValue(item)}</span>
           </div>
         ))}
       </div>
@@ -136,12 +133,8 @@ function formatValue(value: any): string {
 // --- Local Component: TasksTabContent ---
 
 function TasksTabContent({ contactId }: { contactId?: string | null }) {
-  const [displayOption, setDisplayOption] = useState<
-    "all" | "active" | "completed"
-  >("all");
-  const [sortOption, setSortOption] = useState<
-    "default" | "newest" | "oldest" | "dueDate"
-  >("default");
+  const [displayOption, setDisplayOption] = useState<"all" | "active" | "completed">("all");
+  const [sortOption, setSortOption] = useState<"default" | "newest" | "oldest" | "dueDate">("default");
 
   const {
     data: tasks,
@@ -153,7 +146,7 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
     queryFn: async () => {
       // Use the existing apiClientGet to call our Next.js API route which acts as a proxy
       // This allows the server-side to handle authentication without exposing tokens to the client
-      const data = await apiClientGet<ContactTask[]>(
+      const data = await apiClientGet<ContactTask[] | { result: string; error: string; code?: string; error_description?: string }>(
         `/api/tasks`,
         {
           query: {
@@ -165,13 +158,17 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
 
       // Check if the response indicates no resources
       if (
-        data?.result === "error" &&
-        (data?.error === "no_resource" || data?.code === "3")
+        typeof data === 'object' &&
+        data !== null &&
+        'result' in data &&
+        data.result === "error" &&
+        ('error' in data) &&
+        (data.error === "no_resource" || ('code' in data && data.code === "3"))
       ) {
         throw new Error(JSON.stringify(data));
       }
 
-      return data;
+      return data as ContactTask[];
     },
   });
 
@@ -230,15 +227,15 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
     // Assuming active tasks are those without a completed status
     filteredTasks = tasks.filter(
       (task) =>
-        !task.dueDate.includes("ago") ||
-        task.note?.toLowerCase().includes("completed") === false,
+        !(task.dueDate?.includes("ago")) ||
+        (task.note && task.note.toLowerCase().includes("completed")) === false,
     );
   } else if (displayOption === "completed") {
     // Assuming completed tasks are those marked as completed
     filteredTasks = tasks.filter(
       (task) =>
-        task.dueDate.includes("ago") ||
-        task.note?.toLowerCase().includes("completed"),
+        task.dueDate?.includes("ago") ||
+        (task.note && task.note.toLowerCase().includes("completed")),
     );
   }
 
@@ -251,7 +248,7 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
         return a.id - b.id;
       case "dueDate":
         // Sort by due date, handling different date formats
-        return a.dueDate.localeCompare(b.dueDate);
+        return (a.dueDate || "").localeCompare(b.dueDate || "");
       case "default":
       default:
         // Default sorting - could be by ID or as received
@@ -260,80 +257,76 @@ function TasksTabContent({ contactId }: { contactId?: string | null }) {
   });
 
   return (
-    <div className="pb-4">
-      {/* Controls for display and sorting */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-gray-500">Display:</span>
-          <select
-            value={displayOption}
-            onChange={(e) =>
-              setDisplayOption(e.target.value as "all" | "active" | "completed")
-            }
-            className="rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          >
-            <option value="all">All</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-          </select>
+    <div className="flex flex-col gap-4">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button className="text-gray-400 hover:text-gray-600">
+            <Search className="size-4" />
+          </button>
         </div>
-
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-gray-500">Sort:</span>
-          <select
-            value={sortOption}
-            onChange={(e) =>
-              setSortOption(
-                e.target.value as "default" | "newest" | "oldest" | "dueDate",
-              )
-            }
-            className="rounded border border-gray-200 bg-white px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          >
-            <option value="default">Default</option>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="dueDate">Due Date</option>
-          </select>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 text-xs text-blue-600 cursor-pointer">
+            <span className="font-medium">Display: </span>
+            <select
+              value={displayOption}
+              onChange={(e) => setDisplayOption(e.target.value as "all" | "active" | "completed")}
+              className="bg-transparent border-none text-xs text-blue-600 font-medium cursor-pointer focus:outline-none"
+            >
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-blue-600 cursor-pointer">
+            <span className="font-medium">Sorting: </span>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as "default" | "newest" | "oldest" | "dueDate")}
+              className="bg-transparent border-none text-xs text-blue-600 font-medium cursor-pointer focus:outline-none"
+            >
+              <option value="default">Default</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="dueDate">Due Date</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-6">
+      {/* Task List */}
+      <div className="flex flex-col gap-4">
         {filteredTasks.map((task) => (
-          <div
-            key={task.id}
-            className="group relative flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
-          >
-            {/* Header: Title and ID */}
-            <div className="flex items-start justify-between gap-3">
-              <h4 className="text-sm leading-tight font-semibold text-gray-900">
-                {task.ttname}
-              </h4>
-              <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
-                #{task.id}
-              </span>
+          <div key={task.id} className="flex items-start gap-3 group">
+            <div className="pt-1">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
             </div>
-
-            {/* Due Date */}
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <Calendar className="size-3.5 text-gray-400" />
-              <span
-                className={
-                  task.dueDate.includes("ago")
-                    ? "font-medium text-orange-600"
-                    : ""
-                }
-              >
-                {task.dueDate}
-              </span>
-            </div>
-
-            {/* Note */}
-            {task.note && (
-              <div className="mt-1 flex items-start gap-2 rounded-lg bg-gray-50 p-2.5 text-xs text-gray-600">
-                <AlignLeft className="mt-0.5 size-3.5 shrink-0 text-gray-400" />
-                <p className="line-clamp-3">{task.note}</p>
+            <div className="flex-1 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-900">{task.ttname}</h4>
+                <button className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <MoreHorizontal className="size-4" />
+                </button>
               </div>
-            )}
+
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <Calendar className="size-3 text-blue-500" />
+                  <span>{task.dueDate}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <User className="size-3 text-blue-500" />
+                  <span>Note: <span className="text-blue-600">{task.note || "No note"}</span></span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-gray-400 mt-1">
+                  <Clock className="size-3" />
+                  <span>Last edit: {task.dueDate}</span>
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>

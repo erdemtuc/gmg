@@ -96,7 +96,22 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           {activity.additionalFields.slice(0, 3).map((field, idx) => (
             <div key={idx} className="text-xs">
               <span className="text-brand-gray-400">{field.name}: </span>
-              <span className="text-brand-gray-600">{String(field.value)}</span>
+              <span className="text-brand-gray-600">
+                {Array.isArray(field.value) && field.multi === 1 ? (
+                  <div className="flex flex-col gap-1">
+                    {field.value.map((item, itemIdx) => (
+                      <div key={itemIdx} className="flex justify-between">
+                        <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
+                          {itemIdx + 1}
+                        </span>
+                        <span className="text-right max-w-[70%] truncate">{String(item)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  String(field.value)
+                )}
+              </span>
             </div>
           ))}
         </div>

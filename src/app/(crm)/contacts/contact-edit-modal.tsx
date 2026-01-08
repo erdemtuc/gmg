@@ -470,7 +470,7 @@ export function ContactEditModal() {
                   {/* Tasks as third column */}
                   <div className="w-1/3 bg-brand-gray-50 border-l border-gray-200 flex flex-col min-h-0">
                     <div className="p-4 flex-1 max-h-full">
-                      <TasksTabContent />
+                      <TasksTabContent contactId={contactId} />
                     </div>
                   </div>
                 </div>

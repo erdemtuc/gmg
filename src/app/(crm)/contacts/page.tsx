@@ -11,7 +11,6 @@ import { ContactSortComponent } from "./contact-sort";
 import { useContactFilters } from "./use-contact-filters";
 
 export default function ContactsPage() {
-  const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const filterState = useContactFilters();
 
@@ -25,12 +24,9 @@ export default function ContactsPage() {
       </div>
       <div className="flex items-center justify-between">
         <div className="flex-start flex items-center gap-2 flex-wrap">
-          <ContactFilters 
-            showFilters={showFilters} 
-            onToggleFilters={() => setShowFilters(!showFilters)} 
-          />
-          {!showFilters && (
-            <span className="text-brand-gray-300 text-xs flex-1">
+          <ContactFilters />
+          {filterState.filters.length === 0 && (
+            <span className="text-brand-gray-300 text-xs">
               Add filter to begin your contact/client search...
             </span>
           )}

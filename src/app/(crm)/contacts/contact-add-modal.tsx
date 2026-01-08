@@ -372,15 +372,7 @@ export function ContactAddModal() {
                       {(formQuery.error as Error)?.message || "Failed to load"}
                     </div>
                   )}
-                  {formQuery.status === "success" && visibleFields.mainFields && visibleFields.mainFields.length > 0 ? (
-                    visibleFields.mainFields.map((field) => (
-                      <FieldResolver
-                        key={String(field.id)}
-                        field={field}
-                        control={form.control}
-                      />
-                    ))
-                  ) : formQuery.status === "pending" ? (
+                  {formQuery.status === "pending" ? (
                     <div className="text-brand-gray-400 text-xs">
                       Loading…
                     </div>
@@ -388,6 +380,18 @@ export function ContactAddModal() {
                     <div className="text-red-600 text-xs">
                       {(formQuery.error as Error)?.message || "Failed to load"}
                     </div>
+                  ) : formQuery.status === "success" ? (
+                    visibleFields.mainFields && visibleFields.mainFields.length > 0 ? (
+                      visibleFields.mainFields.map((field) => (
+                        <FieldResolver
+                          key={String(field.id)}
+                          field={field}
+                          control={form.control}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-gray-500 text-sm">No main fields available</div>
+                    )
                   ) : (
                     <div className="text-gray-500 text-sm">No main fields available</div>
                   )}
@@ -480,7 +484,7 @@ export function ContactAddModal() {
                   {/* Tasks as third column */}
                   <div className="w-1/3 bg-brand-gray-50 border-l border-gray-200 flex flex-col min-h-0">
                     <div className="p-4 flex-1 max-h-full">
-                      <TasksTabContent />
+                      <TasksTabContent contactId={null} />
                     </div>
                   </div>
                 </div>

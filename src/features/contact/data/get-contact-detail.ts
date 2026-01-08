@@ -81,7 +81,8 @@ function generateFieldGroups(apiContactDetail: ApiContactDetail) {
       // Create a field using the label as the display name (and possibly fname as a backup)
       const field: Field = {
         name: line.label, // Use the human-readable label
-        value: line.value
+        value: line.value,
+        multi: line.multi // Include the multi property to indicate if field supports multiple values
       };
 
       // If we're in a group, add to it; otherwise, create a default group
@@ -112,7 +113,8 @@ function generateFieldGroups(apiContactDetail: ApiContactDetail) {
     else if (line.fid && line.label) {
       const field: Field = {
         name: line.label, // Use the human-readable label
-        value: line.value
+        value: line.value,
+        multi: line.multi // Include the multi property to indicate if field supports multiple values
       };
 
       if (currentGroup) {
@@ -142,7 +144,8 @@ function generateFieldGroups(apiContactDetail: ApiContactDetail) {
       .filter(line => line.label || line.fname)
       .map(line => ({
         name: line.label || line.fname || 'Unknown Field',
-        value: line.value
+        value: line.value,
+        multi: line.multi // Include the multi property to indicate if field supports multiple values
       }));
 
     if (allFields.length > 0) {

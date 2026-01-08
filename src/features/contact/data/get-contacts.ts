@@ -17,7 +17,8 @@ export async function getContacts(page: number): Promise<Contact[]> {
       const value = line.value !== undefined ? line.value : '';
       return {
         name,
-        value
+        value,
+        multi: line.multi // Include the multi property to indicate if field supports multiple values
       };
     }).filter(field => field.name && field.name !== 'unknown'); // Filter out unknown fields
 

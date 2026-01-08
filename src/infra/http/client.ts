@@ -7,6 +7,7 @@ type GetOptions = {
   query?: Record<string, string | number | boolean | undefined | null>;
   // If you ever need to opt into Next.js fetch options on the client
   next?: NextFetchRequestConfig;
+  headers?: Record<string, string>;
 };
 
 /**
@@ -16,7 +17,7 @@ function withQuery(path: string, query?: GetOptions["query"]) {
   if (!query) return path;
   const url = new URL(
     path,
-    typeof window !== "undefined" ? "https://api.mybasiccrm.com" : "https://api.mybasiccrm.com",
+    typeof window !== "undefined" ? window.location.origin : "http://localhost",
   );
   Object.entries(query).forEach(([k, v]) => {
     if (v === undefined || v === null) return;

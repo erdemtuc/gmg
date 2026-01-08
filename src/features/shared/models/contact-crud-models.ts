@@ -31,6 +31,18 @@ export type FieldGroup = {
 
 export type ContactType = "O" | "P";
 
+export interface TaskLine {
+  [key: string]: any;
+}
+
+export interface ContactTask {
+  id: number;
+  ttname: string;
+  note: string;
+  dueDate: string;
+  lines: TaskLine[];
+}
+
 export interface ContactAddForm {
   mainFields: EditField[];
   fieldGroups: EditFieldGroup[];
