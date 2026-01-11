@@ -30,12 +30,20 @@ interface ActiveFilterChipProps {
   onRemove: (index: number) => void;
 }
 
-const ActiveFilterChip = ({ filter, index, onRemove }: ActiveFilterChipProps) => {
-  const label = FILTER_OPTIONS.find((opt) => opt.value === filter.field)?.label || filter.field;
+const ActiveFilterChip = ({
+  filter,
+  index,
+  onRemove,
+}: ActiveFilterChipProps) => {
+  const label =
+    FILTER_OPTIONS.find((opt) => opt.value === filter.field)?.label ||
+    filter.field;
 
   return (
-    <div className="flex items-center gap-1.5 rounded-md bg-brand-primary-50 px-2 py-1 text-sm text-brand-primary-500">
-      <span>{label}: {filter.value}</span>
+    <div className="bg-brand-primary-50 text-brand-primary-500 flex items-center gap-1.5 rounded-md px-2 py-1 text-sm">
+      <span>
+        {label}: {filter.value}
+      </span>
       <button
         onClick={() => onRemove(index)}
         className="hover:text-brand-primary-700"
@@ -68,7 +76,7 @@ export const ContactFilters = () => {
   }, []);
 
   const filteredOptions = FILTER_OPTIONS.filter((option) =>
-    option.label.toLowerCase().includes(searchQuery.toLowerCase())
+    option.label.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleSelectFilter = (field: string) => {
@@ -89,24 +97,28 @@ export const ContactFilters = () => {
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           <span className="text-sm leading-1">Add filters</span>
-          <Image
-            src={AddOutlinedCircleIcon || null}
-            width={14}
-            height={14}
-            alt=""
-            className="size-3.5"
+          <span
+            className="bg-brand-primary-500 inline-block h-4 w-4 rounded-full"
+            style={{
+              maskImage: `url(${AddOutlinedCircleIcon.src})`,
+              WebkitMaskImage: `url(${AddOutlinedCircleIcon.src})`,
+              maskRepeat: "no-repeat",
+              WebkitMaskRepeat: "no-repeat",
+              maskSize: "contain",
+              WebkitMaskSize: "contain",
+            }}
           />
         </button>
 
         {isDropdownOpen && (
-          <div className="absolute left-0 top-full z-50 mt-1 w-56 rounded-md border border-brand-gray-200 bg-white shadow-lg">
-            <div className="border-b border-brand-gray-200 p-2">
-              <div className="flex items-center gap-2 rounded-md border border-brand-gray-200 px-2 py-1.5">
-                <Search size={16} className="text-brand-gray-400" />
+          <div className="border-brand-gray-200 absolute top-full left-0 z-50 mt-1 w-56 rounded-md border bg-white shadow-lg">
+            <div className="border-brand-gray-200 border-b p-2">
+              <div className="border-brand-gray-200 flex items-center gap-2 rounded-md border px-2 py-1.5">
+                <Search size={16} className="text-gray-700" />
                 <input
                   type="text"
                   placeholder="Search filter..."
-                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-brand-gray-400"
+                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-700"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
@@ -117,14 +129,14 @@ export const ContactFilters = () => {
               {filteredOptions.map((option) => (
                 <button
                   key={option.value}
-                  className="w-full px-3 py-2 text-left text-sm text-brand-gray-700 hover:bg-brand-gray-50"
+                  className="hover:bg-brand-gray-50 w-full px-3 py-2 text-left text-sm text-gray-700"
                   onClick={() => handleSelectFilter(option.value)}
                 >
                   {option.label}
                 </button>
               ))}
               {filteredOptions.length === 0 && (
-                <div className="px-3 py-2 text-sm text-brand-gray-400">
+                <div className="text-brand-gray-400 px-3 py-2 text-sm">
                   No filters found
                 </div>
               )}

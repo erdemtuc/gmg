@@ -36,12 +36,13 @@ interface TaskLine {
   [key: string]: any;
 }
 
-type Tab = "files";
+type Tab = "files" | "tasks";
 type LayoutType = "grid" | "column" | "row";
 
 interface SectionVisibility {
   details: boolean;
   files: boolean;
+  tasks: boolean;
 }
 
 // --- Helper Component: FieldValue ---
@@ -357,6 +358,7 @@ export function ContactDetailModal() {
   const [visibleSections, setVisibleSections] = useState<SectionVisibility>({
     details: true,
     files: true,
+    tasks: true,
   });
   const layoutMenuRef = useRef<HTMLDivElement>(null);
 
@@ -541,6 +543,21 @@ export function ContactDetailModal() {
                           className={`text-sm ${visibleSections.files ? "text-gray-900" : "text-gray-500"}`}
                         >
                           Files & Images
+                        </span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          setVisibleSections((s) => ({ ...s, tasks: !s.tasks }))
+                        }
+                        className="flex w-full items-center gap-3 rounded px-1 py-1 text-left hover:bg-gray-50"
+                      >
+                        <Eye
+                          className={`h-4 w-4 ${visibleSections.tasks ? "text-gray-700" : "text-gray-400"}`}
+                        />
+                        <span
+                          className={`text-sm ${visibleSections.tasks ? "text-gray-900" : "text-gray-500"}`}
+                        >
+                          Tasks & Activities
                         </span>
                       </button>
                     </div>
@@ -750,16 +767,33 @@ export function ContactDetailModal() {
                       ? "border-b-2 border-blue-600 text-gray-900"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
+                  onClick={() => setActiveTab("files")}
                 >
                   Files & Images
+                </button>
+              )}
+              {visibleSections.tasks && (
+                <button
+                  type="button"
+                  className={`px-2 pt-4 pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                    activeTab === "tasks"
+                      ? "border-b-2 border-blue-600 text-gray-900"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                  onClick={() => setActiveTab("tasks")}
+                >
+                  Tasks & Activities
                 </button>
               )}
             </div>
 
             {/* Tab Content */}
             <div className="flex-1 p-4">
-              {visibleSections.files && (
+              {activeTab === "files" && visibleSections.files && (
                 <FilesTabContent />
+              )}
+              {activeTab === "tasks" && visibleSections.tasks && (
+                <TasksTabContent contactId={contactId} />
               )}
             </div>
           </div>

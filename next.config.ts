@@ -2,42 +2,22 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Set empty turbopack config to acknowledge use of webpack
-  turbopack: {},
-  webpack: (config, { isServer }) => {
-    // Exclude SVGs from the default asset loader
-    const imageLoader = config.module.rules.find((rule: any) => {
-      if (rule.test && typeof rule.test.exec === 'function') {
-        return rule.test.exec('.svg');
-      }
-    });
 
-    if (imageLoader) {
-      imageLoader.exclude = /\.svg$/;
+  webpack: (config) => {
+    // Exclude SVGs from Next's image loader
+    const imageRule = config.module.rules.find(
+      (rule: any) => rule.test instanceof RegExp && rule.test.test(".svg"),
+    );
+
+    if (imageRule) {
+      imageRule.exclude = /\.svg$/;
     }
 
-    // Add SVGR loader for SVGs
+    // Add SVGR
     config.module.rules.push({
       test: /\.svg$/,
-      use: [
-        {
-          loader: '@svgr/webpack',
-          options: {
-            svgoConfig: {
-              plugins: [
-                {
-                  name: 'preset-default',
-                  params: {
-                    overrides: {
-                      removeViewBox: false,
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
+      issuer: /\.[jt]sx?$/,
+      use: ["@svgr/webpack"],
     });
 
     return config;

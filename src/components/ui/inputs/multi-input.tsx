@@ -30,7 +30,7 @@ export function MultiInput({ field, control }: MultiInputProps) {
       </label>
       <div className="space-y-2">
         {fields.map((fieldItem, index) => (
-          <div key={fieldItem.id} className="flex items-center gap-2">
+          <div key={fieldItem.id} className="relative">
             <Controller
               name={`${id}.${index}`}
               control={control}
@@ -38,7 +38,7 @@ export function MultiInput({ field, control }: MultiInputProps) {
               render={({ field: controllerField }) => (
                 <input
                   type={field.type === "datetime-local" ? "datetime-local" : "text"}
-                  className="input-field flex-1 border border-gray-300 rounded-md px-3 py-2"
+                  className="input-field flex-1 border border-gray-300 rounded-md px-3 py-2 pr-16" // Increased padding to accommodate both remove and add buttons
                   {...controllerField}
                 />
               )}
@@ -46,7 +46,7 @@ export function MultiInput({ field, control }: MultiInputProps) {
             {index > 0 && (
               <button
                 type="button"
-                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5"
+                className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-6 h-6 flex items-center justify-center"
                 onClick={() => remove(index)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,16 +55,18 @@ export function MultiInput({ field, control }: MultiInputProps) {
                 </svg>
               </button>
             )}
+            {/* Add another button positioned inside the last input field */}
+            {index === fields.length - 1 && (
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-6 h-6 flex items-center justify-center"
+                onClick={() => append("")}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            )}
           </div>
         ))}
-        <button
-          type="button"
-          className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm mt-2"
-          onClick={() => append("")}
-        >
-          <Plus className="w-4 h-4" />
-          Add another
-        </button>
       </div>
     </div>
   );

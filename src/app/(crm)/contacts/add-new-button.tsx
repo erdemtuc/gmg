@@ -7,10 +7,10 @@ export function AddNewButton() {
 
   return (
     <button
-      className="bg-brand-primary-500 hover:bg-brand-primary-400 cursor-pointer rounded-md px-2 py-1.5"
+      className="bg-brand-primary-500 hover:bg-brand-primary-400 cursor-pointer items-center rounded-md px-2 py-1.5"
       onClick={() => openAdd(null)}
     >
-      <span className="text-brand-white text-base font-medium">Add New</span>
+      <span className="text-brand-white self-center text-xs">Add New</span>
     </button>
   );
 }
