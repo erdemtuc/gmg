@@ -21,15 +21,13 @@ import {
 } from "@/features/shared/models/crud-models";
 import { useFieldVisibility } from "@/utils/use-field-visibility";
 import { FilesTabContent } from "./files-tab-content";
-import { TasksTabContent } from "./tasks-tab-content";
 import { Search, UserPlus, Settings, X, History, LayoutGrid, Columns, Rows, Eye } from "lucide-react";
 
-type Tab = "details" | "files" | "tasks";
+type Tab = "details" | "files";
 type LayoutType = "grid" | "column" | "row";
 
 interface SectionVisibility {
   details: boolean;
-  tasks: boolean;
   files: boolean;
 }
 
@@ -53,7 +51,6 @@ export function ContactAddModal() {
   const [layout, setLayout] = useState<LayoutType>("grid");
   const [visibleSections, setVisibleSections] = useState<SectionVisibility>({
     details: true,
-    tasks: true,
     files: true,
   });
   const layoutMenuRef = useRef<HTMLDivElement>(null);
@@ -119,8 +116,7 @@ export function ContactAddModal() {
     fieldGroups: formQuery.data?.fieldGroups || [],
   });
 
-  // When tasks tab is active, always use 2 columns for details to make space for expanded tasks
-  const detailColumnsCount = activeTab === "tasks" ? 2 : 3;
+  const detailColumnsCount = 3;
   const detailColumns: EditFieldGroup[][] =
     formQuery.status !== "success"
       ? []
@@ -313,13 +309,6 @@ export function ContactAddModal() {
                         <span className={`text-sm ${visibleSections.details ? 'text-gray-900' : 'text-gray-500'}`}>Details</span>
                       </button>
                       <button
-                        onClick={() => setVisibleSections(s => ({ ...s, tasks: !s.tasks }))}
-                        className="flex w-full items-center gap-3 text-left hover:bg-gray-50 rounded px-1 py-1"
-                      >
-                        <Eye className={`h-4 w-4 ${visibleSections.tasks ? 'text-gray-700' : 'text-gray-400'}`} />
-                        <span className={`text-sm ${visibleSections.tasks ? 'text-gray-900' : 'text-gray-500'}`}>Tasks</span>
-                      </button>
-                      <button
                         onClick={() => setVisibleSections(s => ({ ...s, files: !s.files }))}
                         className="flex w-full items-center gap-3 text-left hover:bg-gray-50 rounded px-1 py-1"
                       >
@@ -402,94 +391,20 @@ export function ContactAddModal() {
                   <div className="flex items-center gap-6 border-b border-gray-200 p-4">
                     <button
                       type="button"
-                      onClick={() => setActiveTab(activeTab === "files" ? "details" : "files")}
-                      className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                        activeTab === "files"
-                          ? "border-b-2 border-blue-600 text-gray-900"
-                          : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-                      }`}
+                      className="pb-3 text-sm font-medium transition-colors focus:outline-none border-b-2 border-blue-600 text-gray-900"
                     >
                       Files & Images
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab(activeTab === "tasks" ? "details" : "tasks")}
-                      className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                        activeTab === "tasks"
-                          ? "border-b-2 border-blue-600 text-gray-900"
-                          : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
-                      }`}
-                    >
-                      Task & Activities
                     </button>
                   </div>
 
                   <div className="p-4 flex-1">
-                    {activeTab === "files" && (
-                      <FilesTabContent />
-                    )}
+                    <FilesTabContent />
                   </div>
                 </div>
               </div>
 
-              {/* Main content area - adjust layout based on active tab */}
-              {visibleSections.details && activeTab === "tasks" ? (
-                // Special layout when tasks tab is active - 2 detail cols + tasks as 3rd col
-                <div className="flex flex-1 min-h-0 max-h-full">
-                  {/* 2 columns of detail fields */}
-                  <div
-                    className="details divide-brand-gray-200 grid grid-cols-2 w-2/3 scroll-thin scrollbar-on-white min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-0 pb-0"
-                  >
-                    {formQuery.status === "pending" && (
-                      <div className="text-brand-gray-400 col-span-2 p-2 text-xs">
-                        Loading…
-                      </div>
-                    )}
-                    {formQuery.status === "error" && (
-                      <div className="text-brand-gray-400 col-span-2 p-2 text-xs text-red-600">
-                        {(formQuery.error as Error)?.message || "Failed to load"}
-                      </div>
-                    )}
-                    {formQuery.status === "success" &&
-                      Array.from({ length: 2 }).map((_, colIdx) => (
-                        <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
-                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                            <section
-                              key={`${group.groupTitle}-${idx}`}
-                              className="flex flex-col gap-3"
-                            >
-                              <h3 className="text-brand-gray-600 text-sm font-medium">
-                                {group.groupTitle}
-                              </h3>
-                              <ul className="flex flex-col gap-3">
-                                {group.fields.map((field, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="flex flex-row justify-between text-xs"
-                                  >
-                                    <FieldResolver
-                                      key={String(field.id)}
-                                      field={field}
-                                      control={form.control}
-                                    />
-                                  </li>
-                                ))}
-                              </ul>
-                            </section>
-                          ))}
-                        </div>
-                      ))}
-                  </div>
-
-                  {/* Tasks as third column */}
-                  <div className="w-1/3 bg-brand-gray-50 border-l border-gray-200 flex flex-col min-h-0">
-                    <div className="p-4 flex-1 max-h-full">
-                      <TasksTabContent contactId={null} />
-                    </div>
-                  </div>
-                </div>
-              ) : visibleSections.details ? (
-                // Default layout when tasks tab is not active
+              {/* Main content area */}
+              {visibleSections.details ? (
                 <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white">
                   {/* Grouped details */}
                   {formQuery.status === "success" && (

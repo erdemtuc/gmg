@@ -18,17 +18,21 @@ export default function ContactList({ filters, sort }: ContactListProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  const queryFn = useCallback(async ({ pageParam }: { pageParam: number }) => {
+    const page = typeof pageParam === "number" ? pageParam : PAGE_START;
+    // Fetch all contacts for now, filtering will be done client-side
+    return apiClientGet<Contact[]>("/api/contacts", { query: { page } });
+  }, []);
+
+  const getNextPageParam = useCallback((lastPage: Contact[], allPages: Contact[][]) => {
+    return lastPage.length > 0 ? allPages.length + PAGE_START : undefined;
+  }, []);
+
   const query = useInfiniteQuery({
     queryKey: ["contacts"], // Keep query key stable
     initialPageParam: PAGE_START,
-    queryFn: useCallback(async ({ pageParam }: { pageParam: number }) => {
-      const page = typeof pageParam === "number" ? pageParam : PAGE_START;
-      // Fetch all contacts for now, filtering will be done client-side
-      return apiClientGet<Contact[]>("/api/contacts", { query: { page } });
-    }, []),
-    getNextPageParam: useCallback((lastPage: Contact[], allPages: Contact[][]) => {
-      return lastPage.length > 0 ? allPages.length + 1 : undefined;
-    }, []),
+    queryFn,
+    getNextPageParam,
   });
 
   const { hasNextPage, fetchNextPage } = query;

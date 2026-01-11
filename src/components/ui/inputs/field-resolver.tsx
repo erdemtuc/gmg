@@ -5,6 +5,7 @@ import {
   TextareaInput,
   RadioInput,
   SelectInput,
+  MultiInput,
   MultiSelectInput,
   CheckboxInput,
 } from "./index";
@@ -17,6 +18,16 @@ interface FieldResolverProps {
 
 export function FieldResolver({ field, control }: FieldResolverProps) {
   const baseProps = { field, control };
+
+  // Check if this is an email, phone, or multi field
+  const isEmailField = field.name.toLowerCase().includes('email');
+  const isPhoneField = field.name.toLowerCase().includes('phone');
+  const isMultiField = !!field.isMulti;
+
+  // Use MultiInput for email, phone, or multi fields
+  if (isEmailField || isPhoneField || isMultiField) {
+    return <MultiInput {...baseProps} />;
+  }
 
   switch (field.type) {
     case "text":
