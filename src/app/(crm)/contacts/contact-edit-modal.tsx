@@ -127,12 +127,20 @@ export function ContactEditModal() {
 
       // Helper to sanitize values and prevent [object Object] in inputs
       // Now checks field type and specific object keys like 'number' and 'option'
-      const sanitizeValue = (val: any, fieldType: string) => {
+      const sanitizeValue = (val: any, fieldType: string, fieldName: string) => {
         if (val === null || val === undefined) return "";
-        
+
         // 1. Handle Arrays
         if (Array.isArray(val)) {
-          if (val.length === 0) return ""; 
+          // For multi-input fields (email, phone, or fields marked as isMulti), return the raw array
+          const isEmailField = fieldName.toLowerCase().includes('email');
+          const isPhoneField = fieldName.toLowerCase().includes('phone');
+
+          if (isEmailField || isPhoneField) {
+            return val; // Return raw array for MultiInput components
+          }
+
+          if (val.length === 0) return "";
 
           const firstItem = val[0];
 
@@ -147,28 +155,28 @@ export function ContactEditModal() {
           if (typeof firstItem === "string" && (fieldType === "text" || fieldType === "textarea")) {
             return val.join(", ");
           }
-          
+
           return val; // Return raw array for Multi-Select components
         }
-        
+
         // 2. Handle Objects
         if (typeof val === "object" && !(val instanceof Date)) {
           // FIX: Handle Organization Structure { id: 21, option: "Kahveci" }
           if ("option" in val) return val.option;
-          
+
           // Standard lookups
           if ("value" in val) return val.value;
           if ("id" in val) return val.id;
           if ("key" in val) return val.key;
         }
-        
+
         return val;
       };
 
       // Add main fields
       if (formQuery.data.mainFields) {
         formQuery.data.mainFields.forEach((field) => {
-          formValues[field.name] = sanitizeValue(field.value, field.type);
+          formValues[field.name] = sanitizeValue(field.value, field.type, field.name);
         });
       }
 
@@ -176,14 +184,14 @@ export function ContactEditModal() {
       if (formQuery.data.fieldGroups) {
         formQuery.data.fieldGroups.forEach((group) => {
           group.fields.forEach((field) => {
-            formValues[field.name] = sanitizeValue(field.value, field.type);
+            formValues[field.name] = sanitizeValue(field.value, field.type, field.name);
           });
         });
       }
 
       form.reset(formValues);
     }
-  }, [formQuery.data, form]);
+  }, [formQuery.data]);
 
   // Update field visibility when form values change
   useEffect(() => {
@@ -392,18 +400,13 @@ export function ContactEditModal() {
               {/* Main content area */}
               {visibleSections.details ? (
                 <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white">
-                  {/* Grouped details */}
+                  {/* Grouped details - Changed from grid to flex layout to allow proper displacement of multi-inputs */}
                   {formQuery.status === "success" && (
-                    <div
-                      className={`details divide-brand-gray-200 ${
-                        detailColumnsCount === 3 ? "grid grid-cols-3 w-full" :
-                        detailColumnsCount === 2 ? "grid grid-cols-2 w-full" : "grid grid-cols-1 w-full"
-                      } scroll-thin scrollbar-on-white min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-0 pb-0 max-h-full`}
-                    >
+                    <div className="details flex w-full gap-6 scroll-thin scrollbar-on-white min-h-0 flex-1 overflow-x-hidden overflow-y-auto pe-0 pt-0 pb-0 max-h-full">
                       {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
                         <div
                           key={`col-${colIdx}`}
-                          className="flex flex-col gap-3 px-4"
+                          className="flex flex-col gap-3 px-4 flex-1 min-w-0" // Added flex-1 and min-w-0 for proper flex distribution
                         >
                           {(detailColumns[colIdx] ?? []).map((group, idx) => (
                             <section
@@ -413,20 +416,20 @@ export function ContactEditModal() {
                               <h3 className="text-brand-gray-600 text-sm font-medium">
                                 {group.groupTitle}
                               </h3>
-                              <ul className="flex flex-col gap-3">
+                              <div className="flex flex-col gap-3"> {/* Changed from ul to div for better flex compatibility */}
                                 {group.fields.map((field, idx) => (
-                                  <li
+                                  <div
                                     key={idx}
-                                    className="flex flex-row justify-between text-xs"
+                                    className="flex flex-col" // Changed from flex-row to flex-col for vertical stacking
                                   >
                                     <FieldResolver
                                       key={String(field.id)}
                                       field={field}
                                       control={form.control}
                                     />
-                                  </li>
+                                  </div>
                                 ))}
-                              </ul>
+                              </div>
                             </section>
                           ))}
                         </div>

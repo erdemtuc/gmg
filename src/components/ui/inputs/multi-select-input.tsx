@@ -9,6 +9,7 @@ interface MultiSelectInputProps {
 }
 
 export function MultiSelectInput({ field, control }: MultiSelectInputProps) {
+  const name = field.name;
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
   const options = field.options ?? [];
@@ -19,7 +20,7 @@ export function MultiSelectInput({ field, control }: MultiSelectInputProps) {
         {label}
       </label>
       <Controller
-        name={id}
+        name={name}
         control={control}
         render={({ field: controllerField }) => (
           <SearchableMultiSelect

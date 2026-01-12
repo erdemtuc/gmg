@@ -9,13 +9,14 @@ interface MultiInputProps {
 }
 
 export function MultiInput({ field, control }: MultiInputProps) {
+  const name = field.name; // Use field name instead of field ID
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
 
   // Use field array to manage multiple inputs
   const { fields, append, remove } = useFieldArray({
     control,
-    name: id,
+    name: name,
   });
 
   // Initialize with one empty field if no fields exist
@@ -29,42 +30,43 @@ export function MultiInput({ field, control }: MultiInputProps) {
         {label}
       </label>
       <div className="space-y-2">
-        {fields.map((fieldItem, index) => (
-          <div key={fieldItem.id} className="relative">
+        {fields.map((fieldItem: { id: string }, index) => (
+          <div key={`${name}-${index}`} className="flex items-start gap-2">
             <Controller
-              name={`${id}.${index}`}
+              name={`${name}.${index}`}
               control={control}
-              defaultValue={fieldItem.value || ""}
+              defaultValue=""
               render={({ field: controllerField }) => (
                 <input
                   type={field.type === "datetime-local" ? "datetime-local" : "text"}
-                  className="input-field flex-1 border border-gray-300 rounded-md px-3 py-2 pr-16" // Increased padding to accommodate both remove and add buttons
+                  className="input-field flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   {...controllerField}
                 />
               )}
             />
-            {index > 0 && (
-              <button
-                type="button"
-                className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-6 h-6 flex items-center justify-center"
-                onClick={() => remove(index)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            )}
-            {/* Add another button positioned inside the last input field */}
-            {index === fields.length - 1 && (
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-6 h-6 flex items-center justify-center"
-                onClick={() => append("")}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            )}
+            <div className="flex gap-1">
+              {fields.length > 1 && (
+                <button
+                  type="button"
+                  className="bg-red-500 hover:bg-red-600 text-white rounded-md w-8 h-8 flex items-center justify-center flex-shrink-0"
+                  onClick={() => remove(index)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              )}
+              {index === fields.length - 1 && (
+                <button
+                  type="button"
+                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-md w-8 h-8 flex items-center justify-center flex-shrink-0"
+                  onClick={() => append("")}
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>

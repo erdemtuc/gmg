@@ -8,6 +8,7 @@ interface TextInputProps {
 }
 
 export function TextInput({ field, control }: TextInputProps) {
+  const name = field.name;
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
 
@@ -17,13 +18,13 @@ export function TextInput({ field, control }: TextInputProps) {
         {label}
       </label>
       <Controller
-        name={id}
+        name={name}
         control={control}
         render={({ field: controllerField }) => (
           <input
             id={id}
             type={field.type === "datetime-local" ? "datetime-local" : "text"}
-            className="input-field border-none"
+            className="input-field border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             {...controllerField}
           />
         )}

@@ -8,6 +8,7 @@ interface CheckboxInputProps {
 }
 
 export function CheckboxInput({ field, control }: CheckboxInputProps) {
+  const name = field.name;
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
   const options = field.options ?? [];
@@ -16,7 +17,7 @@ export function CheckboxInput({ field, control }: CheckboxInputProps) {
     <div className="input-wrapper">
       <label className="input-label">{label}</label>
       <Controller
-        name={id}
+        name={name}
         control={control}
         render={({ field: controllerField }) => (
           <div className="space-y-2">
@@ -25,7 +26,7 @@ export function CheckboxInput({ field, control }: CheckboxInputProps) {
               const isChecked = Array.isArray(controllerField.value)
                 ? controllerField.value.includes(String(opt.id))
                 : String(controllerField.value) === String(opt.id);
-              
+
               return (
                 <label
                   key={String(opt.id)}

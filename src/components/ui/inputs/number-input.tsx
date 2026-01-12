@@ -8,6 +8,7 @@ interface NumberInputProps {
 }
 
 export function NumberInput({ field, control }: NumberInputProps) {
+  const name = field.name;
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
 
@@ -17,7 +18,7 @@ export function NumberInput({ field, control }: NumberInputProps) {
         {label}
       </label>
       <Controller
-        name={id}
+        name={name}
         control={control}
         render={({ field: controllerField }) => (
           <input

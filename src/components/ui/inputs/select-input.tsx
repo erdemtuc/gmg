@@ -9,6 +9,7 @@ interface SelectInputProps {
 }
 
 export function SelectInput({ field, control }: SelectInputProps) {
+  const name = field.name;
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
   const options = field.options ?? [];
@@ -19,7 +20,7 @@ export function SelectInput({ field, control }: SelectInputProps) {
         {label}
       </label>
       <Controller
-        name={id}
+        name={name}
         control={control}
         render={({ field: controllerField }) => (
           <SearchableSelect

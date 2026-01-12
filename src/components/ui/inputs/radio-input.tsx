@@ -12,6 +12,7 @@ interface RadioInputProps {
 }
 
 export function RadioInput({ field, control }: RadioInputProps) {
+  const name = field.name;
   const id = String(field.id);
   const label = field.label || formatFieldLabel(String(field.name));
 
@@ -19,7 +20,7 @@ export function RadioInput({ field, control }: RadioInputProps) {
     <div className="input-wrapper h-auto min-h-10">
       <div className="input-label mb-2">{label}</div>
       <Controller
-        name={id}
+        name={name}
         control={control}
         render={({ field: controllerField }) => (
           <div className="flex items-center gap-4 px-2 py-2">
