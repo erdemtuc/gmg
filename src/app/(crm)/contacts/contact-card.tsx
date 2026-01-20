@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { apiClientGet } from "@/infra/http/client";
 import { ContactDetail } from "@/features/shared/models/contact-crud-models";
 import { useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ExternalLink, Copy } from "lucide-react";
 
 export default function ContactCard({ contact }: { contact: Contact }) {
   const openContact = useUIStore((s) => s.modalState.openContactDetail);
@@ -47,6 +47,48 @@ export default function ContactCard({ contact }: { contact: Contact }) {
     return name ? name.charAt(0).toUpperCase() : "?";
   };
 
+  // Extract specific fields for detailed view
+  const getFieldValue = (fieldName: string) => {
+    const field = contact.additionalFields.find(f => f.name.toLowerCase() === fieldName.toLowerCase());
+    return field?.value?.toString() || '';
+  };
+
+  const webPage = getFieldValue('web page') || getFieldValue('website') || getFieldValue('url');
+  const channel = getFieldValue('channel') || getFieldValue('source channel');
+  const source = getFieldValue('source') || getFieldValue('lead source');
+
+  // Status indicators
+  const isActive = getFieldValue('status')?.toLowerCase().includes('active') ||
+                  getFieldValue('active') === 'true' ||
+                  getFieldValue('active') === 'yes';
+
+  const isCreditAppSigned = getFieldValue('credit app signed') === 'true' ||
+                           getFieldValue('credit app signed') === 'yes' ||
+                           getFieldValue('credit app status')?.toLowerCase().includes('signed');
+
+  const isDocVerificationCompleted = getFieldValue('document verification') === 'completed' ||
+                                    getFieldValue('doc verification') === 'completed' ||
+                                    getFieldValue('verification status')?.toLowerCase().includes('completed');
+
+  // Toggle active status handler
+  const toggleActiveStatus = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // In a real implementation, this would update the contact status via API
+    console.log(`Toggling active status for contact ${contact.name}`);
+  };
+
+  // Handle opening/copying web page
+  const handleWebPageAction = (action: 'open' | 'copy', e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (webPage) {
+      if (action === 'open') {
+        window.open(webPage, '_blank');
+      } else if (action === 'copy') {
+        navigator.clipboard.writeText(webPage);
+      }
+    }
+  };
+
   return (
     <div
       className="bg-brand-white border-brand-gray-200 hover:border-brand-primary-200 relative cursor-pointer overflow-hidden rounded-2xl border transition-colors duration-200 ease-in-out"
@@ -76,186 +118,160 @@ export default function ContactCard({ contact }: { contact: Contact }) {
         }
       }}
     >
-      {/* Header Section */}
-      <div className="bg-white p-4 pb-8">
-        {" "}
-        {/* Added pb-8 to make space for the absolute positioned button */}
-        <div className="mb-3 flex items-start gap-3">
-          {/* Avatar */}
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
-            {getInitial(contact.name)}
+      {/* Top section with status tag */}
+      <div className="relative p-4 pt-6">
+        <div className="absolute top-4 right-4">
+          <span className="rounded  px-2 py-1 text-xs font-semibold whitespace-nowrap text-blue-600">
+            {contact.type || "Prospect"}
+          </span>
+        </div>
+
+        {/* Avatar and primary identification */}
+        <div className="flex items-start gap-4 mb-4">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full  bg-brand-primary-600 text-white border border-brand-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-1/2 h-1/2">
+              <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+            </svg>
           </div>
 
-          {/* Main Content */}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm font-medium text-black">
-                  {contact.name}
-                </h3>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-base text-black mb-1">{contact.name}</div>
+            <div className="text-sm text-brand-gray-600">
+              {getFieldValue('organization') || getFieldValue('company') || getFieldValue('business')}
+            </div>
+            <div className="text-sm text-brand-gray-600 mt-1">
+              {getFieldValue('phone') || getFieldValue('mobile') || getFieldValue('telephone')}
+            </div>
+          </div>
+        </div>
+
+        {/* Separator: Primary header to Active/Inactive */}
+        <div className="border-t border-brand-gray-100 my-3"></div>
+
+        {/* Two-column layout for status information */}
+        <div className="grid grid-cols-2 gap-x-4 mb-4 relative">
+          {/* Vertical divider line between columns */}
+          <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 transform bg-brand-gray-100"></div>
+
+          {/* Column 1: Contains two status items */}
+          <div className="space-y-3 pr-2">
+            {/* Item 1: Active Status */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-brand-gray-600">Active:</span>
+                              <div className="flex items-center gap-2">
+                                <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                <span className="text-xs font-medium text-black">{isActive ? 'Active' : 'Inactive'}</span>
+                              </div>            </div>
+
+            {/* Item 2: Credit App Status */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-brand-gray-600">Credit App:</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-black">{isCreditAppSigned ? 'Signed' : 'Not Signed'}</span>
               </div>
-              <span className="flex-shrink-0 rounded bg-blue-50 px-2 py-1 text-xs font-semibold whitespace-nowrap text-blue-600">
-                {contact.type || "Prospect"}
-              </span>
+            </div>
+          </div>
+
+          {/* Column 2: Contains one status item */}
+          <div className="space-y-3 pl-2">
+            {/* Item 3: Document Verification */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-brand-gray-600">Doc Verified:</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-black">{isDocVerificationCompleted ? 'Yes' : 'No'}</span>
+              </div>
             </div>
           </div>
         </div>
-        {/* Dynamic Fields based on the API response */}
-        <div className="relative">
-          <div className="bg-brand-gray-200 absolute top-0 right-0 left-0 h-px"></div>{" "}
-          {/* Continuous top border */}
-          <div className="relative z-10 mb-3 grid grid-cols-2 gap-4 pt-3">
-            {" "}
-            {/* z-10 to be above the borders, pt-3 for space below the top border */}
-            {contact.additionalFields && contact.additionalFields.length > 0 && (
-              <>
-                {/* Render the vertical border only when there are fields to show it between */}
-                <div className="bg-brand-gray-200 absolute top-0 left-[50%] h-full w-px -translate-x-1/2 transform"></div>{" "}
-                {/* Continuous vertical border */}
-                {/* Determine how many fields to show based on expanded state */}
-                {(() => {
-                  const allFields = contact.additionalFields;
-                  const maxVisibleFields = isExpanded ? allFields.length : 2; // Show 2 fields initially, all when expanded
+      </div>
 
-                  // Left Column - First half of the visible fields
-                  const leftFields = allFields
-                    .slice(0, Math.ceil(allFields.length / 2))
-                    .slice(0, Math.ceil(maxVisibleFields / 2));
-
-                  // Right Column - Second half of the visible fields
-                  const rightFields = allFields
-                    .slice(Math.ceil(allFields.length / 2))
-                    .slice(0, maxVisibleFields - leftFields.length);
-
-                  return (
-                    <>
-                      {/* Left Column - First half of the fields */}
-                      {leftFields.map((field, index) => (
-                        <div
-                          key={`left-${index}`}
-                          className="flex justify-between"
+            {/* Expanded section */}
+            {isExpanded && (
+              <div className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-x-4 relative pt-4"> {/* Added relative and pt-4 */}
+                  {/* Vertical divider */}
+                  <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 transform bg-brand-gray-100"></div>
+      
+                  {/* Expanded Column 1 */}
+                  <div className="space-y-3 pr-2">
+                    {webPage && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-brand-gray-600">Web Page:</span>
+                        <button
+                          onClick={(e) => handleWebPageAction('open', e)}
+                          className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center" // Added flex items-center
                         >
-                          <span className="text-xs text-black">{field.name}</span>
-                          <span className="text-xs font-medium text-black">
-                            {Array.isArray(field.value) && field.multi === 1 ? (
-                              <div className="flex flex-col gap-1">
-                                {field.value.map((item, idx) => (
-                                  <div key={idx} className="flex justify-between">
-                                    <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
-                                      {idx + 1}
-                                    </span>
-                                    <span className="text-xs text-right max-w-[70%] truncate">{String(item)}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              field.value
-                            )}
-                          </span>
+                          {webPage} <ExternalLink className="inline-block h-3 w-3 ml-1" />
+                        </button>
+                      </div>
+                    )}
+      
+                    {channel && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-brand-gray-600">Channel:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-black">{channel}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(channel);
+                            }}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
                         </div>
-                      ))}
-
-                      {/* Right Column - Second half of the fields */}
-                      {rightFields.map((field, index) => (
-                        <div
-                          key={`right-${index}`}
-                          className="flex justify-between"
-                        >
-                          <span className="text-xs text-black">{field.name}</span>
-                          <span className="text-xs font-medium text-black">
-                            {Array.isArray(field.value) && field.multi === 1 ? (
-                              <div className="flex flex-col gap-1">
-                                {field.value.map((item, idx) => (
-                                  <div key={idx} className="flex justify-between">
-                                    <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
-                                      {idx + 1}
-                                    </span>
-                                    <span className="text-xs text-right max-w-[70%] truncate">{String(item)}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              field.value
-                            )}
-                          </span>
+                      </div>
+                    )}
+      
+                    {source && (
+                      <div className="flex items-start justify-between">
+                        <span className="text-sm text-brand-gray-600">Source:</span>
+                        <div className="flex flex-wrap gap-1 justify-end">
+                          {source.split(',').map((item, idx) => (
+                            <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                              {item.trim()}
+                            </span>
+                          ))}
                         </div>
-                      ))}
-                    </>
-                  );
-                })()}
-              </>
+                      </div>
+                    )}
+                  </div>
+      
+                  {/* Expanded Column 2 */}
+                  <div className="space-y-3 pl-2">
+                    {getFieldValue('web search') && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-brand-gray-600">Web Search:</span>
+                        <span className="text-sm font-medium text-black">{getFieldValue('web search')}</span>
+                      </div>
+                    )}
+      
+                    {getFieldValue('unk') && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-brand-gray-600">UNK:</span>
+                        <span className="text-sm font-medium text-black">{getFieldValue('unk')}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
-          </div>
-        </div>
+                {/* Expand/Collapse caret at the bottom */}
+      <div className="px-4 py-3 flex justify-center">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+          className="text-brand-gray-500 hover:text-brand-gray-700"
+        >
+          <ChevronDown
+            size={16}
+            className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+          />
+        </button>
       </div>
-
-      {contact.additionalFields &&
-        contact.additionalFields.length > 2 && (
-          <div className="absolute bottom-0 left-1/2 z-20 -translate-x-1/2 transform">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
-              className="border-brand-gray-300 text-brand-gray-400 hover:text-brand-gray-600 flex h-6 w-6 items-center justify-center rounded-full border bg-white transition-colors"
-            >
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-              />
-            </button>
-          </div>
-        )}
-      {(!contact.additionalFields ||
-        contact.additionalFields.length <= 2) && (
-        <div className="px-4 py-2">
-          {/* Empty div when no expand button is shown */}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function renderAdditionalField(
-  label: string,
-  value: string | number | boolean | undefined | null,
-  multi?: number
-) {
-  // Handle multi-value fields
-  if (Array.isArray(value) && multi === 1) {
-    if (value.length === 0) {
-      return (
-        <div className="flex justify-between">
-          <span className="text-brand-gray-400 text-xs font-normal">{label}:</span>
-          <span className="text-brand-gray-400 text-xs font-normal italic">—</span>
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col">
-        <div className="flex justify-between">
-          <span className="text-brand-gray-400 text-xs font-normal">{label}:</span>
-          <span className="text-brand-gray-600 text-xs font-normal"></span>
-        </div>
-        <div className="flex flex-col gap-1 mt-1">
-          {value.map((item, idx) => (
-            <div key={idx} className="flex justify-between">
-              <span className="flex items-center justify-center bg-gray-200 text-[10px] font-medium text-gray-700 min-w-[18px] h-fit px-1">
-                {idx + 1}
-              </span>
-              <span className="text-xs text-gray-600 text-right max-w-[70%] truncate">{String(item)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex justify-between">
-      <span className="text-brand-gray-400 text-xs font-normal">{label}:</span>
-      <span className="text-brand-gray-600 text-xs font-normal">{value}</span>
     </div>
   );
 }

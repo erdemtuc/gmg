@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { processFieldVisibility, FieldVisibility } from '@/utils/render-function';
 import { EditField, EditFieldGroup } from '@/features/shared/models/crud-models';
 
@@ -37,7 +37,9 @@ export function useFieldVisibility({
     displayed: new Set(),
     hidden: new Set(),
   });
-  const [visibleFields, setVisibleFields] = useState<{ mainFields: EditField[]; fieldGroups: EditFieldGroup[] }>({
+  // Note: We're using useMemo for visibleFields calculation to avoid unnecessary state updates
+  // The visibleFields state is kept for backward compatibility but will be overridden by the return value
+  const [visibleFields] = useState<{ mainFields: EditField[]; fieldGroups: EditFieldGroup[] }>({
     mainFields: [],
     fieldGroups: [],
   });
@@ -78,27 +80,36 @@ export function useFieldVisibility({
       }
       return visibility;
     });
-
-    // Update visible fields based on new visibility
-    setVisibleFields(prevVisibleFields => {
-      // Check if the visible fields have actually changed
-      const newMainFields = mainFields.filter(field => visibility.displayed.has(field.id));
-      const newFieldGroups = fieldGroups.map(group => ({
-        ...group,
-        fields: group.fields.filter(field => visibility.displayed.has(field.id))
-      }));
-
-      // Only return new object if there are actual changes
-      if (areVisibleFieldsEqual(prevVisibleFields, { mainFields: newMainFields, fieldGroups: newFieldGroups })) {
-        return prevVisibleFields;
-      }
-
-      return {
-        mainFields: newMainFields,
-        fieldGroups: newFieldGroups
-      };
-    });
   }, [formRenderFunction, currentFieldValues, getAllFields, mainFields, fieldGroups]);
+
+  // Memoize the visible fields calculation to prevent unnecessary recalculations
+  const calculatedVisibleFields = useMemo(() => {
+    if (!formRenderFunction) {
+      // If no render function, show all fields
+      return {
+        mainFields,
+        fieldGroups
+      };
+    }
+
+    const allFields = getAllFields();
+    const visibility = processFieldVisibility(
+      formRenderFunction,
+      allFields,
+      currentFieldValues
+    );
+
+    const newMainFields = mainFields.filter(field => visibility.displayed.has(field.id));
+    const newFieldGroups = fieldGroups.map(group => ({
+      ...group,
+      fields: group.fields.filter(field => visibility.displayed.has(field.id))
+    }));
+
+    return {
+      mainFields: newMainFields,
+      fieldGroups: newFieldGroups
+    };
+  }, [formRenderFunction, mainFields, fieldGroups, currentFieldValues, getAllFields]);
 
   // Helper function to compare FieldVisibility objects
   const areFieldVisibilityEqual = useCallback((a: FieldVisibility, b: FieldVisibility) => {
@@ -156,7 +167,7 @@ export function useFieldVisibility({
 
 
   return {
-    visibleFields,
+    visibleFields: calculatedVisibleFields,
     fieldVisibility,
     updateFieldValues,
     currentFieldValues,

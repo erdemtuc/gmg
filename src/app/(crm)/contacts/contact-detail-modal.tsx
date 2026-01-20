@@ -380,14 +380,19 @@ export function ContactDetailModal() {
 
   useEffect(() => {
     if (idFromUrl && (!isOpen || contactId !== idFromUrl)) {
+      // Clean up contact_add_type parameter when opening contact detail modal
+      const sp = new URLSearchParams(Array.from(params.entries()));
+      if (sp.has("contact_add_type")) {
+        sp.delete("contact_add_type");
+        router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+      }
       openContact(idFromUrl);
     }
     if (!idFromUrl && isOpen) {
       // URL no longer has contact param; ensure modal closes
       closeStore();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idFromUrl]);
+  }, [idFromUrl, isOpen, contactId, openContact, closeStore, params, router, pathname]);
 
   const handleClose = () => {
     const sp = new URLSearchParams(Array.from(params.entries()));
@@ -424,7 +429,7 @@ export function ContactDetailModal() {
       width="min(1200px, 90vw)"
       hideCloseButton
     >
-      <div className="flex h-full max-h-[calc(90vh-2rem)] flex-col overflow-y-auto">
+      <div className="flex flex-col h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)]">
         {/* Modal header with search and actions */}
         <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4">
           {/* Search Bar */}
@@ -583,7 +588,7 @@ export function ContactDetailModal() {
         </div>
 
         {/* Contact header and content */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-y-auto">
           {/* Left Column - Main Content */}
           <div className="flex flex-1 flex-col border-r border-gray-200 px-6 py-4">
             {/* Contact Title - Full information */}
@@ -756,7 +761,7 @@ export function ContactDetailModal() {
           </div>
 
           {/* Right Column - Tasks & Activities */}
-          <div className="flex w-1/3 flex-col border-l border-gray-200 bg-gray-50">
+          <div className="flex w-1/3 flex-col border-l border-gray-200 bg-gray-50 overflow-y-auto">
             {/* Tabs */}
             <div className="flex flex-shrink-0 border-b border-gray-200 px-4 py-0">
               {visibleSections.files && (
@@ -788,7 +793,7 @@ export function ContactDetailModal() {
             </div>
 
             {/* Tab Content */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-4 overflow-y-auto">
               {activeTab === "files" && visibleSections.files && (
                 <FilesTabContent />
               )}
@@ -827,3 +832,4 @@ function ActionButton({
     </button>
   );
 }
+

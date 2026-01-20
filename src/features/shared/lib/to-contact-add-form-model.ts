@@ -71,11 +71,28 @@ function mapToEditField(line: LineApiModel): EditField | null {
 
   if (line.fid) {
     if (!line.unit) {
-      throw new Error("Unit is required");
+      // If no unit is specified, treat as text field
+      return {
+        id,
+        type: "text",
+        name: String(line.label || id),
+        label: line.label,
+        isMulti: line.multi === 1,
+        value: line.value ?? null,
+      };
     }
+
     const type = mapType(line.unit);
     if (!type) {
-      return null;
+      // If the unit type isn't recognized, default to text
+      return {
+        id,
+        type: "text",
+        name: String(line.label || id),
+        label: line.label,
+        isMulti: line.multi === 1,
+        value: line.value ?? null,
+      };
     }
 
     if (!line.label) {
@@ -83,10 +100,15 @@ function mapToEditField(line: LineApiModel): EditField | null {
     }
     const name = line.label!;
 
-    if (OptionRequiredTypes.includes(type) && !line.options) {
-      throw new Error("Options are required");
+    let options = undefined;
+    if (OptionRequiredTypes.includes(type)) {
+      if (!line.options) {
+        // If options are required but not provided, create a default empty array
+        options = [];
+      } else {
+        options = mapOptions(line);
+      }
     }
-    const options = mapOptions(line);
 
     return {
       id,
@@ -181,7 +203,144 @@ function mapToEditField(line: LineApiModel): EditField | null {
         options: mapOptions(line),
         value: line.value ?? null,
       };
+    case "FulNmxConn":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "Person's Name",
+        value: line.value ?? null,
+      };
+    case "typeContact":
+      return {
+        id,
+        type: "select",
+        name: id,
+        label: line.label || "Person Type",
+        options: mapOptions(line),
+        value: line.value ?? null,
+      };
+    case "email":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "Email",
+        value: line.value ?? null,
+      };
+    case "organizationContact":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "Working for",
+        value: line.value ?? null,
+      };
+    case "jobTitle":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "Job Title",
+        value: line.value ?? null,
+      };
+    case "address":
+      return {
+        id,
+        type: "textarea",
+        name: id,
+        label: line.label || "Address",
+        value: line.value ?? null,
+      };
+    case "city":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "City",
+        value: line.value ?? null,
+      };
+    case "state":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "State",
+        value: line.value ?? null,
+      };
+    case "country":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "Country",
+        value: line.value ?? null,
+      };
+    case "zip":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "ZIP Code",
+        value: line.value ?? null,
+      };
+    case "notes":
+      return {
+        id,
+        type: "textarea",
+        name: id,
+        label: line.label || "Notes",
+        value: line.value ?? null,
+      };
+    case "position":
+      return {
+        id,
+        type: "text",
+        name: id,
+        label: line.label || "Actual Location",
+        value: line.value ?? null,
+      };
     default:
+      // Handle fields that have a label but weren't matched by specific cases
+      if (line.label) {
+        // Determine type based on unit property
+        let type: EditFieldType = "text"; // default type
+
+        if (line.unit) {
+          switch (line.unit) {
+            case "radio":
+              type = "radio";
+              break;
+            case "list":
+              type = "select";
+              break;
+            case "textarea":
+              type = "textarea";
+              break;
+            case "number":
+              type = "number";
+              break;
+            case "checkbox":
+              type = "checkbox";
+              break;
+            case "datetime-local":
+              type = "datetime-local";
+              break;
+            default:
+              type = "text";
+          }
+        }
+
+        return {
+          id,
+          type,
+          name: String(id),
+          label: line.label,
+          options: type === "select" || type === "radio" ? mapOptions(line) : undefined,
+          isMulti: line.multi === 1,
+          value: line.value ?? null,
+        };
+      }
       return null;
   }
 }
@@ -203,6 +362,20 @@ function mapType(type: string): EditFieldType | null {
       return "radio";
     case "list":
       return "select";
+    case "textarea":
+      return "textarea";
+    case "checkbox":
+      return "checkbox";
+    case "datetime-local":
+      return "datetime-local";
+    case "tuser":
+      return "select"; // Map tuser to select since it's typically a user selection
+    case "contact":
+      return "select"; // Map contact to select since it's typically a contact selection
+    case "note":
+      return "textarea"; // Map note to textarea
+    case "button":
+      return "select"; // Map button to select since it's typically a selection
     default:
       return null;
   }

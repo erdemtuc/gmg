@@ -81,8 +81,7 @@ export function ContactAddModal() {
     ) {
       openContactAdd(typeFromUrlValidated);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [typeFromUrlValidated]);
+  }, [typeFromUrlValidated, isOpen, activeType, openContactAdd]);
 
   const handleClose = () => {
     const sp = new URLSearchParams(Array.from(params.entries()));
