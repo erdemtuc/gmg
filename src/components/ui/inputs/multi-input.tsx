@@ -44,7 +44,7 @@ export function MultiInput({ field, control }: MultiInputProps) {
                     {...controllerField}
                     placeholder={`Enter ${label}...`}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center">
+                  <div className="absolute inset-y-0 right-0 flex items-center space-x-1">
                     {fields.length > 1 && (
                       <button
                         type="button"
@@ -54,13 +54,23 @@ export function MultiInput({ field, control }: MultiInputProps) {
                         <Trash2 className="w-4 h-4" />
                       </button>
                     )}
-                    <button
-                      type="button"
-                      className="bg-blue-500 hover:bg-blue-600 text-white  m-1 rounded-sm"
-                      onClick={() => insert(index + 1, { value: "" })}
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                    {fields.length <= 1 && (
+                      // Placeholder to maintain consistent spacing when trash button is not shown
+                      <div className="w-6 h-6 m-1"></div>
+                    )}
+                    {index === fields.length - 1 && ( // Show add button only on the last row
+                      <button
+                        type="button"
+                        className="bg-blue-500 hover:bg-blue-600 text-white m-1 rounded-sm"
+                        onClick={() => insert(index + 1, { value: "" })}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    )}
+                    {index !== fields.length - 1 && (
+                      // Placeholder to maintain consistent spacing when add button is not shown
+                      <div className="w-6 h-6 m-1"></div>
+                    )}
                   </div>
                 </div>
               )}
