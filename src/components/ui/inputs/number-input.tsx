@@ -13,8 +13,8 @@ export function NumberInput({ field, control }: NumberInputProps) {
   const label = field.label || formatFieldLabel(String(field.name));
 
   return (
-    <div className="input-wrapper">
-      <label htmlFor={id} className="input-label">
+    <div className="input-wrapper border border-gray-300 rounded-md p-2">
+      <label htmlFor={id} className="input-label block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <Controller
@@ -24,7 +24,7 @@ export function NumberInput({ field, control }: NumberInputProps) {
           <input
             id={id}
             type="number"
-            className="input-field"
+            className="input-field w-full px-3 py-1 focus:outline-none"
             {...controllerField}
           />
         )}

@@ -106,14 +106,14 @@ export default function AccountMenu() {
         onClick={() => setOpen((v) => !v)}
         className="aria-[expanded=true]:bg-brand-primary-50 group hover:bg-brand-gray-50 inline-flex cursor-pointer items-center gap-3 rounded-md p-1 transition-colors"
       >
-        <span className="bg-brand-success-400 flex h-8 w-8 items-center justify-center rounded-full">
+        {/* <span className="bg-brand-success-400 flex h-8 w-8 items-center justify-center rounded-full">
           <span className="text-sm font-medium text-white">
             {userInfo.name
               .split(" ")
               .map((n) => n[0])
               .join("")}
           </span>
-        </span>
+        </span> */}
 
         <span className="inline-flex flex-col items-start gap-0.5 text-left">
           <span className="text-brand-gray-600 group-aria-[expanded=true]:text-brand-primary-500 text-sm leading-4 font-medium">

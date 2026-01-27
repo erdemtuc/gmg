@@ -25,9 +25,10 @@ export function MultiInput({ field, control }: MultiInputProps) {
   }
 
   return (
-    <div className="input-wrapper h-auto border border-gray-400 rounded-md p-2">
+    <div className={`input-wrapper ${fields.length > 1 ? 'h-auto' : 'max-h-[calc(85vh-2rem)]'} border border-gray-300 rounded-md p-1`}>
       <label htmlFor={id} className="input-label mb-2 block text-sm font-medium text-gray-700">
         {label}
+        {fields.length}
       </label>
       <div className="space-y-2">
         {fields.map((fieldItem, index) => (
@@ -40,15 +41,15 @@ export function MultiInput({ field, control }: MultiInputProps) {
                 <div className="relative">
                   <input
                     type={field.type === "datetime-local" ? "datetime-local" : "text"}
-                    className="input-field w-full px-3 py-2 pr-20 focus:outline-none"
+                    className="input-field w-full px-3 py-2 pr-24 focus:outline-none"
                     {...controllerField}
                     placeholder={`Enter ${label}...`}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center space-x-1">
+                  <div className="absolute inset-y-0 right-0 flex items-center space-x-1 pr-2">
                     {fields.length > 1 && (
                       <button
                         type="button"
-                        className="text-red-500 hover:text-red-700 p-1 m-1 rounded-full hover:bg-red-100"
+                        className={`text-red-500 hover:text-red-700 p-1 m-1 mb-2 ${index === fields.length - 1 ? 'rounded-full hover:bg-red-100 mr-3' : ''}`}
                         onClick={() => remove(index)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -61,7 +62,7 @@ export function MultiInput({ field, control }: MultiInputProps) {
                     {index === fields.length - 1 && ( // Show add button only on the last row
                       <button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-600 text-white m-1 rounded-sm"
+                        className="bg-blue-500 hover:bg-blue-600 text-white m-1 mb-2 rounded-sm"
                         onClick={() => insert(index + 1, { value: "" })}
                       >
                         <Plus className="w-4 h-4" />

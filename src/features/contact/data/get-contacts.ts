@@ -10,16 +10,15 @@ export async function getContacts(page: number): Promise<Contact[]> {
     },
   );
   return contacts.map((contact) => {
-    // Extract additional fields from Lines array, using label as the display name
-    const additionalFields = (contact.Lines || []).map((line: any) => {
-      // Use label if available, otherwise use fname or fid as fallback
-      const name = line.label || line.fname || line.fid || 'unknown';
-      const value = line.value !== undefined ? line.value : '';
-      return {
+    // Extract additional fields from Lines array
+    // Each line object has field names as keys and field values as values
+    const additionalFields = (contact.Lines || []).flatMap((lineObj: any) => {
+      // Convert each object in Lines array to an array of field objects
+      return Object.entries(lineObj).map(([name, value]: [string, any]) => ({
         name,
-        value,
-        multi: line.multi // Include the multi property to indicate if field supports multiple values
-      };
+        value: value !== undefined && value !== null ? value as string | number | boolean : null,
+        multi: undefined // Set multi to undefined since we don't have this info from the current structure
+      }));
     }).filter(field => field.name && field.name !== 'unknown'); // Filter out unknown fields
 
     return {
@@ -33,15 +32,7 @@ type ApiContact = {
   id: number;
   name: string;
   type: string;
-  Lines: Array<{
-    fname?: string;
-    fid?: string;
-    label?: string;
-    value: any;
-    unit?: string;
-    multi?: number;
-    alternativeLabel?: string;
-  }>;
+  Lines: Array<Record<string, any>>;
   createdAt: string;
   createdBy: string;
 };

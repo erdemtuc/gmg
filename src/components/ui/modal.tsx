@@ -38,12 +38,12 @@ export function Modal({
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+
+    // Focus the modal when it opens
     const t = requestAnimationFrame(() => panelRef.current?.focus());
+
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previousOverflow;
       cancelAnimationFrame(t);
     };
   }, [isOpen, onClose]);
@@ -66,8 +66,8 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         className={
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] " +
-          "max-h-[85vh] w-[calc(100%_-_32px)] rounded-xl bg-white text-[#000]" +
+          "absolute top-4 left-1/2 -translate-x-1/2  z-[101] " +
+          " w-[calc(100%_-_32px)] rounded-xl bg-white text-[#000]" +
           "shadow-[0_20px_50px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden" +
           (panelClassName ? " " + panelClassName : "")
         }
@@ -90,7 +90,7 @@ export function Modal({
             <Image src={CloseIcon || null} width={20} height={20} alt="" className="size-5" />
           </button>
         )}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden rounded-b-xl">
+        <div className="flex-1 rounded-b-xl">
           {children}
         </div>
       </div>

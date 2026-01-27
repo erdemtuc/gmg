@@ -102,7 +102,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
           </div>
         </button>
       </div>
-      <div className="left-menu__scroll scroll-thin mt-6 max-h-[calc(100vh-20rem)] min-h-0 w-full flex-1 overflow-y-auto pe-2 [scrollbar-gutter:stable]">
+      <div className="left-menu__scroll mt-6 min-h-0 w-full flex-1 pe-2">
         <ul className="flex min-h-0 w-full flex-1 flex-col items-start justify-start gap-1">
           {items.map((item) => {
             const isActive = isActiveItem(item.href);
@@ -136,7 +136,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
         </ul>
       </div>
       <div className="h-px bg-white/20 group-data-[collapsed=false]:w-full group-data-[collapsed=true]:w-11 group-data-[collapsed=true]:group-hover:w-full" />
-      <ul>
+      {/* <ul>
         <li
           data-active={isActiveItem("/page-wizard")}
           className="text-brand-primary-100 data-[active=true]:text-brand-white h-11 shrink-0 rounded-md px-0.5 pt-1 text-sm group-data-[collapsed=false]:w-full group-data-[collapsed=true]:w-11 group-data-[collapsed=true]:group-hover:w-full hover:hover:bg-white/10 data-[active=true]:bg-white/10"
@@ -165,7 +165,7 @@ export default function LeftMenu({ items }: { items: DynamicMenuItem[] }) {
             <RotateCcw className="size-5 group-data-[collapsed=true]:m-auto group-data-[collapsed=true]:group-hover:m-0" />
           </Link>
         </li>
-      </ul>
+      </ul> */}
     </nav>
   );
 }

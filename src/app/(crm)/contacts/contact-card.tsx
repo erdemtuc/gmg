@@ -57,18 +57,10 @@ export default function ContactCard({ contact }: { contact: Contact }) {
   const channel = getFieldValue('channel') || getFieldValue('source channel');
   const source = getFieldValue('source') || getFieldValue('lead source');
 
-  // Status indicators
-  const isActive = getFieldValue('status')?.toLowerCase().includes('active') ||
-                  getFieldValue('active') === 'true' ||
-                  getFieldValue('active') === 'yes';
-
-  const isCreditAppSigned = getFieldValue('credit app signed') === 'true' ||
-                           getFieldValue('credit app signed') === 'yes' ||
-                           getFieldValue('credit app status')?.toLowerCase().includes('signed');
-
-  const isDocVerificationCompleted = getFieldValue('document verification') === 'completed' ||
-                                    getFieldValue('doc verification') === 'completed' ||
-                                    getFieldValue('verification status')?.toLowerCase().includes('completed');
+  // Use all available fields from the API (not just specific status fields)
+  const displayFields = contact.additionalFields.filter(field =>
+    field.name && field.value && field.value.toString().trim() !== ''
+  );
 
   // Toggle active status handler
   const toggleActiveStatus = (e: React.MouseEvent) => {
@@ -148,39 +140,59 @@ export default function ContactCard({ contact }: { contact: Contact }) {
         {/* Separator: Primary header to Active/Inactive */}
         <div className="border-t border-brand-gray-100 my-3"></div>
 
-        {/* Two-column layout for status information */}
+        {/* Dynamic information from API */}
         <div className="grid grid-cols-2 gap-x-4 mb-4 relative">
           {/* Vertical divider line between columns */}
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 transform bg-brand-gray-100"></div>
 
-          {/* Column 1: Contains two status items */}
+          {/* Display available fields dynamically */}
           <div className="space-y-3 pr-2">
-            {/* Item 1: Active Status */}
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-brand-gray-600">Active:</span>
-                              <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                <span className="text-xs font-medium text-black">{isActive ? 'Active' : 'Inactive'}</span>
-                              </div>            </div>
-
-            {/* Item 2: Credit App Status */}
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-brand-gray-600">Credit App:</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-black">{isCreditAppSigned ? 'Signed' : 'Not Signed'}</span>
+            {displayFields.slice(0, 2).map((field, index) => (
+              <div key={field.name} className="flex items-center justify-between">
+                <span className="text-xs text-brand-gray-600 capitalize">{field.name}:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-black">{field.value?.toString()}</span>
+                </div>
               </div>
-            </div>
+            ))}
+            {/* Fill empty slots if less than 2 fields */}
+            {displayFields.length < 1 && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-brand-gray-600">Info:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-black">N/A</span>
+                </div>
+              </div>
+            )}
+            {displayFields.length < 2 && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-brand-gray-600">Info:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-black">N/A</span>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Column 2: Contains one status item */}
+          {/* Second column for remaining fields */}
           <div className="space-y-3 pl-2">
-            {/* Item 3: Document Verification */}
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-brand-gray-600">Doc Verified:</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-black">{isDocVerificationCompleted ? 'Yes' : 'No'}</span>
+            {displayFields.slice(2, 3).map((field) => (
+              <div key={field.name} className="flex items-center justify-between">
+                <span className="text-xs text-brand-gray-600 capitalize">{field.name}:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-black">{field.value?.toString()}</span>
+                </div>
               </div>
-            </div>
+            ))}
+            {/* Fill empty slot if less than 3 fields */}
+            {displayFields.length < 3 && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-brand-gray-600">Info:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-black">N/A</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -264,7 +276,7 @@ export default function ContactCard({ contact }: { contact: Contact }) {
             e.stopPropagation();
             setIsExpanded(!isExpanded);
           }}
-          className="text-brand-gray-500 hover:text-brand-gray-700"
+          className="text-blue-600 hover:text-brand-gray-700 border-1 p-0.5 border-brand-gray-200 rounded-full"
         >
           <ChevronDown
             size={16}

@@ -13,8 +13,8 @@ export function TextareaInput({ field, control }: TextareaInputProps) {
   const label = field.label || formatFieldLabel(String(field.name));
 
   return (
-    <div className="input-wrapper h-auto">
-      <label htmlFor={id} className="input-label">
+    <div className="input-wrapper h-auto border border-gray-300 rounded-md p-2">
+      <label htmlFor={id} className="input-label block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <Controller
@@ -24,7 +24,7 @@ export function TextareaInput({ field, control }: TextareaInputProps) {
           <textarea
             id={id}
             rows={3}
-            className="input-field h-auto resize-none"
+            className="input-field w-full resize-none py-1 px-3 focus:outline-none"
             {...controllerField}
           />
         )}

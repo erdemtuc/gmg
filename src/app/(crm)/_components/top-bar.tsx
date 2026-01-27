@@ -27,12 +27,12 @@ export default function TopBar() {
         <div className="bg-brand-primary-100 text-brand-primary-500 rounded px-2 py-0.5 text-sm font-medium">
           3
         </div>
-        <div>
+        {/* <div>
           <HelpCircle
             className="text-brand-gray-500 size-4"
             aria-hidden
           />
-        </div>
+        </div> */}
         <AccountMenu />
       </div>
     </div>

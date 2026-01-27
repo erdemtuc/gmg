@@ -13,8 +13,8 @@ export function TextInput({ field, control }: TextInputProps) {
   const label = field.label || formatFieldLabel(String(field.name));
 
   return (
-    <div className="input-wrapper">
-      <label htmlFor={id} className="input-label">
+    <div className="input-wrapper border border-gray-300 rounded-md p-2">
+      <label htmlFor={id} className="input-label block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <Controller
@@ -24,7 +24,7 @@ export function TextInput({ field, control }: TextInputProps) {
           <input
             id={id}
             type={field.type === "datetime-local" ? "datetime-local" : "text"}
-            className="input-field border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="input-field w-full px-3 py-1 focus:outline-none"
             {...controllerField}
           />
         )}

@@ -221,7 +221,7 @@ export function ContactAddModal() {
       width="65.5rem"
       hideCloseButton
     >
-      <div className="flex flex-col max-h-[calc(85vh-2rem)] h-full rounded-b-xl overflow-y-auto">
+      <div className="flex flex-col h-full rounded-b-xl">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
@@ -342,10 +342,10 @@ export function ContactAddModal() {
           />
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col flex-1 min-h-0 overflow-hidden"
+            className="flex flex-col flex-1 min-h-0"
           >
-            {/* Scrollable content area - now handles overflow at the main container level */}
-            <div className="flex-1 min-h-0 overflow-x-hidden">
+            {/* Content area - now allows natural expansion */}
+            <div className="flex-1 min-h-0">
               {/* Contact header and sub collections */}
               <div className="border-brand-gray-100 flex border-y-1 flex-shrink-0">
                 {/* Contact header information */}
@@ -404,14 +404,14 @@ export function ContactAddModal() {
 
               {/* Main content area */}
               {visibleSections.details ? (
-                <div className="flex-1 overflow-y-auto scroll-thin scrollbar-on-white">
+                <div className="flex-1">
                   {/* Grouped details */}
                   {formQuery.status === "success" && (
                     <div
                       className={`details divide-brand-gray-200 ${
                         detailColumnsCount === 3 ? "grid grid-cols-3 w-full" :
                         detailColumnsCount === 2 ? "grid grid-cols-2 w-full" : "grid grid-cols-1 w-full"
-                      } scroll-thin scrollbar-on-white min-h-0 flex-1 gap-y-3 divide-x overflow-x-hidden overflow-y-auto pe-0 pt-0 pb-0 max-h-full`}
+                      } min-h-0 flex-1 gap-y-3 divide-x pe-0 pt-0 pb-0 overflow-x-hidden`}
                     >
                       {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
                         <div
