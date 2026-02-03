@@ -20,6 +20,7 @@ import {
   FormValues,
 } from "@/features/shared/models/crud-models";
 import { useFieldVisibility } from "@/utils/use-field-visibility";
+import { useModalSearch } from "@/hooks/use-modal-search";
 import { FilesTabContent } from "./files-tab-content";
 import { Search, UserPlus, Settings, X, History, LayoutGrid, Columns, Rows, Eye } from "lucide-react";
 
@@ -120,7 +121,7 @@ export function ContactAddModal() {
     formQuery.status !== "success"
       ? []
       : distributeGroupsToColumns(
-          visibleFields.fieldGroups,
+          visibleFields.fieldGroups || [],
           detailColumnsCount,
         );
 
@@ -197,6 +198,11 @@ export function ContactAddModal() {
     });
   }, [watchedValues, updateFieldValues]);
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Search functionality - moved after visibleFields is defined
+  const { searchTerm, setSearchTerm, filteredData } = useModalSearch(formQuery.data, visibleFields);
+
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const onSubmit = async (values: FormValues) => {
@@ -221,16 +227,19 @@ export function ContactAddModal() {
       width="65.5rem"
       hideCloseButton
     >
-      <div className="flex flex-col h-full rounded-b-xl">
+      <div className="flex flex-col h-full rounded-b-xl ">
         {/* Modal header with search and actions */}
         <div className="flex items-center justify-between border-b border-gray-200 p-4 flex-shrink-0">
           {/* Search Bar */}
           <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white bg-gradient-to-r from-sky-100/0 to-sky-100 pl-2 ring-2 ring-blue-200">
             <Search className="size-4 text-zinc-400" aria-hidden />
             <input
+              ref={searchInputRef}
               type="text"
               className="text-height-1 h-full w-80 py-2 pr-1.5 pl-2 text-xs leading-0 font-normal text-gray-600 outline-none placeholder:text-gray-300"
-              placeholder="Search for anything..."
+              placeholder="Search for fields by label or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
@@ -369,16 +378,67 @@ export function ContactAddModal() {
                       {(formQuery.error as Error)?.message || "Failed to load"}
                     </div>
                   ) : formQuery.status === "success" ? (
-                    visibleFields.mainFields && visibleFields.mainFields.length > 0 ? (
-                      visibleFields.mainFields.map((field) => (
-                        <FieldResolver
-                          key={String(field.id)}
-                          field={field}
-                          control={form.control}
-                        />
-                      ))
+                    filteredData?.mainFields && filteredData.mainFields.length > 0 ? (
+                      (() => {
+                        // Find type and name fields
+                        const typeField = filteredData.mainFields.find(field => field.name.toLowerCase().includes('type') || field.id === 'type');
+                        const nameField = filteredData.mainFields.find(field => field.name.toLowerCase().includes('name') || field.id === 'name');
+
+                        // Separate other main fields
+                        const otherMainFields = filteredData.mainFields.filter(field =>
+                          field !== typeField && field !== nameField
+                        );
+
+                        return (
+                          <>
+                            {/* Render type and name fields side by side if both exist */}
+                            {typeField && nameField && (
+                              <div className="flex flex-row gap-4">
+                                <div className="w-1/5">
+                                  <FieldResolver
+                                    key={String(typeField.id)}
+                                    field={{
+                                      ...typeField,
+                                      label: typeField.label || 'Type', // Ensure proper label
+                                      // Override options to show friendly labels while preserving actual values
+                                      options: typeField.options?.map((opt: any) => {
+                                        // Change only the display value, keep the id as the form value
+                                        const displayValue = opt.id === 'O' ? 'Company' :
+                                                           opt.id === 'P' ? 'Person' : opt.value;
+                                        return {
+                                          ...opt,
+                                          value: displayValue  // This is what gets displayed
+                                        };
+                                      }) || typeField.options
+                                    }}
+                                    control={form.control}
+                                  />
+                                </div>
+                                <div className="w-4/5">
+                                  <FieldResolver
+                                    key={String(nameField.id)}
+                                    field={nameField}
+                                    control={form.control}
+                                  />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Render remaining main fields */}
+                            {otherMainFields.map((field) => (
+                              <FieldResolver
+                                key={String(field.id)}
+                                field={field}
+                                control={form.control}
+                              />
+                            ))}
+                          </>
+                        );
+                      })()
                     ) : (
-                      <div className="text-gray-500 text-sm">No main fields available</div>
+                      <div className="text-gray-500 text-sm">
+                        {searchTerm ? "No matching fields found" : "No main fields available"}
+                      </div>
                     )
                   ) : (
                     <div className="text-gray-500 text-sm">No main fields available</div>
@@ -413,37 +473,52 @@ export function ContactAddModal() {
                         detailColumnsCount === 2 ? "grid grid-cols-2 w-full" : "grid grid-cols-1 w-full"
                       } min-h-0 flex-1 gap-y-3 divide-x pe-0 pt-0 pb-0 overflow-x-hidden`}
                     >
-                      {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
-                        <div
-                          key={`col-${colIdx}`}
-                          className="flex flex-col gap-3 px-4"
-                        >
-                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                            <section
-                              key={`${group.groupTitle}-${idx}`}
-                              className="flex flex-col gap-3"
+                      {filteredData?.fieldGroups && filteredData.fieldGroups.length > 0 ? (
+                        Array.from({ length: detailColumnsCount }).map((_, colIdx) => {
+                          // Distribute filtered groups to columns
+                          const filteredGroups = filteredData.fieldGroups || [];
+                          const groupsPerColumn = Math.ceil(filteredGroups.length / detailColumnsCount);
+                          const startIdx = colIdx * groupsPerColumn;
+                          const endIdx = Math.min(startIdx + groupsPerColumn, filteredGroups.length);
+                          const columnGroups = filteredGroups.slice(startIdx, endIdx);
+
+                          return (
+                            <div
+                              key={`col-${colIdx}`}
+                              className="flex flex-col gap-3 px-4"
                             >
-                              <h3 className="text-brand-gray-600 text-sm font-medium">
-                                {group.groupTitle}
-                              </h3>
-                              <ul className="flex flex-col gap-3">
-                                {group.fields.map((field, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="flex flex-row justify-between text-xs"
-                                  >
-                                    <FieldResolver
-                                      key={String(field.id)}
-                                      field={field}
-                                      control={form.control}
-                                    />
-                                  </li>
-                                ))}
-                              </ul>
-                            </section>
-                          ))}
+                              {columnGroups.map((group, idx) => (
+                                <section
+                                  key={`${group.groupTitle}-${idx}`}
+                                  className="flex flex-col gap-3"
+                                >
+                                  <h3 className="text-brand-gray-600 text-sm font-medium">
+                                    {group.groupTitle}
+                                  </h3>
+                                  <ul className="flex flex-col gap-3">
+                                    {group.fields.map((field, idx) => (
+                                      <li
+                                        key={idx}
+                                        className="flex flex-row justify-between text-xs"
+                                      >
+                                        <FieldResolver
+                                          key={String(field.id)}
+                                          field={field}
+                                          control={form.control}
+                                        />
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </section>
+                              ))}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="col-span-full px-4 py-8 text-center text-gray-500">
+                          {searchTerm ? "No matching fields found" : "No grouped fields available"}
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
                 </div>

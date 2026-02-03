@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Control, Controller, FieldValues, useFieldArray } from "react-hook-form";
 import { EditField } from "@/features/shared/models/crud-models";
 import { formatFieldLabel } from "@/utils/format-label";
@@ -19,14 +20,37 @@ export function MultiInput({ field, control }: MultiInputProps) {
     name: name,
   });
 
+  // State to track field values
+  const [fieldValues, setFieldValues] = useState<{ [key: number]: string }>({});
+
   // Initialize with one empty field if no fields exist
   if (fields.length === 0) {
     append({ value: "" });
   }
 
+  // Update field values when fields change
+  useEffect(() => {
+    const newValues: { [key: number]: string } = {};
+    fields.forEach((_, index) => {
+      // Initialize with empty string if not present
+      if (!(index in fieldValues)) {
+        newValues[index] = "";
+      } else {
+        newValues[index] = fieldValues[index];
+      }
+    });
+    setFieldValues(newValues);
+  }, [fields, fieldValues]);
+
+  // Check if any of the previous fields (not the last one) are empty
+  const hasEmptyPreviousFields = fields.slice(0, -1).some((_, idx) => {
+    const fieldValue = fieldValues[idx] || "";
+    return !fieldValue || fieldValue.trim() === "";
+  });
+
   return (
     <div className={`input-wrapper ${fields.length > 1 ? 'h-auto' : 'max-h-[calc(85vh-2rem)]'} border border-gray-300 rounded-md p-1`}>
-      <label htmlFor={id} className="input-label mb-2 block text-sm font-medium text-gray-700">
+      <label htmlFor={id} className="input-label">
         {label}
         {fields.length}
       </label>
@@ -43,7 +67,15 @@ export function MultiInput({ field, control }: MultiInputProps) {
                     type={field.type === "datetime-local" ? "datetime-local" : "text"}
                     className="input-field w-full px-3 py-2 pr-24 focus:outline-none"
                     {...controllerField}
-                    placeholder={`Enter ${label}...`}
+                    value={controllerField.value || ""}
+                    onChange={(e) => {
+                      controllerField.onChange(e);
+                      // Update our local state to track the value
+                      setFieldValues(prev => ({
+                        ...prev,
+                        [index]: e.target.value
+                      }));
+                    }}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center space-x-1 pr-2">
                     {fields.length > 1 && (
@@ -62,8 +94,9 @@ export function MultiInput({ field, control }: MultiInputProps) {
                     {index === fields.length - 1 && ( // Show add button only on the last row
                       <button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-600 text-white m-1 mb-2 rounded-sm"
-                        onClick={() => insert(index + 1, { value: "" })}
+                        className={`bg-blue-500 hover:bg-blue-600 text-white m-1 mb-2 rounded-sm ${hasEmptyPreviousFields ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onClick={() => !hasEmptyPreviousFields && insert(index + 1, { value: "" })}
+                        disabled={hasEmptyPreviousFields}
                       >
                         <Plus className="w-4 h-4" />
                       </button>

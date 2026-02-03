@@ -9,7 +9,9 @@ import { ContactDetail, ContactTask } from "@/features/shared/models/contact-cru
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import EditIcon from "@/components/ui/edit-icon";
+import { EditFieldGroup } from "@/features/shared/models/crud-models";
 import { useState, useRef, useEffect as useReactEffect } from "react";
+import { useModalSearch } from "@/hooks/use-modal-search";
 import { FilesTabContent } from "./files-tab-content";
 import {
   UserPlus,
@@ -361,6 +363,10 @@ export function ContactDetailModal() {
     tasks: true,
   });
   const layoutMenuRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Search functionality
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Close layout menu when clicking outside
   useReactEffect(() => {
@@ -405,9 +411,13 @@ export function ContactDetailModal() {
 
   const handleEdit = () => {
     if (contactId) {
-      // Close the detail modal first
-      closeStore();
-      // Then open the edit modal
+      // Update the URL parameters to switch to the edit modal
+      const sp = new URLSearchParams(Array.from(params.entries()));
+      sp.delete("contact_id"); // Remove the contact detail parameter
+      sp.set("contact_edit_id", contactId); // Add the contact edit parameter
+      router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+
+      // Also update the store state to reflect the change
       openContactEdit(contactId);
     }
   };
@@ -421,6 +431,24 @@ export function ContactDetailModal() {
     staleTime: 30_000,
     gcTime: 2 * 60_000,
   });
+
+  // Filter function for detail modal
+  const filterFields = (groups: any[] | undefined) => {
+    if (!searchTerm || !groups) return groups || [];
+
+    const term = searchTerm.toLowerCase();
+    return groups.map((group: any) => {
+      const filteredFields = group.fields?.filter((field: any) =>
+        field.name?.toLowerCase().includes(term) ||
+        String(field.value || '').toLowerCase().includes(term)
+      ) || [];
+
+      return {
+        ...group,
+        fields: filteredFields
+      };
+    }).filter((group: any) => group.fields?.length > 0); // Only keep groups that have matching fields
+  };
 
   return (
     <Modal
@@ -436,9 +464,12 @@ export function ContactDetailModal() {
           <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white bg-gradient-to-r from-sky-100/0 to-sky-100 pl-2 ring-2 ring-blue-200">
             <Search className="size-4 text-zinc-400" aria-hidden />
             <input
+              ref={searchInputRef}
               type="text"
               className="text-height-1 h-full w-80 py-2 pr-1.5 pl-2 text-xs leading-0 font-normal text-gray-600 outline-none placeholder:text-gray-300"
-              placeholder="Search for anything..."
+              placeholder="Search for fields by label or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
@@ -589,7 +620,7 @@ export function ContactDetailModal() {
 
         {/* Contact header and content */}
         <div className="flex flex-1">
-          {/* Left Column - Main Content */}
+          {/* Left Column - Main Content (all content) */}
           <div className="flex flex-1 flex-col border-r border-gray-200 px-6 py-4">
             {/* Contact Title - Full information */}
             <div className="mb-6">
@@ -625,128 +656,73 @@ export function ContactDetailModal() {
               </p>
             </div>
 
-            {/* Details - Multi-column layout */}
+            {/* Details - Single column layout */}
             {visibleSections.details &&
               detailQuery.status === "success" &&
               detailQuery.data?.fieldGroups && (
-                <div className="relative flex gap-x-8">
-                  {/* Left Column */}
-                  <div className="flex flex-1 flex-col">
-                    {(detailQuery.data?.fieldGroups || [])
-                      .slice(
-                        0,
-                        Math.ceil(
-                          (detailQuery.data?.fieldGroups || []).length / 2,
-                        ),
-                      )
-                      .map((group, idx) => (
-                        <section
-                          key={`${group.groupTitle}-${idx}`}
-                          className="relative mb-8 flex flex-col"
-                        >
-                          <h3 className="mb-4 text-sm font-semibold text-gray-900">
-                            {group.groupTitle}
-                          </h3>
-                          <div className="flex flex-col gap-3">
-                            {(group.fields || [])
-                              .filter((field) => {
-                                // Filter out empty values
-                                if (
-                                  field.value === null ||
-                                  field.value === undefined ||
-                                  field.value === ""
-                                ) {
-                                  return false;
-                                }
-                                // Filter out empty arrays
-                                if (
-                                  Array.isArray(field.value) &&
-                                  field.value.length === 0
-                                ) {
-                                  return false;
-                                }
-                                return true;
-                              })
-                              .map((field, fieldIdx) => (
-                                <div
-                                  key={fieldIdx}
-                                  className="flex items-start justify-between gap-4"
-                                >
-                                  <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
-                                    {field.name}
-                                  </span>
-                                  <span className="ml-auto flex-1 text-right text-sm break-words text-gray-900">
-                                    <FieldValue
-                                      value={field.value}
-                                      isMulti={field.multi === 1}
-                                    />
-                                  </span>
-                                </div>
-                              ))}
-                          </div>
-                        </section>
-                      ))}
-                  </div>
+                <div className="relative">
+                  {detailQuery.data.fieldGroups && filterFields(detailQuery.data.fieldGroups).length === 0 && searchTerm ? (
+                    <div className="w-full py-8 text-center text-gray-500">
+                      No matching fields found
+                    </div>
+                  ) : (
+                    <>
+                      {/* Single Column for all fields */}
+                      <div className="flex flex-col">
+                        {(() => {
+                          const filteredGroups = filterFields(detailQuery.data.fieldGroups);
 
-                  {/* Vertical Separator */}
-                  <div className="w-px bg-gray-200"></div>
-
-                  {/* Right Column */}
-                  <div className="flex flex-1 flex-col">
-                    {(detailQuery.data?.fieldGroups || [])
-                      .slice(
-                        Math.ceil(
-                          (detailQuery.data?.fieldGroups || []).length / 2,
-                        ),
-                      )
-                      .map((group, idx) => (
-                        <section
-                          key={`${group.groupTitle}-${idx}`}
-                          className="relative mb-8 flex flex-col"
-                        >
-                          <h3 className="mb-4 text-sm font-semibold text-gray-900">
-                            {group.groupTitle}
-                          </h3>
-                          <div className="flex flex-col gap-3">
-                            {(group.fields || [])
-                              .filter((field) => {
-                                // Filter out empty values
-                                if (
-                                  field.value === null ||
-                                  field.value === undefined ||
-                                  field.value === ""
-                                ) {
-                                  return false;
-                                }
-                                // Filter out empty arrays
-                                if (
-                                  Array.isArray(field.value) &&
-                                  field.value.length === 0
-                                ) {
-                                  return false;
-                                }
-                                return true;
-                              })
-                              .map((field, fieldIdx) => (
-                                <div
-                                  key={fieldIdx}
-                                  className="flex items-start justify-between gap-4"
-                                >
-                                  <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
-                                    {field.name}
-                                  </span>
-                                  <span className="ml-auto flex-1 text-right text-sm break-words text-gray-900">
-                                    <FieldValue
-                                      value={field.value}
-                                      isMulti={field.multi === 1}
-                                    />
-                                  </span>
-                                </div>
-                              ))}
-                          </div>
-                        </section>
-                      ))}
-                  </div>
+                          return filteredGroups.map((group, idx) => (
+                            <section
+                              key={`${group.groupTitle}-${idx}`}
+                              className="relative mb-8 flex flex-col"
+                            >
+                              <h3 className="mb-4 text-sm font-semibold text-gray-900">
+                                {group.groupTitle}
+                              </h3>
+                              <div className="flex flex-col gap-3">
+                                {(group.fields || [])
+                                  .filter((field: any) => {
+                                    // Filter out empty values
+                                    if (
+                                      field.value === null ||
+                                      field.value === undefined ||
+                                      field.value === ""
+                                    ) {
+                                      return false;
+                                    }
+                                    // Filter out empty arrays
+                                    if (
+                                      Array.isArray(field.value) &&
+                                      field.value.length === 0
+                                    ) {
+                                      return false;
+                                    }
+                                    return true;
+                                  })
+                                  .map((field: any, fieldIdx: number) => (
+                                    <div
+                                      key={fieldIdx}
+                                      className="flex items-start justify-between gap-4"
+                                    >
+                                      <span className="min-w-[40%] flex-shrink-0 text-sm text-gray-600">
+                                        {field.name}
+                                      </span>
+                                      <span className="ml-auto flex-1 text-right text-sm break-words text-gray-900">
+                                        <FieldValue
+                                          value={field.value}
+                                          isMulti={field.isMulti === 1}
+                                        />
+                                      </span>
+                                    </div>
+                                  ))}
+                              </div>
+                            </section>
+                          ));
+                        })()}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -760,46 +736,54 @@ export function ContactDetailModal() {
             )}
           </div>
 
-          {/* Right Column - Tasks & Activities */}
-          <div className="flex w-1/3 flex-col border-l border-gray-200 bg-gray-50">
-            {/* Tabs */}
-            <div className="flex flex-shrink-0 border-b border-gray-200 px-4 py-0">
-              {visibleSections.files && (
-                <button
-                  type="button"
-                  className={`px-2 pt-4 pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                    activeTab === "files"
-                      ? "border-b-2 border-blue-600 text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setActiveTab("files")}
-                >
-                  Files & Images
-                </button>
-              )}
-              {visibleSections.tasks && (
-                <button
-                  type="button"
-                  className={`px-2 pt-4 pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                    activeTab === "tasks"
-                      ? "border-b-2 border-blue-600 text-gray-900"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setActiveTab("tasks")}
-                >
-                  Tasks & Activities
-                </button>
-              )}
+          {/* Right Side - Two Columns for Tabs */}
+          <div className="flex flex-1">
+            {/* Files & Images Column */}
+            <div className="flex flex-1 flex-col border-r border-gray-200 bg-gray-50">
+              <div className="flex flex-shrink-0 border-b border-gray-200 px-4 py-0">
+                {visibleSections.files && (
+                  <button
+                    type="button"
+                    className={`px-2 pt-4 pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "files"
+                        ? "border-b-2 border-blue-600 text-gray-900"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("files")}
+                  >
+                    Files & Images
+                  </button>
+                )}
+              </div>
+              <div className="flex-1 p-4">
+                {activeTab === "files" && visibleSections.files && (
+                  <FilesTabContent />
+                )}
+              </div>
             </div>
 
-            {/* Tab Content */}
-            <div className="flex-1 p-4">
-              {activeTab === "files" && visibleSections.files && (
-                <FilesTabContent />
-              )}
-              {activeTab === "tasks" && visibleSections.tasks && (
-                <TasksTabContent contactId={contactId} />
-              )}
+            {/* Tasks & Activities Column */}
+            <div className="flex flex-1 flex-col bg-gray-50">
+              <div className="flex flex-shrink-0 border-b border-gray-200 px-4 py-0">
+                {visibleSections.tasks && (
+                  <button
+                    type="button"
+                    className={`px-2 pt-4 pb-3 text-sm font-medium transition-colors focus:outline-none ${
+                      activeTab === "tasks"
+                        ? "border-b-2 border-blue-600 text-gray-900"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("tasks")}
+                  >
+                    Tasks & Activities
+                  </button>
+                )}
+              </div>
+              <div className="flex-1 p-4">
+                {activeTab === "tasks" && visibleSections.tasks && (
+                  <TasksTabContent contactId={contactId} />
+                )}
+              </div>
             </div>
           </div>
         </div>

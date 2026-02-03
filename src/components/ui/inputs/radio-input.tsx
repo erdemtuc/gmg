@@ -18,7 +18,7 @@ export function RadioInput({ field, control }: RadioInputProps) {
 
   return (
     <div className="input-wrapper h-auto min-h-10">
-      <div className="input-label mb-2">{label}</div>
+      <div className="input-label">{label}</div>
       <Controller
         name={name}
         control={control}

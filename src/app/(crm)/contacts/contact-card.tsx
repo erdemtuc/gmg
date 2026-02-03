@@ -145,9 +145,9 @@ export default function ContactCard({ contact }: { contact: Contact }) {
           {/* Vertical divider line between columns */}
           <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 transform bg-brand-gray-100"></div>
 
-          {/* Display available fields dynamically */}
+          {/* Display available fields dynamically - showing only 1 row by default */}
           <div className="space-y-3 pr-2">
-            {displayFields.slice(0, 2).map((field, index) => (
+            {displayFields.slice(0, 1).map((field, index) => (
               <div key={field.name} className="flex items-center justify-between">
                 <span className="text-xs text-brand-gray-600 capitalize">{field.name}:</span>
                 <div className="flex items-center gap-2">
@@ -155,16 +155,8 @@ export default function ContactCard({ contact }: { contact: Contact }) {
                 </div>
               </div>
             ))}
-            {/* Fill empty slots if less than 2 fields */}
+            {/* Fill empty slot if less than 1 field */}
             {displayFields.length < 1 && (
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-brand-gray-600">Info:</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-black">N/A</span>
-                </div>
-              </div>
-            )}
-            {displayFields.length < 2 && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-brand-gray-600">Info:</span>
                 <div className="flex items-center gap-2">
@@ -176,7 +168,7 @@ export default function ContactCard({ contact }: { contact: Contact }) {
 
           {/* Second column for remaining fields */}
           <div className="space-y-3 pl-2">
-            {displayFields.slice(2, 3).map((field) => (
+            {displayFields.slice(1, 2).map((field) => (
               <div key={field.name} className="flex items-center justify-between">
                 <span className="text-xs text-brand-gray-600 capitalize">{field.name}:</span>
                 <div className="flex items-center gap-2">
@@ -184,8 +176,8 @@ export default function ContactCard({ contact }: { contact: Contact }) {
                 </div>
               </div>
             ))}
-            {/* Fill empty slot if less than 3 fields */}
-            {displayFields.length < 3 && (
+            {/* Fill empty slot if less than 2 fields */}
+            {displayFields.length < 2 && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-brand-gray-600">Info:</span>
                 <div className="flex items-center gap-2">
@@ -197,74 +189,35 @@ export default function ContactCard({ contact }: { contact: Contact }) {
         </div>
       </div>
 
-            {/* Expanded section */}
+            {/* Expanded section - showing remaining additional fields */}
             {isExpanded && (
               <div className="px-4 pb-4">
-                <div className="grid grid-cols-2 gap-x-4 relative pt-4"> {/* Added relative and pt-4 */}
+                <div className="grid grid-cols-2 gap-x-4 relative pt-4">
                   {/* Vertical divider */}
                   <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 transform bg-brand-gray-100"></div>
-      
-                  {/* Expanded Column 1 */}
+
+                  {/* Remaining additional fields - Column 1 (first half of remaining fields) */}
                   <div className="space-y-3 pr-2">
-                    {webPage && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-brand-gray-600">Web Page:</span>
-                        <button
-                          onClick={(e) => handleWebPageAction('open', e)}
-                          className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center" // Added flex items-center
-                        >
-                          {webPage} <ExternalLink className="inline-block h-3 w-3 ml-1" />
-                        </button>
-                      </div>
-                    )}
-      
-                    {channel && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-brand-gray-600">Channel:</span>
+                    {displayFields.slice(2, 2 + Math.ceil((displayFields.length - 2) / 2)).map((field, index) => (
+                      <div key={field.name + index} className="flex items-center justify-between">
+                        <span className="text-xs text-brand-gray-600 capitalize">{field.name}:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-black">{channel}</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigator.clipboard.writeText(channel);
-                            }}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            <Copy className="h-3 w-3" />
-                          </button>
+                          <span className="text-xs font-medium text-black">{field.value?.toString()}</span>
                         </div>
                       </div>
-                    )}
-      
-                    {source && (
-                      <div className="flex items-start justify-between">
-                        <span className="text-sm text-brand-gray-600">Source:</span>
-                        <div className="flex flex-wrap gap-1 justify-end">
-                          {source.split(',').map((item, idx) => (
-                            <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                              {item.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    ))}
                   </div>
-      
-                  {/* Expanded Column 2 */}
+
+                  {/* Remaining additional fields - Column 2 (second half of remaining fields) */}
                   <div className="space-y-3 pl-2">
-                    {getFieldValue('web search') && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-brand-gray-600">Web Search:</span>
-                        <span className="text-sm font-medium text-black">{getFieldValue('web search')}</span>
+                    {displayFields.slice(2 + Math.ceil((displayFields.length - 2) / 2)).map((field, index) => (
+                      <div key={field.name + index} className="flex items-center justify-between">
+                        <span className="text-xs text-brand-gray-600 capitalize">{field.name}:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-black">{field.value?.toString()}</span>
+                        </div>
                       </div>
-                    )}
-      
-                    {getFieldValue('unk') && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-brand-gray-600">UNK:</span>
-                        <span className="text-sm font-medium text-black">{getFieldValue('unk')}</span>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>

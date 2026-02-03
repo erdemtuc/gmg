@@ -246,10 +246,10 @@ export function ActivityDetailModal() {
         </div>
 
         {/* Activity header and sub collections */}
-        <div className="border-brand-gray-100 flex border-y-1 min-h-0">
-          {/* Activity header information */}
+        <div className="flex flex-1 min-h-0">
+          {/* Activity header information - Left Column */}
           {visibleSections.details && (
-            <div className="flex basis-2/3 flex-col gap-6 p-4 overflow-y-auto">
+            <div className="flex flex-1 flex-col gap-6 p-4 overflow-y-auto border-r border-gray-200">
               {detailQuery.status === "pending" && (
                 <div className="text-brand-gray-400 text-xs">Loading…</div>
               )}
@@ -286,41 +286,35 @@ export function ActivityDetailModal() {
                       </div>
                     </div>
 
-                    {/* Grouped details */}
-                    <div
-                      className={`details divide-brand-gray-200 grid ${
-                        detailColumnsCount === 2 ? "grid-cols-2" : detailColumnsCount === 3 ? "grid-cols-3" : "grid-cols-1"
-                      } gap-y-3 divide-x`}
-                    >
-                      {Array.from({ length: detailColumnsCount }).map((_, colIdx) => (
-                        <div key={`col-${colIdx}`} className="flex flex-col gap-3 px-4">
-                          {(detailColumns[colIdx] ?? []).map((group, idx) => (
-                            <section
-                              key={`${group.groupTitle}-${idx}`}
-                              className="flex flex-col gap-3"
-                            >
-                              <h3 className="text-brand-gray-600 text-sm font-medium">
-                                {group.groupTitle}
-                              </h3>
-                              <ul className="flex flex-col gap-3">
-                                {group.fields.map((field, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="flex flex-row justify-between text-xs"
-                                  >
-                                    <span className="text-brand-gray-400">
-                                      {field.label || formatFieldLabel(field.name)}
-                                    </span>
-                                    <span className="text-brand-gray-600">
-                                      {String(field.value ?? "—")}
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </section>
-                          ))}
-                        </div>
-                      ))}
+                    {/* Grouped details - Single column layout */}
+                    <div className="details flex flex-col gap-3">
+                      {detailQuery.status === "success" && detailQuery.data.fieldGroups && (
+                        detailQuery.data.fieldGroups.map((group, idx) => (
+                          <section
+                            key={`${group.groupTitle}-${idx}`}
+                            className="flex flex-col gap-3"
+                          >
+                            <h3 className="text-brand-gray-600 text-sm font-medium">
+                              {group.groupTitle}
+                            </h3>
+                            <ul className="flex flex-col gap-3">
+                              {group.fields.map((field, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex flex-row justify-between text-xs"
+                                >
+                                  <span className="text-brand-gray-400">
+                                    {field.label || formatFieldLabel(field.name)}
+                                  </span>
+                                  <span className="text-brand-gray-600">
+                                    {String(field.value ?? "—")}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </section>
+                        ))
+                      )}
                     </div>
                   </div>
                 </>
@@ -328,51 +322,56 @@ export function ActivityDetailModal() {
             </div>
           )}
 
-          {/* Activity sub collections */}
-          {(visibleSections.files || visibleSections.tasks) && (
-            <div className="bg-brand-gray-50 basis-1/3 p-4 flex flex-col min-h-0">
-              <div className="flex items-center gap-6 border-b border-gray-200">
-                {visibleSections.files && (
-                  <button 
+          {/* Right Side - Two Columns for Tabs */}
+          <div className="flex flex-1">
+            {/* Files & Images Column */}
+            {visibleSections.files && (
+              <div className="flex flex-1 flex-col bg-gray-50 border-r border-gray-200">
+                <div className="flex items-center gap-6 border-b border-gray-200 p-4 flex-shrink-0">
+                  <button
                     type="button"
                     onClick={() => setActiveTab("files")}
                     className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                      activeTab === "files" 
-                        ? "border-b-2 border-blue-600 text-gray-900 font-bold" 
+                      activeTab === "files"
+                        ? "border-b-2 border-blue-600 text-gray-900 font-bold"
                         : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
                     }`}
                   >
                     Files & Images
                   </button>
+                </div>
+                {visibleSections.files && activeTab === "files" && (
+                  <div className="flex-1 p-4 overflow-y-auto">
+                    <FilesTabContent />
+                  </div>
                 )}
-                {visibleSections.tasks && (
-                  <button 
+              </div>
+            )}
+
+            {/* Tasks & Activities Column */}
+            {visibleSections.tasks && (
+              <div className="flex flex-1 flex-col bg-gray-50">
+                <div className="flex items-center gap-6 border-b border-gray-200 p-4 flex-shrink-0">
+                  <button
                     type="button"
                     onClick={() => setActiveTab("tasks")}
                     className={`pb-3 text-sm font-medium transition-colors focus:outline-none ${
-                      activeTab === "tasks" 
-                        ? "border-b-2 border-blue-600 text-gray-900 font-bold" 
+                      activeTab === "tasks"
+                        ? "border-b-2 border-blue-600 text-gray-900 font-bold"
                         : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
                     }`}
                   >
                     Task & Activities
                   </button>
+                </div>
+                {visibleSections.tasks && activeTab === "tasks" && (
+                  <div className="flex-1 p-4 overflow-y-auto">
+                    <TasksTabContent />
+                  </div>
                 )}
               </div>
-
-              {visibleSections.files && activeTab === "files" && (
-                <div className="mt-4">
-                  <FilesTabContent />
-                </div>
-              )}
-
-              {visibleSections.tasks && activeTab === "tasks" && (
-                <div className="mt-4 max-h-[300px] overflow-y-auto pr-1">
-                  <TasksTabContent />
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </Modal>

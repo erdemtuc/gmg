@@ -14,7 +14,7 @@ export function TextInput({ field, control }: TextInputProps) {
 
   return (
     <div className="input-wrapper border border-gray-300 rounded-md p-2">
-      <label htmlFor={id} className="input-label block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={id} className="input-label">
         {label}
       </label>
       <Controller
